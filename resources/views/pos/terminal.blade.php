@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $posPoint->name }} - نقطة البيع</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    <link href="{{ asset('assets/fonts/almarai/almarai.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}">
     <style>
         * {
             margin: 0;
@@ -1215,7 +1213,7 @@
                 '<html dir="rtl">' +
                 '<head>' +
                 '<meta charset="UTF-8">' +
-                '<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">' +
+                '<link href="{{ asset("assets/fonts/cairo/cairo.css") }}" rel="stylesheet">' +
                 '<title>فاتورة</title>' +
                 '<style>' +
                 '@page{margin:0;size:80mm auto;}' +

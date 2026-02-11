@@ -8,7 +8,7 @@
 @endsection
 
 @push('styles')
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+<link href="{{ asset('assets/plugins/tom-select/tom-select.bootstrap5.min.css') }}" rel="stylesheet">
 <style>
     .orders-table {
         border-radius: 12px;
@@ -838,7 +838,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+<script src="{{ asset('assets/plugins/tom-select/tom-select.complete.min.js') }}"></script>
 <script>
 let currentPage = 1;
 let currentOrderId = null;

@@ -831,7 +831,7 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="{{ asset('assets/plugins/apexcharts/apexcharts.min.js') }}"></script>
 <script>
 let currentPage = 1;
 let specialCurrentPage = 1;
