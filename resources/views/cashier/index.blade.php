@@ -1388,6 +1388,7 @@
                     },
                     body: JSON.stringify({
                         order_id: orderId,
+                        discount: discount,
                         payments: payments.map(p => ({
                             payment_method_id: p.payment_method_id,
                             amount: p.amount

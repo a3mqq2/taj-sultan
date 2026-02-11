@@ -292,12 +292,13 @@ class CashierController extends Controller
     {
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
+            'discount' => 'nullable|numeric|min:0|max:5',
             'payments' => 'required|array|min:1',
             'payments.*.payment_method_id' => 'required|exists:payment_methods,id',
             'payments.*.amount' => 'required|numeric|min:0.001',
         ]);
 
-        $order = Order::find($validated['order_id']);
+        $order = Order::with('items')->find($validated['order_id']);
 
         if ($order->status === 'paid') {
             return response()->json([
@@ -313,9 +314,13 @@ class CashierController extends Controller
             ], 400);
         }
 
+        $discount = $validated['discount'] ?? 0;
+        $grossTotal = $order->items->sum('total');
+        $expectedTotal = $grossTotal - $discount;
+
         $totalPayments = array_sum(array_column($validated['payments'], 'amount'));
 
-        if (abs($totalPayments - $order->total) > 0.001) {
+        if (abs($totalPayments - $expectedTotal) > 0.001) {
             return response()->json([
                 'success' => false,
                 'message' => 'مجموع المدفوعات لا يساوي الإجمالي',
@@ -323,7 +328,7 @@ class CashierController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($order, $validated, $totalPayments) {
+            DB::transaction(function () use ($order, $validated, $totalPayments, $discount, $expectedTotal) {
                 foreach ($validated['payments'] as $payment) {
                     OrderPayment::create([
                         'order_id' => $order->id,
@@ -337,6 +342,8 @@ class CashierController extends Controller
                     'paid_at' => now(),
                     'paid_by' => auth()->id(),
                     'amount_received' => $totalPayments,
+                    'discount' => $discount,
+                    'total' => $expectedTotal,
                 ]);
             });
 
@@ -350,8 +357,8 @@ class CashierController extends Controller
                 ];
             });
 
+            $grossTotal = $order->items->sum('total');
             $discount = $order->discount ?? 0;
-            $grossTotal = $order->total + $discount;
 
             return response()->json([
                 'success' => true,
