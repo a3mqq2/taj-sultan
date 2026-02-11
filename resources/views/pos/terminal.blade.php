@@ -1214,66 +1214,17 @@
                 '<head>' +
                 '<meta charset="UTF-8">' +
                 '<link href="{{ asset("assets/fonts/cairo/cairo.css") }}" rel="stylesheet">' +
-                '<title>فاتورة</title>' +
+                '<title>ستيكر</title>' +
                 '<style>' +
-                '@page{margin:0;size:80mm auto;}' +
+                '@page{margin:0;}' +
                 '*{margin:0;padding:0;box-sizing:border-box;}' +
-                'body{font-family:"Cairo",sans-serif;font-size:14px;line-height:1.5;padding:10px;width:80mm;color:#000;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
-                '.logo{text-align:center;padding:12px 0;border-bottom:2px solid #000;}' +
-                '.logo img{height:110px;margin-bottom:10px;filter:grayscale(100%) contrast(1.4);}' +
-                '.shop-name{font-size:22px;font-weight:800;margin:5px 0;color:#000;}' +
-                '.divider{border-bottom:2px solid #000;margin:10px 0;}' +
-                '.info{padding:10px 0;background:#f0f0f0;}' +
-                '.info-row{display:flex;justify-content:space-between;padding:4px 8px;font-size:13px;font-weight:600;}' +
-                '.info-row span:first-child{font-weight:700;color:#000;}' +
-                'table{width:100%;border-collapse:collapse;margin:10px 0;}' +
-                'th{background:#000;color:#fff;padding:10px 5px;font-size:13px;font-weight:700;}' +
-                'th:first-child{text-align:right;}' +
-                'td{padding:10px 5px;border-bottom:1px solid #333;font-size:13px;font-weight:600;}' +
-                '.center{text-align:center;}' +
-                '.left{text-align:left;font-weight:700;}' +
-                '.total-section{background:#000;color:#fff;padding:14px;margin:10px 0;}' +
-                '.total-row{display:flex;justify-content:space-between;font-size:24px;font-weight:800;}' +
-                '.barcode{text-align:center;padding:15px 0;margin:10px 0;background:#fff;}' +
-                '.barcode svg{max-width:100%;}' +
-                '.cashier-notice{text-align:center;padding:14px;margin:10px 0;border:3px solid #000;font-size:16px;font-weight:700;background:#f5f5f5;}' +
-                '.thanks{text-align:center;font-size:18px;font-weight:700;padding:15px 0;border-top:2px solid #000;margin-top:10px;}' +
-                '.footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px;}' +
-                '.footer img{height:35px;filter:grayscale(100%) contrast(1.3);}' +
-                '.footer p{font-size:12px;font-weight:700;color:#000;}' +
+                'body{font-family:"Cairo",sans-serif;display:flex;align-items:center;justify-content:center;padding:2mm;-webkit-print-color-adjust:exact;print-color-adjust:exact;}' +
+                '.barcode{text-align:center;}' +
+                '.barcode svg{max-width:100%;height:auto;}' +
                 '</style>' +
                 '</head>' +
                 '<body>' +
-                '<div class="logo">' +
-                '<img src="{{ asset("logo-dark.png") }}" alt="Logo">' +
-                '<div class="shop-name">{{ $posPoint->name }}</div>' +
-                '</div>' +
-                '<div class="info">' +
-                '<div class="info-row"><span>رقم الطلب:</span><span>#' + orderNumber + '</span></div>' +
-                '<div class="info-row"><span>التاريخ:</span><span>' + dateStr + '</span></div>' +
-                '<div class="info-row"><span>الوقت:</span><span>' + timeStr + '</span></div>' +
-                (currentUserName ? '<div class="info-row"><span>الموظف:</span><span>' + currentUserName + '</span></div>' : '') +
-                '</div>' +
-                '<div class="divider"></div>' +
-                '<table>' +
-                '<thead><tr>' +
-                '<th>الصنف</th>' +
-                '<th class="center">الكمية</th>' +
-                '<th class="center">السعر</th>' +
-                '<th class="left">المجموع</th>' +
-                '</tr></thead>' +
-                '<tbody>' + itemsHtml + '</tbody>' +
-                '</table>' +
-                '<div class="total-section">' +
-                '<div class="total-row"><span>الإجمالي</span><span>' + total.toFixed(3) + ' د.ل</span></div>' +
-                '</div>' +
                 '<div class="barcode">' + barcodeSvg + '</div>' +
-                '<div class="cashier-notice">يرجى التوجه للكاشير</div>' +
-                '<div class="thanks">شكراً لزيارتكم</div>' +
-                '<div class="footer">' +
-                '<img src="{{ asset("hulul.jpg") }}" alt="Hulul">' +
-                '<p>حلول لتقنية المعلومات</p>' +
-                '</div>' +
                 '</body>' +
                 '</html>';
 
@@ -1282,7 +1233,11 @@
             printWindow.document.close();
             setTimeout(function() {
                 printWindow.focus();
-                printWindow.print();
+                if (window.printer && window.printer.print) {
+                    window.printer.print();
+                } else {
+                    printWindow.print();
+                }
                 printWindow.close();
             }, 250);
 

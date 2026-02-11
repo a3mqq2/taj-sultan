@@ -298,14 +298,22 @@
     </div>
 
     <div class="no-print">
-        <button onclick="window.print()">طباعة</button>
+        <button onclick="silentPrint()">طباعة</button>
         <button onclick="window.close()">إغلاق</button>
     </div>
 
     <script>
+        function silentPrint() {
+            if (window.printer && window.printer.print) {
+                window.printer.print();
+            } else {
+                window.print();
+            }
+        }
+
         window.onload = function() {
             setTimeout(function() {
-                window.print();
+                silentPrint();
             }, 300);
         };
     </script>

@@ -290,12 +290,17 @@ class CashierController extends Controller
 
     public function pay(Request $request)
     {
+        $isCredit = $request->boolean('is_credit');
+
         $validated = $request->validate([
             'order_id' => 'required|exists:orders,id',
             'discount' => 'nullable|numeric|min:0|max:5',
-            'payments' => 'required|array|min:1',
+            'payments' => $isCredit ? 'nullable|array' : 'required|array|min:1',
             'payments.*.payment_method_id' => 'required|exists:payment_methods,id',
-            'payments.*.amount' => 'required|numeric|min:0.001',
+            'payments.*.amount' => 'required|numeric|min:0',
+            'is_credit' => 'nullable|boolean',
+            'customer_id' => 'required_if:is_credit,true|nullable|exists:customers,id',
+            'paid_amount' => 'nullable|numeric|min:0',
         ]);
 
         $order = Order::with('items')->find($validated['order_id']);
@@ -318,23 +323,45 @@ class CashierController extends Controller
         $grossTotal = $order->items->sum('total');
         $expectedTotal = $grossTotal - $discount;
 
-        $totalPayments = array_sum(array_column($validated['payments'], 'amount'));
+        $payments = $validated['payments'] ?? [];
+        $totalPayments = array_sum(array_column($payments, 'amount'));
 
-        if (abs($totalPayments - $expectedTotal) > 0.001) {
+        if (!$isCredit) {
+            if (empty($payments) || $totalPayments <= 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'يجب إدخال مبلغ الدفع',
+                ], 400);
+            }
+
+            if (abs($totalPayments - $expectedTotal) > 0.001) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'مجموع المدفوعات لا يساوي الإجمالي',
+                ], 400);
+            }
+        }
+
+        if ($isCredit && $totalPayments > $expectedTotal) {
             return response()->json([
                 'success' => false,
-                'message' => 'مجموع المدفوعات لا يساوي الإجمالي',
+                'message' => 'المبلغ المدفوع أكبر من الإجمالي',
             ], 400);
         }
 
+        $creditAmount = $isCredit ? ($expectedTotal - $totalPayments) : 0;
+        $customerId = $isCredit ? $validated['customer_id'] : null;
+
         try {
-            DB::transaction(function () use ($order, $validated, $totalPayments, $discount, $expectedTotal) {
-                foreach ($validated['payments'] as $payment) {
-                    OrderPayment::create([
-                        'order_id' => $order->id,
-                        'payment_method_id' => $payment['payment_method_id'],
-                        'amount' => $payment['amount'],
-                    ]);
+            DB::transaction(function () use ($order, $payments, $totalPayments, $discount, $expectedTotal, $isCredit, $creditAmount, $customerId) {
+                foreach ($payments as $payment) {
+                    if ($payment['amount'] > 0) {
+                        OrderPayment::create([
+                            'order_id' => $order->id,
+                            'payment_method_id' => $payment['payment_method_id'],
+                            'amount' => $payment['amount'],
+                        ]);
+                    }
                 }
 
                 $order->update([
@@ -344,11 +371,18 @@ class CashierController extends Controller
                     'amount_received' => $totalPayments,
                     'discount' => $discount,
                     'total' => $expectedTotal,
+                    'customer_id' => $customerId,
+                    'credit_amount' => $creditAmount,
                 ]);
+
+                if ($isCredit && $creditAmount > 0 && $customerId) {
+                    $customer = Customer::find($customerId);
+                    $customer->addCreditOrderTransaction($creditAmount, $order->id, auth()->id());
+                }
             });
 
             $order->refresh();
-            $order->load(['payments.paymentMethod', 'items']);
+            $order->load(['payments.paymentMethod', 'items', 'customer']);
 
             $paymentsData = $order->payments->map(function ($payment) {
                 return [
@@ -368,6 +402,8 @@ class CashierController extends Controller
                     'gross_total' => $grossTotal,
                     'discount' => $discount,
                     'total' => $order->total,
+                    'credit_amount' => $order->credit_amount,
+                    'customer_name' => $order->customer ? $order->customer->name : null,
                     'payments' => $paymentsData,
                     'paid_at' => $order->paid_at->format('Y-m-d H:i'),
                     'cashier_name' => auth()->user()->name,
@@ -383,6 +419,7 @@ class CashierController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
+            \Log::error('pay error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ أثناء تسجيل الدفع',
@@ -809,5 +846,186 @@ class CashierController extends Controller
             ->findOrFail($id);
 
         return view('cashier.special-order-print', compact('order'));
+    }
+
+    public function searchCustomers(Request $request)
+    {
+        $search = $request->get('q', '');
+
+        $customers = Customer::where('is_active', true)
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get()
+            ->map(function ($customer) {
+                return [
+                    'id' => $customer->id,
+                    'name' => $customer->name,
+                    'phone' => $customer->phone,
+                    'balance' => $customer->balance,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $customers,
+        ]);
+    }
+
+    public function createQuickCustomer(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+        ]);
+
+        $customer = Customer::create([
+            'name' => $validated['name'],
+            'phone' => $validated['phone'] ?? null,
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+                'balance' => 0,
+            ],
+        ]);
+    }
+
+    public function customersPage()
+    {
+        $paymentMethods = PaymentMethod::active()->ordered()->get();
+
+        return view('cashier.customers', compact('paymentMethods'));
+    }
+
+    public function customersData(Request $request)
+    {
+        $search = $request->get('search', '');
+
+        $customers = Customer::where('is_active', true)
+            ->when($search, function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->get()
+            ->map(function ($customer) {
+                return [
+                    'id' => $customer->id,
+                    'name' => $customer->name,
+                    'phone' => $customer->phone,
+                    'balance' => $customer->balance,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $customers,
+        ]);
+    }
+
+    public function customerDetails(Customer $customer)
+    {
+        $creditOrders = $customer->orders()
+            ->where('credit_amount', '>', 0)
+            ->with('items')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'total' => $order->total,
+                    'credit_amount' => $order->credit_amount,
+                    'created_at' => $order->created_at->format('Y-m-d H:i'),
+                ];
+            });
+
+        $transactions = $customer->transactions()
+            ->with('paymentMethod')
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'type' => $transaction->type,
+                    'type_name' => $transaction->type === 'payment' ? 'تسديد' : 'دين',
+                    'amount' => $transaction->amount,
+                    'balance_after' => $transaction->balance_after,
+                    'payment_method' => $transaction->paymentMethod ? $transaction->paymentMethod->name : null,
+                    'created_at' => $transaction->created_at->format('Y-m-d H:i'),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $customer->id,
+                'name' => $customer->name,
+                'phone' => $customer->phone,
+                'balance' => $customer->balance,
+                'credit_orders' => $creditOrders,
+                'transactions' => $transactions,
+            ],
+        ]);
+    }
+
+    public function payDebt(Request $request, Customer $customer)
+    {
+        $validated = $request->validate([
+            'amount' => 'required|numeric|min:0.001',
+            'payment_method_id' => 'required|exists:payment_methods,id',
+        ]);
+
+        $currentBalance = $customer->balance;
+
+        if ($currentBalance >= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يوجد دين على هذا الزبون',
+            ], 400);
+        }
+
+        $debtAmount = abs($currentBalance);
+        if ($validated['amount'] > $debtAmount + 0.001) {
+            return response()->json([
+                'success' => false,
+                'message' => 'المبلغ أكبر من الدين المتبقي',
+            ], 400);
+        }
+
+        try {
+            $customer->addPayment(
+                $validated['amount'],
+                $validated['payment_method_id'],
+                auth()->id()
+            );
+
+            $customer->refresh();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $customer->id,
+                    'name' => $customer->name,
+                    'new_balance' => $customer->balance,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('payDebt error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء تسجيل الدفعة',
+            ], 500);
+        }
     }
 }

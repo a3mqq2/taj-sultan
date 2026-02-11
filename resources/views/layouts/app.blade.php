@@ -986,5 +986,15 @@
             to { transform: rotate(360deg); }
         }
         </style>
+
+        <script>
+        function silentPrint() {
+            if (window.printer && window.printer.print) {
+                window.printer.print();
+            } else {
+                window.print();
+            }
+        }
+        </script>
     </body>
 </html>

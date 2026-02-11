@@ -32,6 +32,16 @@ class Customer extends Model
         return $this->hasMany(SpecialOrder::class)->orderBy('created_at', 'desc');
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class)->orderBy('created_at', 'desc');
+    }
+
+    public function creditOrders()
+    {
+        return $this->orders()->where('credit_amount', '>', 0);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
@@ -104,8 +114,26 @@ class Customer extends Model
         ]);
     }
 
+    public function addCreditOrderTransaction($creditAmount, $orderId, $userId)
+    {
+        $balanceBefore = $this->balance;
+        $balanceAfter = $balanceBefore - $creditAmount;
+
+        return $this->transactions()->create([
+            'type' => CustomerTransaction::TYPE_ORDER,
+            'amount' => $creditAmount,
+            'balance_before' => $balanceBefore,
+            'balance_after' => $balanceAfter,
+            'reference_type' => Order::class,
+            'reference_id' => $orderId,
+            'user_id' => $userId,
+        ]);
+    }
+
     public function canDelete()
     {
-        return $this->transactions()->count() === 0 && $this->specialOrders()->count() === 0;
+        return $this->transactions()->count() === 0
+            && $this->specialOrders()->count() === 0
+            && $this->orders()->count() === 0;
     }
 }

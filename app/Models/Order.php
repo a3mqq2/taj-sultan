@@ -12,7 +12,9 @@ class Order extends Model
         'order_number',
         'pos_point_id',
         'user_id',
+        'customer_id',
         'total',
+        'credit_amount',
         'discount',
         'status',
         'paid_at',
@@ -25,6 +27,7 @@ class Order extends Model
     {
         return [
             'total' => 'decimal:3',
+            'credit_amount' => 'decimal:3',
             'discount' => 'decimal:3',
             'amount_received' => 'decimal:3',
             'paid_at' => 'datetime',
@@ -34,6 +37,11 @@ class Order extends Model
     public function posPoint(): BelongsTo
     {
         return $this->belongsTo(PosPoint::class);
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
 
     public function user(): BelongsTo
@@ -76,6 +84,11 @@ class Order extends Model
         return $query->where('status', 'cancelled');
     }
 
+    public function scopeHasCredit($query)
+    {
+        return $query->where('credit_amount', '>', 0);
+    }
+
     public function isPending(): bool
     {
         return $this->status === 'pending';
@@ -84,6 +97,11 @@ class Order extends Model
     public function isPaid(): bool
     {
         return $this->status === 'paid';
+    }
+
+    public function hasCredit(): bool
+    {
+        return $this->credit_amount > 0;
     }
 
     public function markAsPaid(int $paidBy): void

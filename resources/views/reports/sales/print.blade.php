@@ -217,8 +217,16 @@
     </div>
 
     <script>
+        function silentPrint() {
+            if (window.printer && window.printer.print) {
+                window.printer.print();
+            } else {
+                window.print();
+            }
+        }
+
         window.onload = function() {
-            window.print();
+            silentPrint();
         };
     </script>
 </body>

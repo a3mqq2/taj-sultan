@@ -7,6 +7,7 @@
     <title>الكاشير - {{ config('app.name') }}</title>
     <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('assets/plugins/tabler-icons/tabler-icons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.css') }}">
     <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
     <style>
         * {
@@ -329,6 +330,26 @@
             color: #fff;
         }
 
+        .pm-btn.credit-btn {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border-color: #ea580c;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .pm-btn.credit-btn:hover {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+            border-color: #c2410c;
+        }
+
+        .pm-btn.credit-btn.selected {
+            background: linear-gradient(135deg, #c2410c, #9a3412);
+            border-color: #9a3412;
+        }
+
         .added-payments {
             padding: 12px;
             border-top: 1px solid #e2e8f0;
@@ -629,6 +650,52 @@
             display: none !important;
         }
 
+        .swal2-popup.swal-rtl {
+            font-family: 'Cairo', sans-serif !important;
+            direction: rtl !important;
+            border-radius: 16px !important;
+            padding: 24px !important;
+        }
+
+        .swal2-popup .swal-title-rtl {
+            font-family: 'Cairo', sans-serif !important;
+            font-size: 20px !important;
+            font-weight: 700 !important;
+            line-height: 1.6 !important;
+        }
+
+        .swal2-popup .swal2-html-container {
+            font-family: 'Cairo', sans-serif !important;
+            margin: 16px 0 !important;
+        }
+
+        .swal2-actions {
+            flex-direction: row-reverse !important;
+            gap: 12px !important;
+            margin-top: 16px !important;
+        }
+
+        .swal2-confirm, .swal2-cancel {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+            font-size: 15px !important;
+            padding: 10px 24px !important;
+            border-radius: 8px !important;
+            min-width: 100px !important;
+        }
+
+        .swal2-icon {
+            margin: 0 auto 16px !important;
+        }
+
+        .swal2-container {
+            z-index: 99999 !important;
+        }
+
+        .swal2-backdrop-show {
+            background: transparent !important;
+        }
+
         .weight-tag {
             display: inline-flex;
             align-items: center;
@@ -712,6 +779,10 @@
         <div class="header">
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan"></div>
             <div class="header-left">
+                <a href="{{ route('cashier.customers') }}" class="special-order-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);">
+                    <i class="ti ti-users"></i>
+                    الزبائن والديون
+                </a>
                 <a href="{{ route('cashier.special-orders') }}" class="special-order-btn">
                     <i class="ti ti-cake"></i>
                     طلبيات خاصة
@@ -790,6 +861,10 @@
                                 {{ $method->name }}
                             </button>
                             @endforeach
+                            <button class="pm-btn credit-btn" id="creditBtn">
+                                <i class="ti ti-clock-dollar"></i>
+                                آجل
+                            </button>
                         </div>
                     </div>
 
@@ -857,6 +932,71 @@
         </div>
     </div>
 
+    <div class="modal" id="creditModal">
+        <div class="modal-content" style="max-width:450px;">
+            <div class="modal-header">
+                <div class="modal-title"><i class="ti ti-clock-dollar" style="color:#f97316;"></i> البيع بالآجل</div>
+                <button class="modal-close" id="closeCreditModal"><i class="ti ti-x"></i></button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">البحث عن زبون</label>
+                <input type="text" class="form-input" id="customerSearch" placeholder="اسم أو رقم هاتف..." style="font-size:14px;text-align:right;">
+            </div>
+
+            <div id="customerResults" style="max-height:150px;overflow-y:auto;margin-bottom:12px;"></div>
+
+            <div id="selectedCustomerBox" class="hidden" style="background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:12px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <div>
+                        <div style="font-weight:700;color:#15803d;" id="selectedCustomerName">-</div>
+                        <div style="font-size:12px;color:#64748b;" id="selectedCustomerPhone">-</div>
+                        <div style="font-size:12px;color:#dc2626;" id="selectedCustomerBalance">-</div>
+                    </div>
+                    <button type="button" class="modal-close" id="clearCustomer" style="width:28px;height:28px;"><i class="ti ti-x"></i></button>
+                </div>
+            </div>
+
+            <div id="newCustomerForm" class="hidden" style="background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;padding:12px;margin-bottom:12px;">
+                <div style="font-weight:700;color:#92400e;margin-bottom:8px;"><i class="ti ti-user-plus"></i> إضافة زبون جديد</div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label class="form-label">الاسم *</label>
+                    <input type="text" class="form-input" id="newCustomerName" placeholder="اسم الزبون" style="font-size:14px;text-align:right;">
+                </div>
+                <div class="form-group" style="margin-bottom:8px;">
+                    <label class="form-label">الهاتف</label>
+                    <input type="text" class="form-input" id="newCustomerPhone" placeholder="رقم الهاتف" style="font-size:14px;text-align:right;">
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <button type="button" class="modal-btn" id="saveNewCustomer" style="flex:1;background:#22c55e;color:#fff;">حفظ الزبون</button>
+                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelNewCustomer" style="flex:0;">إلغاء</button>
+                </div>
+            </div>
+
+            <button type="button" class="modal-btn" id="showNewCustomerForm" style="width:100%;background:#fef3c7;color:#92400e;border:2px dashed #f59e0b;margin-bottom:12px;">
+                <i class="ti ti-user-plus"></i> إضافة زبون جديد
+            </button>
+
+            <div style="border-top:1px solid #e2e8f0;padding-top:12px;">
+                <div class="form-group">
+                    <label class="form-label">المبلغ المدفوع</label>
+                    <input type="number" class="form-input" id="creditPaidAmount" step="0.001" min="0" placeholder="0.000">
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:8px;background:#fef2f2;border-radius:6px;margin-bottom:12px;">
+                    <span style="color:#991b1b;font-weight:600;">المبلغ الآجل:</span>
+                    <span style="color:#dc2626;font-weight:800;" id="creditRemainingAmount">0.000</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" id="cancelCreditModal">إلغاء</button>
+                <button class="modal-btn" id="confirmCredit" style="background:#f97316;color:#fff;" disabled>
+                    <i class="ti ti-check"></i> حفظ البيع بالآجل
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const WEIGHT_PREFIX = '99';
         const MAX_DISCOUNT = 5;
@@ -866,6 +1006,8 @@
         let payments = [];
         let selectedMethod = null;
         let discount = 0;
+        let selectedCustomer = null;
+        let isCredit = false;
 
         document.addEventListener('DOMContentLoaded', init);
 
@@ -890,6 +1032,25 @@
             });
 
             document.addEventListener('keydown', handleGlobalKeys);
+
+            document.getElementById('creditBtn').addEventListener('click', openCreditModal);
+            document.getElementById('closeCreditModal').addEventListener('click', closeCreditModal);
+            document.getElementById('cancelCreditModal').addEventListener('click', closeCreditModal);
+            document.getElementById('customerSearch').addEventListener('input', debounce(searchCustomers, 300));
+            document.getElementById('clearCustomer').addEventListener('click', clearSelectedCustomer);
+            document.getElementById('showNewCustomerForm').addEventListener('click', showNewCustomerForm);
+            document.getElementById('cancelNewCustomer').addEventListener('click', hideNewCustomerForm);
+            document.getElementById('saveNewCustomer').addEventListener('click', saveNewCustomer);
+            document.getElementById('creditPaidAmount').addEventListener('input', updateCreditRemaining);
+            document.getElementById('confirmCredit').addEventListener('click', processCreditPayment);
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
         }
 
         function handleGlobalKeys(e) {
@@ -920,13 +1081,17 @@
             if (!hasItems) return;
 
             const confirm = await Swal.fire({
-                title: 'إلغاء الأصناف',
-                text: 'هل تريد إلغاء جميع الأصناف؟',
-                icon: 'warning',
+                title: '<i class="ti ti-trash" style="color:#ef4444;font-size:28px;"></i><br>إلغاء الأصناف',
+                html: '<div style="font-family:Cairo,sans-serif;direction:rtl;">هل تريد إلغاء جميع الأصناف؟</div>',
                 showCancelButton: true,
-                confirmButtonText: 'نعم، إلغاء',
+                confirmButtonText: '<i class="ti ti-x"></i> نعم، إلغاء',
                 cancelButtonText: 'لا',
-                confirmButtonColor: '#ef4444'
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                customClass: {
+                    popup: 'swal-rtl',
+                    title: 'swal-title-rtl'
+                }
             });
 
             if (!confirm.isConfirmed) return;
@@ -1323,33 +1488,49 @@
 
             let paymentsHtml = '';
             payments.forEach(p => {
-                paymentsHtml += `<div style="display:flex;justify-content:space-between;padding:4px 0;"><span>${p.method_name}</span><span>${parseFloat(p.amount).toFixed(3)}</span></div>`;
+                paymentsHtml += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;"><span style="color:#64748b;">${p.method_name}</span><span style="font-weight:700;">${parseFloat(p.amount).toFixed(3)} د.ل</span></div>`;
             });
 
             const grossTotal = getGrossTotal();
             let discountHtml = '';
             if (discount > 0) {
-                discountHtml = `<div style="color:#f59e0b;"><strong>الخصم:</strong> -${discount.toFixed(3)} د.ل</div>`;
+                discountHtml = `
+                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
+                        <span style="color:#f59e0b;">الخصم</span>
+                        <span style="color:#f59e0b;font-weight:700;">-${discount.toFixed(3)} د.ل</span>
+                    </div>`;
             }
 
             const confirm = await Swal.fire({
-                title: 'تأكيد الدفع',
+                title: '<i class="ti ti-cash" style="color:#10b981;font-size:28px;"></i><br>تأكيد الدفع',
                 html: `
-                    <div style="text-align:right;font-size:14px;">
-                        <div style="margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #eee;">
-                            <strong>إجمالي الفاتورة:</strong> ${grossTotal.toFixed(3)} د.ل
+                    <div style="text-align:right;font-size:15px;direction:rtl;font-family:'Cairo',sans-serif;">
+                        <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
+                                <span style="color:#64748b;">إجمالي الفاتورة</span>
+                                <span style="font-weight:700;">${grossTotal.toFixed(3)} د.ل</span>
+                            </div>
                             ${discountHtml}
-                            <strong>الصافي:</strong> ${total.toFixed(3)} د.ل
+                            <div style="display:flex;justify-content:space-between;padding:8px 0;margin-top:4px;">
+                                <span style="font-weight:700;">الصافي</span>
+                                <span style="font-weight:800;font-size:16px;color:#10b981;">${total.toFixed(3)} د.ل</span>
+                            </div>
                         </div>
-                        <div style="font-weight:600;margin-bottom:4px;">المدفوعات:</div>
-                        ${paymentsHtml}
+                        <div style="background:#f0fdf4;border-radius:8px;padding:12px;">
+                            <div style="font-weight:700;margin-bottom:8px;color:#15803d;font-size:13px;">المدفوعات</div>
+                            ${paymentsHtml}
+                        </div>
                     </div>
                 `,
-                icon: 'question',
                 showCancelButton: true,
-                confirmButtonText: 'تأكيد',
+                confirmButtonText: '<i class="ti ti-check"></i> تأكيد الدفع',
                 cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#10b981'
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#64748b',
+                customClass: {
+                    popup: 'swal-rtl',
+                    title: 'swal-title-rtl'
+                }
             });
 
             if (!confirm.isConfirmed) return;
@@ -1439,7 +1620,305 @@
             if (win) {
                 win.document.write(html);
                 win.document.close();
-                setTimeout(() => { win.focus(); win.print(); win.close(); }, 250);
+                setTimeout(() => {
+                    win.focus();
+                    if (window.printer && window.printer.print) {
+                        window.printer.print();
+                    } else {
+                        win.print();
+                    }
+                    win.close();
+                }, 250);
+            }
+        }
+
+        function openCreditModal() {
+            const total = getTotal();
+            if (total <= 0) return toast('لا يوجد مبلغ للبيع', 'error');
+
+            document.getElementById('creditModal').classList.add('active');
+            document.getElementById('customerSearch').value = '';
+            document.getElementById('customerResults').innerHTML = '';
+            document.getElementById('selectedCustomerBox').classList.add('hidden');
+            document.getElementById('newCustomerForm').classList.add('hidden');
+            document.getElementById('showNewCustomerForm').classList.remove('hidden');
+            document.getElementById('creditPaidAmount').value = '0';
+            selectedCustomer = null;
+            updateCreditRemaining();
+            document.getElementById('customerSearch').focus();
+        }
+
+        function closeCreditModal() {
+            document.getElementById('creditModal').classList.remove('active');
+            selectedCustomer = null;
+        }
+
+        async function searchCustomers() {
+            const q = document.getElementById('customerSearch').value.trim();
+            if (!q) {
+                document.getElementById('customerResults').innerHTML = '';
+                return;
+            }
+
+            try {
+                const res = await fetch(`/cashier/search-customers?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                if (data.success) {
+                    renderCustomerResults(data.data);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        function renderCustomerResults(customers) {
+            const container = document.getElementById('customerResults');
+            if (customers.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#64748b;padding:12px;">لا توجد نتائج</div>';
+                return;
+            }
+
+            container.innerHTML = customers.map(c => `
+                <div class="customer-result-item" onclick="selectCustomer(${c.id}, '${c.name}', '${c.phone || ''}', ${c.balance})" style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:6px;cursor:pointer;transition:background 0.15s;">
+                    <div style="font-weight:600;">${c.name}</div>
+                    <div style="font-size:12px;color:#64748b;">${c.phone || '-'}</div>
+                    <div style="font-size:12px;color:${c.balance < 0 ? '#dc2626' : '#22c55e'};">الرصيد: ${parseFloat(c.balance).toFixed(3)}</div>
+                </div>
+            `).join('');
+        }
+
+        function selectCustomer(id, name, phone, balance) {
+            selectedCustomer = { id, name, phone, balance };
+            document.getElementById('selectedCustomerName').textContent = name;
+            document.getElementById('selectedCustomerPhone').textContent = phone || '-';
+            document.getElementById('selectedCustomerBalance').textContent = 'الرصيد: ' + parseFloat(balance).toFixed(3);
+            document.getElementById('selectedCustomerBox').classList.remove('hidden');
+            document.getElementById('customerResults').innerHTML = '';
+            document.getElementById('customerSearch').value = '';
+            document.getElementById('newCustomerForm').classList.add('hidden');
+            document.getElementById('showNewCustomerForm').classList.add('hidden');
+            updateCreditConfirmBtn();
+        }
+
+        function clearSelectedCustomer() {
+            selectedCustomer = null;
+            document.getElementById('selectedCustomerBox').classList.add('hidden');
+            document.getElementById('showNewCustomerForm').classList.remove('hidden');
+            updateCreditConfirmBtn();
+        }
+
+        function showNewCustomerForm() {
+            document.getElementById('newCustomerForm').classList.remove('hidden');
+            document.getElementById('showNewCustomerForm').classList.add('hidden');
+            document.getElementById('newCustomerName').value = '';
+            document.getElementById('newCustomerPhone').value = '';
+            document.getElementById('newCustomerName').focus();
+        }
+
+        function hideNewCustomerForm() {
+            document.getElementById('newCustomerForm').classList.add('hidden');
+            document.getElementById('showNewCustomerForm').classList.remove('hidden');
+        }
+
+        async function saveNewCustomer() {
+            const name = document.getElementById('newCustomerName').value.trim();
+            const phone = document.getElementById('newCustomerPhone').value.trim();
+
+            if (!name) return toast('أدخل اسم الزبون', 'error');
+
+            try {
+                const res = await fetch('/cashier/quick-customer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ name, phone })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    selectCustomer(data.data.id, data.data.name, data.data.phone, data.data.balance);
+                    toast('تم إضافة الزبون', 'success');
+                } else {
+                    toast(data.message || 'خطأ في الحفظ', 'error');
+                }
+            } catch (err) {
+                toast('خطأ في الاتصال', 'error');
+            }
+        }
+
+        function updateCreditRemaining() {
+            const total = getTotal();
+            const paid = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
+            const remaining = Math.max(0, total - paid);
+            document.getElementById('creditRemainingAmount').textContent = remaining.toFixed(3);
+            updateCreditConfirmBtn();
+        }
+
+        function updateCreditConfirmBtn() {
+            const btn = document.getElementById('confirmCredit');
+            const total = getTotal();
+            const paid = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
+            btn.disabled = !selectedCustomer || paid > total;
+        }
+
+        async function processCreditPayment() {
+            if (!selectedCustomer) return toast('اختر زبون', 'error');
+
+            const total = getTotal();
+            const paidAmount = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
+            const creditAmount = total - paidAmount;
+
+            if (paidAmount > total) return toast('المبلغ المدفوع أكبر من الإجمالي', 'error');
+
+            const confirm = await Swal.fire({
+                title: '<i class="ti ti-clock-dollar" style="color:#f97316;font-size:28px;"></i><br>تأكيد البيع بالآجل',
+                html: `
+                    <div style="text-align:right;font-size:15px;direction:rtl;font-family:'Cairo',sans-serif;">
+                        <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
+                                <span style="color:#64748b;">الزبون</span>
+                                <span style="font-weight:700;">${selectedCustomer.name}</span>
+                            </div>
+                            <div style="display:flex;justify-content:space-between;padding:6px 0;">
+                                <span style="color:#64748b;">إجمالي الفاتورة</span>
+                                <span style="font-weight:700;">${total.toFixed(3)} د.ل</span>
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:10px;background:#f0fdf4;border-radius:6px;margin-bottom:8px;">
+                            <span style="color:#15803d;font-weight:600;">المدفوع</span>
+                            <span style="color:#22c55e;font-weight:800;font-size:16px;">${paidAmount.toFixed(3)} د.ل</span>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:12px;background:#fef2f2;border:2px solid #fecaca;border-radius:8px;">
+                            <span style="color:#991b1b;font-weight:700;">المبلغ الآجل</span>
+                            <span style="color:#dc2626;font-weight:800;font-size:18px;">${creditAmount.toFixed(3)} د.ل</span>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="ti ti-check"></i> تأكيد البيع',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#f97316',
+                cancelButtonColor: '#64748b',
+                customClass: {
+                    popup: 'swal-rtl',
+                    title: 'swal-title-rtl'
+                }
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            try {
+                let orderId;
+                const grossTotal = getGrossTotal();
+
+                if (isDirectMode) {
+                    const createRes = await fetch('/cashier/new-invoice', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+                            gross_total: grossTotal,
+                            discount: discount,
+                            total: total
+                        })
+                    });
+                    const createData = await createRes.json();
+                    if (!createData.success) return toast(createData.message, 'error');
+                    orderId = createData.data.id;
+                } else {
+                    orderId = currentOrder.id;
+                }
+
+                const firstPaymentMethod = document.querySelector('.pm-btn:not(.credit-btn)');
+                const defaultPaymentMethodId = firstPaymentMethod ? firstPaymentMethod.dataset.id : 1;
+
+                const creditPayments = paidAmount > 0 ? [{ payment_method_id: defaultPaymentMethodId, amount: paidAmount }] : [];
+
+                const payRes = await fetch('/cashier/pay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        discount: discount,
+                        payments: creditPayments,
+                        is_credit: true,
+                        customer_id: selectedCustomer.id,
+                        paid_amount: paidAmount
+                    })
+                });
+
+                const payData = await payRes.json();
+                if (payData.success) {
+                    closeCreditModal();
+                    printCreditReceipt(payData.data);
+                    toast('تم حفظ البيع بالآجل', 'success');
+                    resetAll();
+                } else {
+                    toast(payData.message, 'error');
+                }
+            } catch (err) {
+                toast('خطأ في الاتصال', 'error');
+            }
+        }
+
+        function printCreditReceipt(data) {
+            const items = isDirectMode ? directItems : (currentOrder?.items || data.items);
+            let itemsHtml = '';
+            items.forEach(i => {
+                const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
+                itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${parseFloat(i.total).toFixed(3)}</td></tr>`;
+            });
+
+            const discountVal = parseFloat(data.discount) || 0;
+            const grossTotal = parseFloat(data.gross_total) || parseFloat(data.total);
+            const creditAmount = parseFloat(data.credit_amount) || 0;
+            const paidAmount = parseFloat(data.total) - creditAmount;
+
+            let totalsHtml = '';
+            if (discountVal > 0) {
+                totalsHtml = `
+                    <div class="subtotal"><span>المجموع</span><span>${grossTotal.toFixed(3)} د.ل</span></div>
+                    <div class="discount-box"><span>الخصم</span><span>- ${discountVal.toFixed(3)} د.ل</span></div>
+                    <div class="total"><span>الصافي</span><span>${parseFloat(data.total).toFixed(3)} د.ل</span></div>
+                `;
+            } else {
+                totalsHtml = `<div class="total"><span>الإجمالي</span><span>${parseFloat(data.total).toFixed(3)} د.ل</span></div>`;
+            }
+
+            let creditHtml = '';
+            if (creditAmount > 0) {
+                creditHtml = `
+                    <div class="credit-section">
+                        <div class="credit-title"><i class="ti ti-clock-dollar"></i> بيع آجل</div>
+                        <div class="credit-customer">${data.customer_name || '-'}</div>
+                        <div class="credit-row"><span>المدفوع</span><span>${paidAmount.toFixed(3)} د.ل</span></div>
+                        <div class="credit-row credit-amount"><span>المتبقي (آجل)</span><span>${creditAmount.toFixed(3)} د.ل</span></div>
+                    </div>
+                `;
+            }
+
+            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet"><style>@page{margin:0;size:80mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:13px;padding:10px;width:80mm}.header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}.logo{max-width:200px;margin-bottom:8px;filter:grayscale(100%) contrast(1.5)}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}.subtotal{padding:8px 10px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}.discount-box{padding:10px;margin:6px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border:3px dashed #000;background:#f5f5f5}.total{background:#000;color:#fff;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}.credit-section{border:3px solid #000;padding:12px;margin:12px 0;background:#fff5f5}.credit-title{font-size:14px;font-weight:800;text-align:center;margin-bottom:8px}.credit-customer{text-align:center;font-weight:700;margin-bottom:8px;font-size:13px}.credit-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}.credit-amount{font-weight:800;font-size:14px;border-top:1px dashed #000;padding-top:8px;margin-top:4px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.thanks{text-align:center;font-size:14px;font-weight:700;padding:12px 0;border-top:2px dashed #000}.hulul-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px}.hulul-footer img{height:35px;filter:grayscale(100%) contrast(1.3)}.hulul-footer p{font-size:12px;font-weight:700;color:#000}</style></head><body><div class="header"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan" class="logo"></div><div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div><div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div><div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>${totalsHtml}${creditHtml}<div class="thanks">شكراً لزيارتكم</div><div class="hulul-footer"><img src="{{ asset('hulul.jpg') }}" alt="Hulul"><p>حلول لتقنية المعلومات</p></div></body></html>`;
+
+            const win = window.open('', '_blank', 'width=400,height=600');
+            if (win) {
+                win.document.write(html);
+                win.document.close();
+                setTimeout(() => {
+                    win.focus();
+                    if (window.printer && window.printer.print) {
+                        window.printer.print();
+                    } else {
+                        win.print();
+                    }
+                    win.close();
+                }, 250);
             }
         }
 
@@ -1449,6 +1928,8 @@
             isDirectMode = false;
             payments = [];
             discount = 0;
+            selectedCustomer = null;
+            isCredit = false;
 
             document.getElementById('invoiceInput').value = '';
             document.getElementById('invoiceInput').disabled = false;
@@ -1470,7 +1951,10 @@
                 title: msg,
                 showConfirmButton: false,
                 timer: 2000,
-                timerProgressBar: true
+                timerProgressBar: true,
+                customClass: {
+                    popup: 'swal-rtl'
+                }
             });
         }
     </script>

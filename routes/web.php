@@ -120,6 +120,14 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::post('/remove-item', [CashierController::class, 'removeItem'])->name('remove-item');
     Route::get('/weight-products', [CashierController::class, 'weightProducts'])->name('weight-products');
 
+    Route::get('/search-customers', [CashierController::class, 'searchCustomers'])->name('search-customers');
+    Route::post('/quick-customer', [CashierController::class, 'createQuickCustomer'])->name('quick-customer');
+
+    Route::get('/customers', [CashierController::class, 'customersPage'])->name('customers');
+    Route::get('/customers/data', [CashierController::class, 'customersData'])->name('customers.data');
+    Route::get('/customers/{customer}', [CashierController::class, 'customerDetails'])->name('customers.details');
+    Route::post('/customers/{customer}/pay-debt', [CashierController::class, 'payDebt'])->name('customers.pay-debt');
+
     Route::get('/special-orders', [CashierController::class, 'specialOrders'])->name('special-orders');
     Route::get('/special-orders/products', [CashierController::class, 'specialOrderProducts'])->name('special-orders.products');
     Route::get('/special-orders/customers', [CashierController::class, 'specialOrderCustomers'])->name('special-orders.customers');

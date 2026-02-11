@@ -919,7 +919,15 @@
             if (win) {
                 win.document.write(html);
                 win.document.close();
-                setTimeout(() => { win.focus(); win.print(); win.close(); }, 250);
+                setTimeout(() => {
+                    win.focus();
+                    if (window.printer && window.printer.print) {
+                        window.printer.print();
+                    } else {
+                        win.print();
+                    }
+                    win.close();
+                }, 250);
             }
         }
 
