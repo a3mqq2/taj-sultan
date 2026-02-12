@@ -17,8 +17,8 @@ padding:0 !important;
 }
 
 .barcode-item{
-width:25mm;
-height:35mm;
+width:38mm;
+height:25mm;
 display:flex;
 align-items:center;
 justify-content:center;
@@ -26,8 +26,8 @@ flex-direction:column;
 }
 
 .barcode svg{
-width:22mm;
-height:25mm;
+width:35mm;
+height:16mm;
 }
 
 .barcode-text{
@@ -46,12 +46,12 @@ padding:20px !important;
 .no-print{display:none !important;}
 
 html,body{
-width:25mm !important;
-height:35mm !important;
+width:38mm !important;
+height:25mm !important;
 }
 
 @page{
-size:25mm 35mm;
+size:38mm 25mm;
 margin:0 !important;
 }
 }
@@ -71,7 +71,7 @@ background:white;
 <button onclick="window.print()" style="padding:10px 30px;font-size:16px;cursor:pointer;">
 طباعة
 </button>
-<p style="margin-top:10px !important;color:#666;">25mm x 35mm</p>
+<p style="margin-top:10px !important;color:#666;">38mm x 25mm</p>
 </div>
 
 <div class="barcode-item">
@@ -85,7 +85,7 @@ background:white;
 JsBarcode("#barcode","{{ $barcode }}",{
 format:"CODE128",
 width:1.5,
-height:50,
+height:40,
 displayValue:false,
 margin:0
 });
