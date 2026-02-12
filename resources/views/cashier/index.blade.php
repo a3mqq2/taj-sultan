@@ -1221,8 +1221,6 @@
         }
 
         function renderOrder() {
-            document.getElementById('orderBox').classList.remove('hidden');
-            document.getElementById('orderNum').textContent = currentOrder.order_number;
             document.getElementById('emptyState').classList.add('hidden');
             document.getElementById('itemsTable').classList.remove('hidden');
 
@@ -1281,7 +1279,6 @@
             payments = [];
 
             document.getElementById('invoiceInput').value = '';
-            document.getElementById('orderBox').classList.add('hidden');
             document.getElementById('emptyState').classList.remove('hidden');
             document.getElementById('itemsTable').classList.add('hidden');
             document.getElementById('itemsBody').innerHTML = '';
@@ -2064,7 +2061,6 @@
 
             document.getElementById('invoiceInput').value = '';
             document.getElementById('invoiceInput').disabled = false;
-            document.getElementById('orderBox').classList.add('hidden');
             document.getElementById('emptyState').classList.remove('hidden');
             document.getElementById('itemsTable').classList.add('hidden');
             document.getElementById('itemsBody').innerHTML = '';

@@ -179,4 +179,9 @@ class PosController extends Controller
             ], 500);
         }
     }
+
+    public function sticker(string $slug, string $orderNumber)
+    {
+        return view('pos.sticker', compact('orderNumber'));
+    }
 }
