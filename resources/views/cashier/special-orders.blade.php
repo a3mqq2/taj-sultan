@@ -388,6 +388,7 @@
     </div>
 
     <script>
+        const BASE_URL = "{{ url('/') }}";
         let currentOrder = null;
         let isNewOrder = false;
         let orderItems = [];
@@ -443,7 +444,7 @@
                 }
             });
 
-            const res = await fetch('/cashier/special-orders/products');
+            const res = await fetch(BASE_URL + '/cashier/special-orders/products');
             const data = await res.json();
             if (data.success) {
                 allProducts = data.data;
@@ -468,7 +469,7 @@
             }
 
             try {
-                const res = await fetch(`/cashier/special-orders/customers?q=${encodeURIComponent(query)}`);
+                const res = await fetch(BASE_URL + `/cashier/special-orders/customers?q=${encodeURIComponent(query)}`);
                 const data = await res.json();
 
                 if (data.success && data.data.length > 0) {
@@ -500,7 +501,7 @@
             if (!search) return toast('أدخل رقم الطلبية أو اسم الزبون', 'error');
 
             try {
-                const res = await fetch('/cashier/special-orders/fetch', {
+                const res = await fetch(BASE_URL + '/cashier/special-orders/fetch', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -786,7 +787,7 @@
             };
 
             try {
-                const res = await fetch('/cashier/special-orders/store', {
+                const res = await fetch(BASE_URL + '/cashier/special-orders/store', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -817,7 +818,7 @@
             if (amount > currentOrder.remaining_amount + 0.001) return toast('المبلغ أكبر من المتبقي', 'error');
 
             try {
-                const res = await fetch('/cashier/special-orders/payment', {
+                const res = await fetch(BASE_URL + '/cashier/special-orders/payment', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

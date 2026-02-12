@@ -626,6 +626,7 @@
     </div>
 
     <script>
+        const BASE_URL = "{{ url('/') }}";
         let customers = [];
         let selectedCustomer = null;
 
@@ -660,7 +661,7 @@
 
         async function loadCustomers() {
             try {
-                const res = await fetch('/cashier/customers/data');
+                const res = await fetch(BASE_URL + '/cashier/customers/data');
                 const data = await res.json();
                 if (data.success) {
                     customers = data.data;
@@ -705,7 +706,7 @@
 
         async function selectCustomer(id, el) {
             try {
-                const res = await fetch(`/cashier/customers/${id}`);
+                const res = await fetch(BASE_URL + `/cashier/customers/${id}`);
                 const data = await res.json();
                 if (data.success) {
                     selectedCustomer = data.data;
@@ -799,7 +800,7 @@
             if (amount > debtAmount + 0.001) return toast('المبلغ أكبر من الدين', 'error');
 
             try {
-                const res = await fetch(`/cashier/customers/${selectedCustomer.id}/pay-debt`, {
+                const res = await fetch(BASE_URL + `/cashier/customers/${selectedCustomer.id}/pay-debt`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

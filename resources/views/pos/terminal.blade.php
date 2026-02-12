@@ -867,6 +867,7 @@
     </div>
 
     <script>
+        const BASE_URL = "{{ url('/') }}";
         const cart = [];
         let selectedProduct = null;
         const posSlug = '{{ $posPoint->slug }}';
@@ -1128,7 +1129,7 @@
 
             var orderNumber;
             try {
-                var response = await fetch('/pos/' + posSlug + '/orders', {
+                var response = await fetch(BASE_URL + '/pos/' + posSlug + '/orders', {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',

@@ -998,6 +998,7 @@
     </div>
 
     <script>
+        const BASE_URL = "{{ url('/') }}";
         const WEIGHT_PREFIX = '99';
         const MAX_DISCOUNT = 5;
         let currentOrder = null;
@@ -1116,7 +1117,7 @@
 
         async function handleWeightBarcode(barcode) {
             try {
-                const res = await fetch('/cashier/add-weight-barcode', {
+                const res = await fetch(BASE_URL + '/cashier/add-weight-barcode', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1127,7 +1128,7 @@
                 const data = await res.json();
                 if (data.success) {
                     if (currentOrder) {
-                        const addRes = await fetch('/cashier/add-weight-item', {
+                        const addRes = await fetch(BASE_URL + '/cashier/add-weight-item', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -1165,7 +1166,7 @@
 
         async function fetchOrder(num) {
             try {
-                const res = await fetch('/cashier/fetch-order', {
+                const res = await fetch(BASE_URL + '/cashier/fetch-order', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1179,7 +1180,7 @@
 
                     if (directItems.length > 0) {
                         for (const item of directItems) {
-                            const addRes = await fetch('/cashier/add-weight-item', {
+                            const addRes = await fetch(BASE_URL + '/cashier/add-weight-item', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -1236,7 +1237,7 @@
 
         async function removeOrderItem(itemId) {
             try {
-                const res = await fetch('/cashier/remove-item', {
+                const res = await fetch(BASE_URL + '/cashier/remove-item', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1591,7 +1592,7 @@
                 let orderId;
 
                 if (isDirectMode) {
-                    const createRes = await fetch('/cashier/new-invoice', {
+                    const createRes = await fetch(BASE_URL + '/cashier/new-invoice', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1611,7 +1612,7 @@
                     orderId = currentOrder.id;
                 }
 
-                const payRes = await fetch('/cashier/pay', {
+                const payRes = await fetch(BASE_URL + '/cashier/pay', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1720,7 +1721,7 @@
             }
 
             try {
-                const res = await fetch(`/cashier/search-customers?q=${encodeURIComponent(q)}`);
+                const res = await fetch(BASE_URL + `/cashier/search-customers?q=${encodeURIComponent(q)}`);
                 const data = await res.json();
                 if (data.success) {
                     renderCustomerResults(data.data);
@@ -1786,7 +1787,7 @@
             if (!name) return toast('أدخل اسم الزبون', 'error');
 
             try {
-                const res = await fetch('/cashier/quick-customer', {
+                const res = await fetch(BASE_URL + '/cashier/quick-customer', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1924,7 +1925,7 @@
                 const grossTotal = getGrossTotal();
 
                 if (isDirectMode) {
-                    const createRes = await fetch('/cashier/new-invoice', {
+                    const createRes = await fetch(BASE_URL + '/cashier/new-invoice', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1949,7 +1950,7 @@
 
                 const creditPayments = paidAmount > 0 ? [{ payment_method_id: defaultPaymentMethodId, amount: paidAmount }] : [];
 
-                const payRes = await fetch('/cashier/pay', {
+                const payRes = await fetch(BASE_URL + '/cashier/pay', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
