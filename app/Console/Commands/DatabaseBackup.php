@@ -104,39 +104,14 @@ class DatabaseBackup extends Command
 
     private function findUsbDrive(): ?string
     {
-        $drives = [];
-
         for ($letter = 'D'; $letter <= 'Z'; $letter++) {
             $drive = $letter . ':\\';
-            if (is_dir($drive)) {
-                $driveType = $this->getDriveType($drive);
-                if ($driveType === 'removable' || $driveType === 'fixed') {
-                    $drives[] = $drive;
-                }
+            if (is_dir($drive) && is_writable($drive)) {
+                return $drive;
             }
         }
 
-        return $drives[0] ?? null;
-    }
-
-    private function getDriveType(string $drive): string
-    {
-        $letter = substr($drive, 0, 1);
-        $script = 'Get-WmiObject Win32_LogicalDisk | Where-Object {$_.DeviceID -eq "' . $letter . ':"} | Select-Object -ExpandProperty DriveType';
-
-        exec("powershell -Command \"{$script}\" 2>&1", $output, $returnCode);
-
-        if ($returnCode === 0 && !empty($output)) {
-            $type = trim($output[0]);
-            if ($type === '2') {
-                return 'removable';
-            }
-            if ($type === '3') {
-                return 'fixed';
-            }
-        }
-
-        return 'unknown';
+        return null;
     }
 
     private function findMysqldump(): ?string
