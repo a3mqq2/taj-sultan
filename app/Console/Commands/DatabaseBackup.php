@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class DatabaseBackup extends Command
 {
-    protected $signature = 'db:backup {--manual : Manual backup from admin}';
+    protected $signature = 'db:backup {--manual : Manual backup from admin} {--drive= : Drive letter (e.g. F)}';
 
     protected $description = 'Backup database to USB drive (Windows only)';
 
@@ -19,10 +19,21 @@ class DatabaseBackup extends Command
             return 1;
         }
 
-        $usbDrive = $this->findUsbDrive();
+        $driveLetter = $this->option('drive');
+
+        if ($driveLetter) {
+            $usbDrive = strtoupper($driveLetter) . ':\\';
+            if (!is_dir($usbDrive)) {
+                $this->error("Drive {$driveLetter}: not found");
+                Log::error("Database backup failed: Drive {$driveLetter}: not accessible");
+                return 1;
+            }
+        } else {
+            $usbDrive = $this->findUsbDrive();
+        }
 
         if (!$usbDrive) {
-            $this->error('No USB drive found');
+            $this->error('No USB drive found. Use --drive=F to specify drive letter');
             Log::error('Database backup failed: No USB drive connected');
             return 1;
         }
@@ -99,7 +110,7 @@ class DatabaseBackup extends Command
             $drive = $letter . ':\\';
             if (is_dir($drive)) {
                 $driveType = $this->getDriveType($drive);
-                if ($driveType === 'removable') {
+                if ($driveType === 'removable' || $driveType === 'fixed') {
                     $drives[] = $drive;
                 }
             }
@@ -119,6 +130,9 @@ class DatabaseBackup extends Command
             $type = trim($output[0]);
             if ($type === '2') {
                 return 'removable';
+            }
+            if ($type === '3') {
+                return 'fixed';
             }
         }
 
