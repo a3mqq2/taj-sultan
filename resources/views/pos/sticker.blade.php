@@ -14,13 +14,13 @@ box-sizing:border-box;
 }
 
 @page{
-size:302px 199px;
+size:304px 200px;
 margin:0;
 }
 
 html,body{
-width:302px;
-height:199px;
+width:304px;
+height:200px;
 overflow:hidden;
 background:#fff;
 }
@@ -32,8 +32,8 @@ justify-content:center;
 }
 
 .container{
-width:302px;
-height:199px;
+width:304px;
+height:200px;
 display:flex;
 flex-direction:column;
 align-items:center;
@@ -41,8 +41,8 @@ justify-content:center;
 }
 
 svg{
-width:260px;
-height:90px;
+width:280px;
+height:100px;
 }
 
 .print-btn{
@@ -74,7 +74,7 @@ display:none;
 
 <div class="container">
 <svg id="barcode"></svg>
-<div style="font-size:11px;margin-top:4px">{{ $orderNumber }}</div>
+<div style="font-size:12px;margin-top:4px">{{ $orderNumber }}</div>
 </div>
 
 <script>
@@ -82,7 +82,7 @@ display:none;
 JsBarcode("#barcode","{{ $orderNumber }}",{
 format:"CODE128",
 width:2,
-height:90,
+height:100,
 displayValue:false,
 margin:0
 });
