@@ -9,7 +9,7 @@
     <style>
         @page {
             margin: 0;
-            size: 80mm auto;
+            size: 72mm auto;
         }
 
         * {
@@ -24,9 +24,11 @@
             line-height: 1.4;
             background: #fff;
             color: #000;
-            padding: 10px;
-            max-width: 80mm;
+            padding: 6mm 4mm;
+            width: 72mm;
             margin: 0 auto;
+            direction: rtl;
+            text-align: right;
         }
 
         .receipt {
@@ -41,11 +43,13 @@
         }
 
         .header .logo {
-            max-width: 220px;
+            max-width: 180px;
             height: auto;
             margin: 0 auto 10px;
             display: block;
-            filter: grayscale(100%) contrast(2) brightness(0.1);
+            background: #000;
+            padding: 10px 15px;
+            filter: invert(1) brightness(2) contrast(1.5);
         }
 
         .header .subtitle {
@@ -220,8 +224,8 @@
 
         @media print {
             body {
-                padding: 0;
-                max-width: 100%;
+                padding: 6mm 4mm;
+                width: 72mm;
             }
         }
     </style>
