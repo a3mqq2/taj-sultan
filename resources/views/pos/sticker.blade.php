@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <title>ستيكر - {{ $barcode }}</title>
 <script src="{{ asset('assets/js/jsbarcode.min.js') }}"></script>
+
 <style>
 *{
 margin:0 !important;
@@ -20,15 +21,18 @@ height:30mm;
 
 body{
 font-family:Arial,sans-serif;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .barcode-item{
 width:35mm;
 height:30mm;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
-flex-direction:column;
 padding:2mm;
 overflow:hidden;
 }
@@ -48,7 +52,9 @@ height:18mm;
 font-family:monospace;
 font-size:9px;
 font-weight:bold;
-margin-top:1mm;
+margin-top:-1mm;
+line-height:1;
+text-align:center;
 }
 
 .no-print{
@@ -66,6 +72,9 @@ width:35mm !important;
 height:30mm !important;
 margin:0 !important;
 padding:0 !important;
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .barcode-item{
@@ -89,20 +98,24 @@ background:white;
 }
 </style>
 </head>
+
 <body>
 
 <div class="no-print">
 <button onclick="window.print()" style="padding:10px 30px;font-size:16px;cursor:pointer;">
 طباعة
 </button>
-<p style="margin-top:10px !important;color:#666;">35mm x 30mm</p>
+<p style="margin-top:10px;color:#666;">35mm x 30mm</p>
 </div>
 
 <div class="barcode-item">
+
 <div class="barcode">
 <svg id="barcode"></svg>
 </div>
+
 <div class="barcode-text">{{ $barcode }}</div>
+
 </div>
 
 <script>
