@@ -2032,7 +2032,235 @@
                 deliveryHtml = `<div class="delivery-box"><div class="delivery-icon">🚚</div><div class="delivery-title">توصيل</div><div class="delivery-phone">${data.delivery_phone || '-'}</div></div>`;
             }
 
-            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet"><style>@page{margin:0;size:80mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:13px;padding:10px;width:80mm}.header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}.logo{max-width:200px;margin-bottom:8px;filter:grayscale(100%) contrast(1.5)}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}.subtotal{padding:8px 10px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}.discount-box{padding:10px;margin:6px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border:3px dashed #000;background:#f5f5f5}.total{background:#000;color:#fff;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}.delivery-box{border:3px solid #000;padding:12px;margin:10px 0;text-align:center;background:#fff}.delivery-icon{font-size:24px;margin-bottom:4px}.delivery-title{font-size:16px;font-weight:800;margin-bottom:4px}.delivery-phone{font-size:18px;font-weight:700;direction:ltr}.credit-section{border:3px solid #000;padding:12px;margin:12px 0;background:#fff5f5}.credit-title{font-size:14px;font-weight:800;text-align:center;margin-bottom:8px}.credit-customer{text-align:center;font-weight:700;margin-bottom:8px;font-size:13px}.credit-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}.credit-amount{font-weight:800;font-size:14px;border-top:1px dashed #000;padding-top:8px;margin-top:4px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.thanks{text-align:center;font-size:14px;font-weight:700;padding:12px 0;border-top:2px dashed #000}.hulul-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px}.hulul-footer img{height:35px;filter:grayscale(100%) contrast(1.3)}.hulul-footer p{font-size:12px;font-weight:700;color:#000}</style></head><body><div class="header"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan" class="logo"></div><div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div><div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div><div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div>${deliveryHtml}<table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>${totalsHtml}${creditHtml}<div class="thanks">شكراً لزيارتكم</div><div class="hulul-footer"><img src="{{ asset('hulul.jpg') }}" alt="Hulul"><p>حلول لتقنية المعلومات</p></div></body></html>`;
+const html = `<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
+
+<style>
+
+@page{
+margin:0;
+size:80mm auto;
+}
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Cairo',sans-serif;
+font-size:13px;
+width:80mm;
+margin:0 auto;
+padding:6mm 4mm;
+direction:rtl;
+text-align:right;
+}
+
+.header{
+text-align:center;
+padding:8px 0;
+border-bottom:2px dashed #000;
+margin-bottom:10px;
+}
+
+.logo{
+max-width:180px;
+margin-bottom:6px;
+}
+
+.info{
+display:flex;
+justify-content:space-between;
+font-size:11px;
+padding:2px 0;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin:8px 0;
+}
+
+th{
+background:#f0f0f0;
+padding:6px;
+font-size:11px;
+border-bottom:1px solid #000;
+}
+
+td{
+padding:6px;
+font-size:11px;
+border-bottom:1px dashed #ccc;
+}
+
+.subtotal{
+padding:8px 6px;
+display:flex;
+justify-content:space-between;
+font-size:13px;
+font-weight:600;
+border-top:1px dashed #000;
+}
+
+.discount-box{
+padding:8px;
+margin:6px 0;
+display:flex;
+justify-content:space-between;
+font-size:14px;
+font-weight:800;
+border:2px dashed #000;
+background:#f5f5f5;
+}
+
+.total{
+background:#000;
+color:#fff;
+padding:8px;
+margin:8px 0;
+display:flex;
+justify-content:space-between;
+font-size:15px;
+font-weight:800;
+}
+
+.delivery-box{
+border:2px solid #000;
+padding:8px;
+margin:8px 0;
+text-align:center;
+background:#fff;
+}
+
+.delivery-icon{
+font-size:22px;
+margin-bottom:4px;
+}
+
+.delivery-title{
+font-size:15px;
+font-weight:800;
+margin-bottom:4px;
+}
+
+.delivery-phone{
+font-size:16px;
+font-weight:700;
+direction:ltr;
+}
+
+.credit-section{
+border:2px solid #000;
+padding:8px;
+margin:10px 0;
+background:#fff5f5;
+}
+
+.credit-title{
+font-size:14px;
+font-weight:800;
+text-align:center;
+margin-bottom:6px;
+}
+
+.credit-customer{
+text-align:center;
+font-weight:700;
+margin-bottom:6px;
+font-size:12px;
+}
+
+.credit-row{
+display:flex;
+justify-content:space-between;
+padding:3px 0;
+font-size:11px;
+}
+
+.credit-amount{
+font-weight:800;
+font-size:13px;
+border-top:1px dashed #000;
+padding-top:6px;
+margin-top:4px;
+}
+
+.thanks{
+text-align:center;
+font-size:14px;
+font-weight:700;
+padding:10px 0;
+border-top:2px dashed #000;
+}
+
+.hulul-footer{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:8px;
+padding:10px 0;
+border-top:2px solid #000;
+margin-top:8px;
+}
+
+.hulul-footer img{
+height:32px;
+}
+
+.hulul-footer p{
+font-size:11px;
+font-weight:700;
+color:#000;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<img src="{{ asset('logo-dark.png') }}" class="logo">
+</div>
+
+<div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div>
+<div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div>
+<div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div>
+
+${deliveryHtml}
+
+<table>
+<thead>
+<tr>
+<th>الصنف</th>
+<th>الكمية</th>
+<th>السعر</th>
+<th>الإجمالي</th>
+</tr>
+</thead>
+<tbody>
+${itemsHtml}
+</tbody>
+</table>
+
+${totalsHtml}
+
+${creditHtml}
+
+<div class="thanks">شكراً لزيارتكم</div>
+
+<div class="hulul-footer">
+<img src="{{ asset('hulul.jpg') }}">
+<p>حلول لتقنية المعلومات</p>
+</div>
+
+</body>
+</html>`;
 
             const win = window.open('', '_blank', 'width=400,height=600');
             if (win) {

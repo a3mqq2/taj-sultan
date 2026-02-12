@@ -126,6 +126,16 @@ height:18,
 displayValue:false,
 margin:0
 });
+
+window.onload = function(){
+setTimeout(function(){
+window.print();
+},300);
+};
+
+window.onafterprint = function(){
+window.close();
+};
 </script>
 
 </body>
