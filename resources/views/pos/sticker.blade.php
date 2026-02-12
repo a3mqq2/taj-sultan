@@ -14,6 +14,12 @@ box-sizing:border-box;
 html,body{
 margin:0 !important;
 padding:0 !important;
+width:35mm;
+height:30mm;
+}
+
+body{
+font-family:Arial,sans-serif;
 }
 
 .barcode-item{
@@ -23,16 +29,24 @@ display:flex;
 align-items:center;
 justify-content:center;
 flex-direction:column;
+padding:2mm;
+overflow:hidden;
+}
+
+.barcode{
+display:flex;
+align-items:center;
+justify-content:center;
 }
 
 .barcode svg{
-width:32mm;
+width:30mm;
 height:18mm;
 }
 
 .barcode-text{
 font-family:monospace;
-font-size:10px;
+font-size:9px;
 font-weight:bold;
 margin-top:1mm;
 }
@@ -43,11 +57,21 @@ padding:20px !important;
 }
 
 @media print{
-.no-print{display:none !important;}
+.no-print{
+display:none !important;
+}
 
 html,body{
 width:35mm !important;
 height:30mm !important;
+margin:0 !important;
+padding:0 !important;
+}
+
+.barcode-item{
+width:35mm !important;
+height:30mm !important;
+padding:2mm !important;
 }
 
 @page{
@@ -84,8 +108,8 @@ background:white;
 <script>
 JsBarcode("#barcode","{{ $barcode }}",{
 format:"CODE128",
-width:1.5,
-height:45,
+width:0.7,
+height:18,
 displayValue:false,
 margin:0
 });
