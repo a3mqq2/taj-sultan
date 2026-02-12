@@ -148,5 +148,5 @@ Route::prefix('pos')->name('pos.')->group(function () {
     Route::get('/{slug}/products', [PosController::class, 'products'])->name('products');
     Route::get('/{slug}/categories', [PosController::class, 'categories'])->name('categories');
     Route::post('/{slug}/orders', [PosController::class, 'createOrder'])->name('create-order');
-    Route::get('/{slug}/sticker/{orderNumber}', [PosController::class, 'sticker'])->name('sticker');
+    Route::get('/{slug}/sticker/{barcode}', [PosController::class, 'sticker'])->name('sticker');
 });

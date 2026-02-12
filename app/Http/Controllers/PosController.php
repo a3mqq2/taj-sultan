@@ -180,8 +180,8 @@ class PosController extends Controller
         }
     }
 
-    public function sticker(string $slug, string $orderNumber)
+    public function sticker(string $slug, string $barcode)
     {
-        return view('pos.sticker', compact('orderNumber'));
+        return view('pos.sticker', compact('barcode'));
     }
 }
