@@ -866,6 +866,7 @@
         </div>
     </div>
 
+    <script src="{{ asset('assets/js/jsbarcode.min.js') }}"></script>
     <script>
         const BASE_URL = "{{ url('/') }}";
         const cart = [];
@@ -1151,20 +1152,20 @@
                 orderNumber = Date.now().toString().slice(-8);
             }
 
+            var tempSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            document.body.appendChild(tempSvg);
+            JsBarcode(tempSvg, orderNumber, {format:"CODE128",width:1.5,height:50,displayValue:true,margin:2,fontSize:10});
+            var svgContent = tempSvg.outerHTML;
+            document.body.removeChild(tempSvg);
+
             var printWindow = window.open('', '_blank', 'width=400,height=300');
-            printWindow.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ستيكر</title><style>*{margin:0!important;padding:0!important;box-sizing:border-box;}html,body{width:38mm!important;height:25mm!important;margin:0!important;padding:0!important;}body{display:flex;align-items:center;justify-content:center;}svg{max-width:36mm;height:auto;}@page{size:38mm 25mm;margin:0!important;padding:0!important;}</style></head><body><svg id="barcode"></svg></body></html>');
+            printWindow.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ستيكر</title><style>*{margin:0!important;padding:0!important;box-sizing:border-box;}html,body{width:38mm!important;height:25mm!important;margin:0!important;padding:0!important;}body{display:flex;align-items:center;justify-content:center;}svg{max-width:36mm;height:auto;}@page{size:38mm 25mm;margin:0!important;padding:0!important;}</style></head><body>' + svgContent + '</body></html>');
             printWindow.document.close();
 
-            var script = printWindow.document.createElement('script');
-            script.src = '{{ asset("assets/js/jsbarcode.min.js") }}';
-            script.onload = function() {
-                printWindow.JsBarcode("#barcode", orderNumber, {format:"CODE128",width:1.5,height:50,displayValue:true,margin:2,fontSize:10});
-                setTimeout(function() {
-                    printWindow.focus();
-                    printWindow.print();
-                }, 200);
-            };
-            printWindow.document.head.appendChild(script);
+            setTimeout(function() {
+                printWindow.focus();
+                printWindow.print();
+            }, 300);
 
             cart.length = 0;
             renderCart();

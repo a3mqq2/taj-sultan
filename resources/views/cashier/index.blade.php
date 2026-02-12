@@ -1166,7 +1166,8 @@
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                toast('خطأ في الاتصال', 'error');
+                console.error('handleWeightBarcode error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
@@ -1214,7 +1215,8 @@
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                toast('خطأ في الاتصال', 'error');
+                console.error('fetchOrder error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
@@ -1267,7 +1269,8 @@
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                toast('خطأ في الاتصال', 'error');
+                console.error('removeOrderItem error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
@@ -1645,7 +1648,8 @@
                     toast(payData.message, 'error');
                 }
             } catch (err) {
-                toast('خطأ في الاتصال', 'error');
+                console.error('processPayment error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
@@ -1809,7 +1813,8 @@
                     toast(data.message || 'خطأ في الحفظ', 'error');
                 }
             } catch (err) {
-                toast('خطأ في الاتصال', 'error');
+                console.error('saveNewCustomer error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
@@ -1984,7 +1989,8 @@
                     toast(payData.message, 'error');
                 }
             } catch (err) {
-                toast('خطأ في الاتصال', 'error');
+                console.error('processCreditPayment error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
