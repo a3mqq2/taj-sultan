@@ -282,36 +282,35 @@
         }
 
         .payment-header {
-            padding: 14px 16px;
+            padding: 10px 12px;
             border-bottom: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
 
         .payment-title {
-            font-size: 15px;
+            font-size: 13px;
             font-weight: 700;
             color: #64748b;
         }
 
         .payment-methods-scroll {
-            flex: 1;
             overflow-y: auto;
-            padding: 12px;
-            min-height: 0;
+            padding: 10px;
+            max-height: 140px;
         }
 
         .payment-methods {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
 
         .pm-btn {
-            padding: 12px;
+            padding: 8px;
             background: #f8fafc;
             border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 6px;
+            font-size: 12px;
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
@@ -337,7 +336,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
+        }
+
+        .pm-btn.credit-btn i {
+            font-size: 14px;
         }
 
         .pm-btn.credit-btn:hover {
@@ -351,35 +354,36 @@
         }
 
         .added-payments {
-            padding: 12px;
+            padding: 8px 10px;
             border-top: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
 
         .added-title {
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 600;
             color: #64748b;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .payment-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 10px;
+            padding: 6px 8px;
             background: #f0fdf4;
-            border-radius: 6px;
-            margin-bottom: 6px;
+            border-radius: 4px;
+            margin-bottom: 4px;
         }
 
         .payment-row .method {
             font-weight: 600;
-            font-size: 13px;
+            font-size: 11px;
         }
 
         .payment-row .amount {
             font-weight: 700;
+            font-size: 12px;
             color: #059669;
         }
 
@@ -389,35 +393,35 @@
             color: #ef4444;
             cursor: pointer;
             padding: 2px;
-            font-size: 16px;
+            font-size: 14px;
         }
 
         .amount-input-section {
-            padding: 12px;
+            padding: 10px;
             border-top: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
 
         .amount-label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #64748b;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .amount-row {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
 
         .amount-input {
             flex: 1;
-            padding: 10px 12px;
-            font-size: 18px;
+            padding: 8px 10px;
+            font-size: 16px;
             font-weight: 700;
             text-align: center;
             border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            border-radius: 6px;
             font-family: inherit;
         }
 
@@ -427,12 +431,13 @@
         }
 
         .add-payment-btn {
-            padding: 10px 16px;
+            padding: 8px 12px;
             background: #3b82f6;
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             font-weight: 600;
+            font-size: 12px;
             cursor: pointer;
             font-family: inherit;
         }
@@ -449,6 +454,7 @@
         .discount-row {
             color: #f59e0b;
             font-weight: 600;
+            font-size: 11px;
         }
 
         .remove-discount-btn {
@@ -456,8 +462,8 @@
             border: none;
             color: #ef4444;
             cursor: pointer;
-            padding: 0 4px;
-            font-size: 12px;
+            padding: 0 2px;
+            font-size: 10px;
             vertical-align: middle;
         }
 
@@ -466,13 +472,17 @@
             border: none;
             color: #f59e0b;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             font-family: inherit;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             padding: 0;
+        }
+
+        .discount-btn i {
+            font-size: 12px;
         }
 
         .discount-btn:hover {
@@ -585,7 +595,7 @@
         }
 
         .summary-section {
-            padding: 12px;
+            padding: 10px;
             border-top: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
@@ -593,16 +603,16 @@
         .summary-row {
             display: flex;
             justify-content: space-between;
-            padding: 4px 0;
-            font-size: 13px;
+            padding: 3px 0;
+            font-size: 12px;
         }
 
         .summary-row.total {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
-            padding-top: 8px;
+            padding-top: 6px;
             border-top: 1px dashed #e2e8f0;
-            margin-top: 4px;
+            margin-top: 3px;
         }
 
         .summary-row.diff {
@@ -615,26 +625,26 @@
         }
 
         .pay-section {
-            padding: 12px;
+            padding: 10px;
             border-top: 1px solid #e2e8f0;
             flex-shrink: 0;
         }
 
         .pay-btn {
             width: 100%;
-            padding: 16px;
+            padding: 14px;
             background: #10b981;
             color: #fff;
             border: none;
             border-radius: 10px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .pay-btn:hover {
@@ -846,10 +856,6 @@
             </div>
 
             <div class="right-panel">
-                <div class="order-box hidden" id="orderBox">
-                    <div class="order-num">رقم الطلب: <span id="orderNum">-</span></div>
-                </div>
-
                 <div class="payment-box">
                     <div class="payment-header">
                         <div class="payment-title">طرق الدفع</div>
