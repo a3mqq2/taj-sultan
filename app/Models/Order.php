@@ -16,6 +16,8 @@ class Order extends Model
         'total',
         'credit_amount',
         'discount',
+        'delivery_type',
+        'delivery_phone',
         'status',
         'paid_at',
         'paid_by',

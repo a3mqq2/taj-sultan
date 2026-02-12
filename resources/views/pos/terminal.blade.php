@@ -1150,21 +1150,17 @@
                 orderNumber = Date.now().toString().slice(-8);
             }
 
-            var now = new Date();
-            var dateStr = now.toLocaleDateString('ar-LY');
-            var timeStr = now.toLocaleTimeString('ar-LY', {hour: '2-digit', minute: '2-digit'});
-
             var printContent = '<!DOCTYPE html>' +
                 '<html>' +
                 '<head>' +
                 '<meta charset="UTF-8">' +
                 '<title>ستيكر</title>' +
-                '<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"><\/script>' +
+                '<script src="{{ asset("assets/js/jsbarcode.min.js") }}"><\/script>' +
                 '<style>' +
                 '*{margin:0!important;padding:0!important;box-sizing:border-box;}' +
                 'html,body{width:38mm!important;height:25mm!important;margin:0!important;padding:0!important;}' +
                 'body{display:flex;align-items:center;justify-content:center;}' +
-                '#barcode{width:36mm;height:23mm;}' +
+                'svg{max-width:36mm;height:auto;}' +
                 '@page{size:38mm 25mm;margin:0!important;padding:0!important;}' +
                 '</style>' +
                 '</head>' +
@@ -1172,7 +1168,7 @@
                 '<svg id="barcode"></svg>' +
                 '<script>' +
                 'JsBarcode("#barcode","' + orderNumber + '",{format:"CODE128",width:1.5,height:50,displayValue:true,margin:2,fontSize:10});' +
-                'setTimeout(function(){window.print();},500);' +
+                'setTimeout(function(){window.print();},300);' +
                 '<\/script>' +
                 '</body>' +
                 '</html>';

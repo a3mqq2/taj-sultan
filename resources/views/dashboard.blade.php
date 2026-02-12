@@ -378,6 +378,10 @@
                         <i class="ti ti-credit-card"></i>
                         <span>طرق الدفع</span>
                     </a>
+                    <a href="javascript:void(0)" onclick="createBackup()" class="shortcut-item" id="backup-btn">
+                        <i class="ti ti-database-export"></i>
+                        <span>نسخ احتياطي</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -592,6 +596,51 @@ function loadUpcomingDeliveries() {
                 `;
             }
         });
+}
+
+function createBackup() {
+    const btn = document.getElementById('backup-btn');
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<div class="spinner-border spinner-border-sm"></div><span>جاري النسخ...</span>';
+    btn.style.pointerEvents = 'none';
+
+    fetch('{{ route("admin.backup") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        btn.innerHTML = originalContent;
+        btn.style.pointerEvents = 'auto';
+        if (result.success) {
+            Swal.fire({
+                icon: 'success',
+                title: 'تم بنجاح',
+                text: result.message,
+                confirmButtonText: 'حسناً'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'خطأ',
+                text: result.message,
+                confirmButtonText: 'حسناً'
+            });
+        }
+    })
+    .catch(error => {
+        btn.innerHTML = originalContent;
+        btn.style.pointerEvents = 'auto';
+        Swal.fire({
+            icon: 'error',
+            title: 'خطأ',
+            text: 'حدث خطأ في الاتصال',
+            confirmButtonText: 'حسناً'
+        });
+    });
 }
 </script>
 @endpush

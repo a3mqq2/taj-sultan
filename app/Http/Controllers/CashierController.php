@@ -301,6 +301,8 @@ class CashierController extends Controller
             'is_credit' => 'nullable|boolean',
             'customer_id' => 'required_if:is_credit,true|nullable|exists:customers,id',
             'paid_amount' => 'nullable|numeric|min:0',
+            'delivery_type' => 'nullable|in:pickup,delivery',
+            'delivery_phone' => 'required_if:delivery_type,delivery|nullable|string|max:20',
         ]);
 
         $order = Order::with('items')->find($validated['order_id']);
@@ -373,6 +375,8 @@ class CashierController extends Controller
                     'total' => $expectedTotal,
                     'customer_id' => $customerId,
                     'credit_amount' => $creditAmount,
+                    'delivery_type' => $validated['delivery_type'] ?? 'pickup',
+                    'delivery_phone' => $validated['delivery_phone'] ?? null,
                 ]);
 
                 if ($isCredit && $creditAmount > 0 && $customerId) {
@@ -404,6 +408,8 @@ class CashierController extends Controller
                     'total' => $order->total,
                     'credit_amount' => $order->credit_amount,
                     'customer_name' => $order->customer ? $order->customer->name : null,
+                    'delivery_type' => $order->delivery_type,
+                    'delivery_phone' => $order->delivery_phone,
                     'payments' => $paymentsData,
                     'paid_at' => $order->paid_at->format('Y-m-d H:i'),
                     'cashier_name' => auth()->user()->name,

@@ -1516,9 +1516,25 @@
                                 <span style="font-weight:800;font-size:16px;color:#10b981;">${total.toFixed(3)} د.ل</span>
                             </div>
                         </div>
-                        <div style="background:#f0fdf4;border-radius:8px;padding:12px;">
+                        <div style="background:#f0fdf4;border-radius:8px;padding:12px;margin-bottom:12px;">
                             <div style="font-weight:700;margin-bottom:8px;color:#15803d;font-size:13px;">المدفوعات</div>
                             ${paymentsHtml}
+                        </div>
+                        <div style="background:#fff;border:2px solid #e2e8f0;border-radius:8px;padding:12px;">
+                            <div style="font-weight:700;margin-bottom:10px;color:#475569;font-size:13px;">نوع الاستلام</div>
+                            <div style="display:flex;gap:10px;margin-bottom:10px;">
+                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;cursor:pointer;font-weight:600;">
+                                    <input type="radio" name="deliveryType" value="pickup" checked style="width:18px;height:18px;">
+                                    <i class="ti ti-building-store" style="font-size:18px;"></i> استلام
+                                </label>
+                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;font-weight:600;" id="deliveryLabel">
+                                    <input type="radio" name="deliveryType" value="delivery" style="width:18px;height:18px;">
+                                    <i class="ti ti-truck-delivery" style="font-size:18px;"></i> توصيل
+                                </label>
+                            </div>
+                            <div id="deliveryPhoneBox" style="display:none;">
+                                <input type="text" id="deliveryPhoneInput" placeholder="رقم الهاتف للتوصيل" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;text-align:center;">
+                            </div>
                         </div>
                     </div>
                 `,
@@ -1530,10 +1546,46 @@
                 customClass: {
                     popup: 'swal-rtl',
                     title: 'swal-title-rtl'
+                },
+                didOpen: () => {
+                    const radios = document.querySelectorAll('input[name="deliveryType"]');
+                    const phoneBox = document.getElementById('deliveryPhoneBox');
+                    const pickupLabel = radios[0].closest('label');
+                    const deliveryLabel = radios[1].closest('label');
+                    radios.forEach(radio => {
+                        radio.addEventListener('change', () => {
+                            if (radio.value === 'delivery') {
+                                phoneBox.style.display = 'block';
+                                deliveryLabel.style.background = '#fef3c7';
+                                deliveryLabel.style.borderColor = '#f59e0b';
+                                pickupLabel.style.background = '#f8fafc';
+                                pickupLabel.style.borderColor = '#e2e8f0';
+                                document.getElementById('deliveryPhoneInput').focus();
+                            } else {
+                                phoneBox.style.display = 'none';
+                                pickupLabel.style.background = '#f0fdf4';
+                                pickupLabel.style.borderColor = '#22c55e';
+                                deliveryLabel.style.background = '#f8fafc';
+                                deliveryLabel.style.borderColor = '#e2e8f0';
+                            }
+                        });
+                    });
+                },
+                preConfirm: () => {
+                    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
+                    const deliveryPhone = document.getElementById('deliveryPhoneInput').value.trim();
+                    if (deliveryType === 'delivery' && !deliveryPhone) {
+                        Swal.showValidationMessage('أدخل رقم الهاتف للتوصيل');
+                        return false;
+                    }
+                    return { deliveryType, deliveryPhone };
                 }
             });
 
             if (!confirm.isConfirmed) return;
+
+            const deliveryType = confirm.value.deliveryType;
+            const deliveryPhone = confirm.value.deliveryPhone;
 
             try {
                 let orderId;
@@ -1571,7 +1623,9 @@
                         payments: payments.map(p => ({
                             payment_method_id: p.payment_method_id,
                             amount: p.amount
-                        }))
+                        })),
+                        delivery_type: deliveryType,
+                        delivery_phone: deliveryPhone
                     })
                 });
 
@@ -1614,7 +1668,12 @@
                 totalsHtml = `<div class="total"><span>الإجمالي</span><span>${parseFloat(data.total).toFixed(3)} د.ل</span></div>`;
             }
 
-            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet"><style>@page{margin:0;size:80mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:13px;padding:10px;width:80mm}.header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}.logo{max-width:200px;margin-bottom:8px;filter:grayscale(100%) contrast(1.5)}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}.subtotal{padding:8px 10px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}.discount-box{padding:10px;margin:6px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border:3px dashed #000;background:#f5f5f5}.total{background:#000;color:#fff;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}.section{margin:10px 0;padding:10px 0;border-top:1px dashed #000}.section-title{font-size:12px;font-weight:700;margin-bottom:6px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.thanks{text-align:center;font-size:14px;font-weight:700;padding:12px 0;border-top:2px dashed #000}.hulul-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px}.hulul-footer img{height:35px;filter:grayscale(100%) contrast(1.3)}.hulul-footer p{font-size:12px;font-weight:700;color:#000}</style></head><body><div class="header"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan" class="logo"></div><div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div><div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div><div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>${totalsHtml}<div class="section"><div class="section-title">طرق الدفع</div><table><thead><tr><th>الطريقة</th><th>المبلغ</th></tr></thead><tbody>${paymentsHtml}</tbody></table></div><div class="thanks">شكراً لزيارتكم</div><div class="hulul-footer"><img src="{{ asset('hulul.jpg') }}" alt="Hulul"><p>حلول لتقنية المعلومات</p></div></body></html>`;
+            let deliveryHtml = '';
+            if (data.delivery_type === 'delivery') {
+                deliveryHtml = `<div class="delivery-box"><div class="delivery-icon">🚚</div><div class="delivery-title">توصيل</div><div class="delivery-phone">${data.delivery_phone || '-'}</div></div>`;
+            }
+
+            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet"><style>@page{margin:0;size:80mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:13px;padding:10px;width:80mm}.header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}.logo{max-width:200px;margin-bottom:8px;filter:grayscale(100%) contrast(1.5)}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}.subtotal{padding:8px 10px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}.discount-box{padding:10px;margin:6px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border:3px dashed #000;background:#f5f5f5}.total{background:#000;color:#fff;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}.delivery-box{border:3px solid #000;padding:12px;margin:10px 0;text-align:center;background:#fff}.delivery-icon{font-size:24px;margin-bottom:4px}.delivery-title{font-size:16px;font-weight:800;margin-bottom:4px}.delivery-phone{font-size:18px;font-weight:700;direction:ltr}.section{margin:10px 0;padding:10px 0;border-top:1px dashed #000}.section-title{font-size:12px;font-weight:700;margin-bottom:6px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.thanks{text-align:center;font-size:14px;font-weight:700;padding:12px 0;border-top:2px dashed #000}.hulul-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px}.hulul-footer img{height:35px;filter:grayscale(100%) contrast(1.3)}.hulul-footer p{font-size:12px;font-weight:700;color:#000}</style></head><body><div class="header"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan" class="logo"></div><div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div><div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div><div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div>${deliveryHtml}<table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>${totalsHtml}<div class="section"><div class="section-title">طرق الدفع</div><table><thead><tr><th>الطريقة</th><th>المبلغ</th></tr></thead><tbody>${paymentsHtml}</tbody></table></div><div class="thanks">شكراً لزيارتكم</div><div class="hulul-footer"><img src="{{ asset('hulul.jpg') }}" alt="Hulul"><p>حلول لتقنية المعلومات</p></div></body></html>`;
 
             const win = window.open('', '_blank', 'width=400,height=600');
             if (win) {
@@ -1789,9 +1848,25 @@
                             <span style="color:#15803d;font-weight:600;">المدفوع</span>
                             <span style="color:#22c55e;font-weight:800;font-size:16px;">${paidAmount.toFixed(3)} د.ل</span>
                         </div>
-                        <div style="display:flex;justify-content:space-between;padding:12px;background:#fef2f2;border:2px solid #fecaca;border-radius:8px;">
+                        <div style="display:flex;justify-content:space-between;padding:12px;background:#fef2f2;border:2px solid #fecaca;border-radius:8px;margin-bottom:12px;">
                             <span style="color:#991b1b;font-weight:700;">المبلغ الآجل</span>
                             <span style="color:#dc2626;font-weight:800;font-size:18px;">${creditAmount.toFixed(3)} د.ل</span>
+                        </div>
+                        <div style="background:#fff;border:2px solid #e2e8f0;border-radius:8px;padding:12px;">
+                            <div style="font-weight:700;margin-bottom:10px;color:#475569;font-size:13px;">نوع الاستلام</div>
+                            <div style="display:flex;gap:10px;margin-bottom:10px;">
+                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;cursor:pointer;font-weight:600;">
+                                    <input type="radio" name="creditDeliveryType" value="pickup" checked style="width:18px;height:18px;">
+                                    <i class="ti ti-building-store" style="font-size:18px;"></i> استلام
+                                </label>
+                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;font-weight:600;" id="creditDeliveryLabel">
+                                    <input type="radio" name="creditDeliveryType" value="delivery" style="width:18px;height:18px;">
+                                    <i class="ti ti-truck-delivery" style="font-size:18px;"></i> توصيل
+                                </label>
+                            </div>
+                            <div id="creditDeliveryPhoneBox" style="display:none;">
+                                <input type="text" id="creditDeliveryPhoneInput" placeholder="رقم الهاتف للتوصيل" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;text-align:center;">
+                            </div>
                         </div>
                     </div>
                 `,
@@ -1803,10 +1878,46 @@
                 customClass: {
                     popup: 'swal-rtl',
                     title: 'swal-title-rtl'
+                },
+                didOpen: () => {
+                    const radios = document.querySelectorAll('input[name="creditDeliveryType"]');
+                    const phoneBox = document.getElementById('creditDeliveryPhoneBox');
+                    const pickupLabel = radios[0].closest('label');
+                    const deliveryLabel = radios[1].closest('label');
+                    radios.forEach(radio => {
+                        radio.addEventListener('change', () => {
+                            if (radio.value === 'delivery') {
+                                phoneBox.style.display = 'block';
+                                deliveryLabel.style.background = '#fef3c7';
+                                deliveryLabel.style.borderColor = '#f59e0b';
+                                pickupLabel.style.background = '#f8fafc';
+                                pickupLabel.style.borderColor = '#e2e8f0';
+                                document.getElementById('creditDeliveryPhoneInput').focus();
+                            } else {
+                                phoneBox.style.display = 'none';
+                                pickupLabel.style.background = '#f0fdf4';
+                                pickupLabel.style.borderColor = '#22c55e';
+                                deliveryLabel.style.background = '#f8fafc';
+                                deliveryLabel.style.borderColor = '#e2e8f0';
+                            }
+                        });
+                    });
+                },
+                preConfirm: () => {
+                    const deliveryType = document.querySelector('input[name="creditDeliveryType"]:checked').value;
+                    const deliveryPhone = document.getElementById('creditDeliveryPhoneInput').value.trim();
+                    if (deliveryType === 'delivery' && !deliveryPhone) {
+                        Swal.showValidationMessage('أدخل رقم الهاتف للتوصيل');
+                        return false;
+                    }
+                    return { deliveryType, deliveryPhone };
                 }
             });
 
             if (!confirm.isConfirmed) return;
+
+            const creditDeliveryType = confirm.value.deliveryType;
+            const creditDeliveryPhone = confirm.value.deliveryPhone;
 
             try {
                 let orderId;
@@ -1850,7 +1961,9 @@
                         payments: creditPayments,
                         is_credit: true,
                         customer_id: selectedCustomer.id,
-                        paid_amount: paidAmount
+                        paid_amount: paidAmount,
+                        delivery_type: creditDeliveryType,
+                        delivery_phone: creditDeliveryPhone
                     })
                 });
 
@@ -1904,7 +2017,12 @@
                 `;
             }
 
-            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet"><style>@page{margin:0;size:80mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:13px;padding:10px;width:80mm}.header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}.logo{max-width:200px;margin-bottom:8px;filter:grayscale(100%) contrast(1.5)}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}.subtotal{padding:8px 10px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}.discount-box{padding:10px;margin:6px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border:3px dashed #000;background:#f5f5f5}.total{background:#000;color:#fff;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}.credit-section{border:3px solid #000;padding:12px;margin:12px 0;background:#fff5f5}.credit-title{font-size:14px;font-weight:800;text-align:center;margin-bottom:8px}.credit-customer{text-align:center;font-weight:700;margin-bottom:8px;font-size:13px}.credit-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}.credit-amount{font-weight:800;font-size:14px;border-top:1px dashed #000;padding-top:8px;margin-top:4px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.thanks{text-align:center;font-size:14px;font-weight:700;padding:12px 0;border-top:2px dashed #000}.hulul-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px}.hulul-footer img{height:35px;filter:grayscale(100%) contrast(1.3)}.hulul-footer p{font-size:12px;font-weight:700;color:#000}</style></head><body><div class="header"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan" class="logo"></div><div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div><div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div><div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>${totalsHtml}${creditHtml}<div class="thanks">شكراً لزيارتكم</div><div class="hulul-footer"><img src="{{ asset('hulul.jpg') }}" alt="Hulul"><p>حلول لتقنية المعلومات</p></div></body></html>`;
+            let deliveryHtml = '';
+            if (data.delivery_type === 'delivery') {
+                deliveryHtml = `<div class="delivery-box"><div class="delivery-icon">🚚</div><div class="delivery-title">توصيل</div><div class="delivery-phone">${data.delivery_phone || '-'}</div></div>`;
+            }
+
+            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet"><style>@page{margin:0;size:80mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:13px;padding:10px;width:80mm}.header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}.logo{max-width:200px;margin-bottom:8px;filter:grayscale(100%) contrast(1.5)}table{width:100%;border-collapse:collapse;margin:8px 0}th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}.subtotal{padding:8px 10px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}.discount-box{padding:10px;margin:6px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800;border:3px dashed #000;background:#f5f5f5}.total{background:#000;color:#fff;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}.delivery-box{border:3px solid #000;padding:12px;margin:10px 0;text-align:center;background:#fff}.delivery-icon{font-size:24px;margin-bottom:4px}.delivery-title{font-size:16px;font-weight:800;margin-bottom:4px}.delivery-phone{font-size:18px;font-weight:700;direction:ltr}.credit-section{border:3px solid #000;padding:12px;margin:12px 0;background:#fff5f5}.credit-title{font-size:14px;font-weight:800;text-align:center;margin-bottom:8px}.credit-customer{text-align:center;font-weight:700;margin-bottom:8px;font-size:13px}.credit-row{display:flex;justify-content:space-between;padding:4px 0;font-size:12px}.credit-amount{font-weight:800;font-size:14px;border-top:1px dashed #000;padding-top:8px;margin-top:4px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.thanks{text-align:center;font-size:14px;font-weight:700;padding:12px 0;border-top:2px dashed #000}.hulul-footer{display:flex;align-items:center;justify-content:center;gap:10px;padding:12px 0;border-top:2px solid #000;margin-top:10px}.hulul-footer img{height:35px;filter:grayscale(100%) contrast(1.3)}.hulul-footer p{font-size:12px;font-weight:700;color:#000}</style></head><body><div class="header"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan" class="logo"></div><div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div><div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div><div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div>${deliveryHtml}<table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>${totalsHtml}${creditHtml}<div class="thanks">شكراً لزيارتكم</div><div class="hulul-footer"><img src="{{ asset('hulul.jpg') }}" alt="Hulul"><p>حلول لتقنية المعلومات</p></div></body></html>`;
 
             const win = window.open('', '_blank', 'width=400,height=600');
             if (win) {

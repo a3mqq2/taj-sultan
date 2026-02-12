@@ -12,6 +12,7 @@ use App\Http\Controllers\PosPointController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\SalesReportController;
+use App\Http\Controllers\Admin\BackupController;
 
 Route::redirect('/', 'login');
 
@@ -107,6 +108,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/sales/special-orders/summary', [SalesReportController::class, 'specialOrdersSummary'])->name('sales.special-orders.summary');
         Route::get('/sales/special-orders/export', [SalesReportController::class, 'exportSpecialOrdersExcel'])->name('sales.special-orders.export');
     });
+
+    Route::post('/backup', [BackupController::class, 'create'])->name('admin.backup');
 });
 
 Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->group(function () {
