@@ -111,7 +111,7 @@ class DatabaseBackup extends Command
     private function getDriveType(string $drive): string
     {
         $letter = substr($drive, 0, 1);
-        $script = "Get-WmiObject Win32_LogicalDisk | Where-Object {\\$_.DeviceID -eq '{$letter}:'} | Select-Object -ExpandProperty DriveType";
+        $script = 'Get-WmiObject Win32_LogicalDisk | Where-Object {$_.DeviceID -eq "' . $letter . ':"} | Select-Object -ExpandProperty DriveType';
 
         exec("powershell -Command \"{$script}\" 2>&1", $output, $returnCode);
 
