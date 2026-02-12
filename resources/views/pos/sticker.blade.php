@@ -1,68 +1,148 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="{{ app()->getLocale() }}" dir="{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }}">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ __('messages.print_barcode') }} - {{ $item['name'] }}</title>
 
 <style>
-@page{
-size:38mm 25mm;
-margin:0;
+*{
+margin:0 !important;
+padding:0 !important;
+box-sizing:border-box;
 }
 
 html,body{
-width:38mm;
-height:25mm;
-margin:0;
-padding:0;
-display:flex;
-align-items:center;
-justify-content:center;
+margin:0 !important;
+padding:0 !important;
 }
 
-.sticker{
-width:38mm;
+body{
+font-family:Arial,sans-serif;
+direction:{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }};
+}
+
+.barcode-item{
+width:30mm;
 height:25mm;
+padding:0.5mm !important;
+text-align:center;
 display:flex;
 flex-direction:column;
+justify-content:space-between;
+page-break-after:always;
+overflow:hidden;
+}
+
+.barcode-item:last-child{
+page-break-after:auto;
+}
+
+.product-name{
+font-size:7px;
+font-weight:bold;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+
+.barcode{
+flex:1;
+display:flex;
 align-items:center;
 justify-content:center;
-padding:0;
 }
 
-svg{
-width:34mm;
-height:14mm;
+.barcode svg{
+width:27mm;
+height:13mm;
 }
 
-.order-num{
-font-size:7pt;
-margin-top:1mm;
+.product-code{
+font-size:7px;
 font-weight:bold;
+font-family:monospace;
+}
+
+.product-price{
+font-size:8px;
+font-weight:bold;
+}
+
+.no-print{
+text-align:center;
+padding:20px !important;
+}
+
+@media print{
+.no-print{display:none !important;}
+
+html,body{
+width:30mm !important;
+height:25mm !important;
+margin:0 !important;
+padding:0 !important;
+}
+
+.barcode-item{
+width:30mm !important;
+height:25mm !important;
+padding:0.5mm !important;
+}
+
+@page{
+size:30mm 25mm;
+margin:0 !important;
+}
+}
+
+@media screen{
+.barcode-item{
+border:1px dashed #ccc;
+margin:5px auto !important;
+background:white;
+}
 }
 </style>
 
-<script src="{{ asset('assets/js/jsbarcode.min.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 </head>
 
 <body>
 
-<div class="sticker">
-<svg id="barcode"></svg>
-<div class="order-num">{{ $orderNumber }}</div>
+<div class="no-print">
+<button onclick="window.print()" style="padding:10px 30px;font-size:16px;cursor:pointer;margin-bottom:20px;">
+{{ __('messages.print') }}
+</button>
+<p style="margin-top:10px;color:#666;">30mm x 25mm</p>
+</div>
+
+<div>
+@for($i = 0; $i < $quantity; $i++)
+<div class="barcode-item">
+<div class="product-name">{{ $item['name'] }}</div>
+<div class="barcode">
+<svg id="barcode-{{ $i }}"></svg>
+</div>
+<div class="product-code">{{ $item['code'] }}</div>
+<div class="product-price">{{ number_format($item['price'],2) }} {{ __('messages.currency') }}</div>
+</div>
+@endfor
 </div>
 
 <script>
-JsBarcode("#barcode","{{ $orderNumber }}",{
+document.addEventListener('DOMContentLoaded',function(){
+@for($i = 0; $i < $quantity; $i++)
+JsBarcode("#barcode-{{ $i }}","{{ $item['code'] }}",{
 format:"CODE128",
 width:1.2,
-height:24,
-margin:0,
-displayValue:false
+height:22,
+displayValue:false,
+margin:0
 });
-
-window.onload=function(){
-window.print();
-};
+@endfor
+setTimeout(function(){window.print();},400);
+});
 </script>
 
 </body>
