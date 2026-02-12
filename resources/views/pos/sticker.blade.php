@@ -17,7 +17,7 @@ padding:0 !important;
 }
 
 .barcode-item{
-width:40mm;
+width:35mm;
 height:30mm;
 display:flex;
 align-items:center;
@@ -26,13 +26,13 @@ flex-direction:column;
 }
 
 .barcode svg{
-width:37mm;
+width:32mm;
 height:18mm;
 }
 
 .barcode-text{
 font-family:monospace;
-font-size:11px;
+font-size:10px;
 font-weight:bold;
 margin-top:1mm;
 }
@@ -46,12 +46,12 @@ padding:20px !important;
 .no-print{display:none !important;}
 
 html,body{
-width:40mm !important;
+width:35mm !important;
 height:30mm !important;
 }
 
 @page{
-size:40mm 30mm;
+size:35mm 30mm;
 margin:0 !important;
 }
 }
@@ -71,7 +71,7 @@ background:white;
 <button onclick="window.print()" style="padding:10px 30px;font-size:16px;cursor:pointer;">
 طباعة
 </button>
-<p style="margin-top:10px !important;color:#666;">40mm x 30mm</p>
+<p style="margin-top:10px !important;color:#666;">35mm x 30mm</p>
 </div>
 
 <div class="barcode-item">
