@@ -24,7 +24,7 @@ direction:{{ app()->getLocale() == 'ar' ? 'rtl' : 'ltr' }};
 
 .barcode-item{
 width:25mm;
-height:30mm;
+height:35mm;
 padding:0.5mm !important;
 text-align:center;
 display:flex;
@@ -55,7 +55,7 @@ justify-content:center;
 
 .barcode svg{
 width:22mm;
-height:16mm;
+height:18mm;
 }
 
 .product-code{
@@ -79,19 +79,19 @@ padding:20px !important;
 
 html,body{
 width:25mm !important;
-height:30mm !important;
+height:35mm !important;
 margin:0 !important;
 padding:0 !important;
 }
 
 .barcode-item{
 width:25mm !important;
-height:30mm !important;
+height:35mm !important;
 padding:0.5mm !important;
 }
 
 @page{
-size:25mm 30mm;
+size:25mm 35mm;
 margin:0 !important;
 }
 }
@@ -114,7 +114,7 @@ background:white;
 <button onclick="window.print()" style="padding:10px 30px;font-size:16px;cursor:pointer;margin-bottom:20px;">
 {{ __('messages.print') }}
 </button>
-<p style="margin-top:10px;color:#666;">25mm x 30mm</p>
+<p style="margin-top:10px;color:#666;">25mm x 35mm</p>
 </div>
 
 <div>
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded',function(){
 JsBarcode("#barcode-{{ $i }}","{{ $item['code'] }}",{
 format:"CODE128",
 width:1,
-height:28,
+height:30,
 displayValue:false,
 margin:0
 });
