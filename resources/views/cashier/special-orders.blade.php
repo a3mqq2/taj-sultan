@@ -937,6 +937,7 @@
                 <div class="info"><span class="label">المناسبة:</span><span>${data.event_type}</span></div>
                 <div class="info"><span class="label">التسليم:</span><span>${data.delivery_date}</span></div>
             </div>
+            <div class="status-box">${data.status_name || 'قيد الانتظار'}</div>
             <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>
             <div class="total-box"><span>الإجمالي</span><span>${parseFloat(data.total_amount).toFixed(3)} د.ل</span></div>
             <div class="paid-box"><span>المدفوع</span><span>${parseFloat(data.paid_amount).toFixed(3)} د.ل</span></div>
@@ -952,34 +953,35 @@
             <style>
                 @page{margin:0;size:72mm auto}
                 *{margin:0;padding:0;box-sizing:border-box}
-                body{font-family:'Cairo',sans-serif;font-size:8px;line-height:1;padding:1mm;width:72mm;color:#000}
+                body{font-family:'Cairo',sans-serif;font-size:11px;line-height:1.3;padding:3mm;width:72mm;color:#000}
                 .receipt{page-break-after:always}
                 .receipt:last-child{page-break-after:auto}
-                .header{text-align:center;border-bottom:1px dashed #000}
-                .header .title{font-size:10px;font-weight:700}
-                .barcode-section{text-align:center;border-bottom:1px dashed #000}
+                .header{text-align:center;border-bottom:1px dashed #000;padding-bottom:6px;margin-bottom:6px}
+                .header .title{font-size:13px;font-weight:700}
+                .barcode-section{text-align:center;border-bottom:1px dashed #000;padding:5px 0}
                 .barcode-svg{display:block;margin:0 auto}
-                .order-id{font-size:9px;font-weight:700}
-                .info{font-size:7px;display:flex;justify-content:space-between}
+                .order-id{font-size:12px;font-weight:700;margin-top:3px}
+                .info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}
                 .info .label{font-weight:700}
-                .section{border-bottom:1px dashed #000}
-                table{width:100%;border-collapse:collapse}
-                th{background:#000;color:#fff;padding:1px;font-size:7px}
-                td{padding:1px;font-size:7px;border-bottom:1px dotted #ccc}
-                .total-box{border:1px solid #000;padding:2px;display:flex;justify-content:space-between;font-size:10px;font-weight:800}
-                .paid-box{display:flex;justify-content:space-between;font-size:8px;font-weight:700}
-                .remaining-box{border:1px dashed #000;padding:1px;display:flex;justify-content:space-between;font-size:9px;font-weight:700}
-                .payments-section{border-top:1px dashed #000}
-                .section-title{background:#000;color:#fff;text-align:center;font-weight:700;font-size:7px}
-                .payment-row{display:flex;justify-content:space-between;font-size:7px}
-                .thanks{text-align:center;font-size:8px;font-weight:700;border-top:1px dashed #000}
-                .footer{text-align:center;display:flex;align-items:center;justify-content:center;gap:3px;font-size:7px;color:#333}
-                .footer img{height:14px;width:auto;filter:grayscale(100%)}
+                .section{border-bottom:1px dashed #000;padding-bottom:6px;margin-bottom:6px}
+                .status-box{text-align:center;padding:5px;border:1px solid #000;font-weight:700;font-size:12px;margin:6px 0}
+                table{width:100%;border-collapse:collapse;margin:6px 0}
+                th{background:#000;color:#fff;padding:4px;font-size:10px}
+                td{padding:4px;font-size:10px;border-bottom:1px dotted #ccc}
+                .total-box{border:1px solid #000;padding:6px;margin:6px 0;display:flex;justify-content:space-between;font-size:14px;font-weight:800}
+                .paid-box{display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:3px 0}
+                .remaining-box{border:1px dashed #000;padding:5px;margin-top:4px;display:flex;justify-content:space-between;font-size:12px;font-weight:700}
+                .payments-section{border-top:1px dashed #000;padding-top:6px;margin-top:6px}
+                .section-title{background:#000;color:#fff;text-align:center;font-weight:700;font-size:10px;padding:3px}
+                .payment-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0}
+                .thanks{text-align:center;font-size:11px;font-weight:700;border-top:1px dashed #000;padding:6px 0}
+                .footer{text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;font-size:9px;color:#333;padding-top:4px}
+                .footer img{height:22px;width:auto;filter:grayscale(100%)}
             </style></head><body>
             ${receiptContent}
             ${receiptContent}
             <script>
-                JsBarcode(".barcode-svg", "${barcodeValue}", {format:"CODE128",width:1.2,height:28,displayValue:false,margin:2,background:"#ffffff",lineColor:"#000000"});
+                JsBarcode(".barcode-svg", "${barcodeValue}", {format:"CODE128",width:1.8,height:40,displayValue:false,margin:5,background:"#ffffff",lineColor:"#000000"});
             <\/script>
             </body></html>`;
 
