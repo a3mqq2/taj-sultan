@@ -789,6 +789,10 @@
         <div class="header">
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan"></div>
             <div class="header-left">
+                <button type="button" class="special-order-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="showCancelInvoiceModal()">
+                    <i class="ti ti-file-x"></i>
+                    إلغاء فاتورة
+                </button>
                 <a href="{{ route('cashier.customers') }}" class="special-order-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);">
                     <i class="ti ti-users"></i>
                     الزبائن والديون
@@ -1290,6 +1294,96 @@
                 }
             } catch (err) {
                 console.error('cancelSpecialOrder error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
+            }
+        }
+
+        async function showCancelInvoiceModal() {
+            const { value: orderNumber } = await Swal.fire({
+                title: 'إلغاء فاتورة بيع',
+                input: 'text',
+                inputLabel: 'أدخل رقم الفاتورة أو امسح الباركود',
+                inputPlaceholder: 'رقم الفاتورة...',
+                showCancelButton: true,
+                confirmButtonText: '<i class="ti ti-search"></i> بحث',
+                cancelButtonText: 'إغلاق',
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#64748b',
+                customClass: {
+                    popup: 'swal-rtl',
+                    title: 'swal-title-rtl',
+                    input: 'swal-input-rtl'
+                },
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'يرجى إدخال رقم الفاتورة';
+                    }
+                }
+            });
+
+            if (orderNumber) {
+                await searchAndDeleteInvoice(orderNumber);
+            }
+        }
+
+        async function searchAndDeleteInvoice(orderNumber) {
+            try {
+                const res = await fetch(BASE_URL + '/cashier/find-invoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ order_number: orderNumber })
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    toast(data.message, 'error');
+                    return;
+                }
+
+                const order = data.data;
+                let itemsList = order.items.map(item => `<li>${item.product_name} × ${item.quantity}</li>`).join('');
+
+                const confirm = await Swal.fire({
+                    title: `فاتورة #${order.order_number}`,
+                    html: `<div style="text-align:right;font-size:14px;">
+                        <p><strong>التاريخ:</strong> ${order.paid_at}</p>
+                        <p><strong>الإجمالي:</strong> ${parseFloat(order.total).toFixed(3)} د.ل</p>
+                        <p><strong>الأصناف:</strong></p>
+                        <ul style="margin:5px 20px;text-align:right;">${itemsList}</ul>
+                    </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: '<i class="ti ti-trash"></i> حذف الفاتورة',
+                    cancelButtonText: 'إلغاء',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#64748b',
+                    customClass: {
+                        popup: 'swal-rtl',
+                        title: 'swal-title-rtl'
+                    }
+                });
+
+                if (!confirm.isConfirmed) return;
+
+                const deleteRes = await fetch(BASE_URL + '/cashier/delete-invoice/' + order.id, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+                const deleteData = await deleteRes.json();
+
+                if (deleteData.success) {
+                    toast(deleteData.message, 'success');
+                } else {
+                    toast(deleteData.message, 'error');
+                }
+            } catch (err) {
+                console.error('searchAndDeleteInvoice error:', err);
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }

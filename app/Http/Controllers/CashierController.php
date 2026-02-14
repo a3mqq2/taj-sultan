@@ -899,6 +899,74 @@ class CashierController extends Controller
         ]);
     }
 
+    public function findInvoice(Request $request)
+    {
+        $orderNumber = $request->input('order_number');
+
+        $order = Order::with('items')
+            ->where('order_number', $orderNumber)
+            ->orWhere('id', $orderNumber)
+            ->first();
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على الفاتورة'
+            ]);
+        }
+
+        if ($order->status === 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذه الفاتورة ملغية مسبقاً'
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'total' => $order->total,
+                'paid_at' => $order->paid_at ? $order->paid_at->format('Y-m-d H:i') : $order->created_at->format('Y-m-d H:i'),
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'product_name' => $item->product_name,
+                        'quantity' => $item->is_weight ? number_format($item->quantity, 3) : $item->quantity,
+                    ];
+                })
+            ]
+        ]);
+    }
+
+    public function deleteInvoice($id)
+    {
+        $order = Order::with(['items', 'payments'])->find($id);
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على الفاتورة'
+            ]);
+        }
+
+        if ($order->status === 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذه الفاتورة ملغية مسبقاً'
+            ]);
+        }
+
+        $order->items()->delete();
+        $order->payments()->delete();
+        $order->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حذف الفاتورة بنجاح'
+        ]);
+    }
+
     public function searchCustomers(Request $request)
     {
         $search = $request->get('q', '');

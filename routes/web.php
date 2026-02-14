@@ -142,6 +142,8 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
 
     Route::post('/fetch-order-for-merge', [CashierController::class, 'fetchOrderForMerge'])->name('fetch-order-for-merge');
     Route::post('/merge-orders', [CashierController::class, 'mergeOrders'])->name('merge-orders');
+    Route::post('/find-invoice', [CashierController::class, 'findInvoice'])->name('find-invoice');
+    Route::post('/delete-invoice/{id}', [CashierController::class, 'deleteInvoice'])->name('delete-invoice');
 });
 
 Route::prefix('pos')->name('pos.')->group(function () {
