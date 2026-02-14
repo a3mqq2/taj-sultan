@@ -904,7 +904,7 @@
 
         function printOrder() {
             if (!currentOrder) return;
-            window.open(`/public/cashier/special-orders/${currentOrder.id}/print`, '_blank');
+            window.open(`/taj-sultan/public/cashier/special-orders/${currentOrder.id}/print`, '_blank');
         }
 
         function printNewOrder(data) {
