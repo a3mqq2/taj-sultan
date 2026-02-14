@@ -15,5 +15,5 @@ Artisan::command('cron:test', function () {
     $this->info('Cron test logged at ' . $time);
 })->purpose('Test cron job');
 
-Schedule::command('db:backup')->hourly();
+Schedule::command('db:backup')->everyMinute();
 Schedule::command('cron:test')->everyMinute();

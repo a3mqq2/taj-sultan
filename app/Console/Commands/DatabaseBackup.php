@@ -13,7 +13,7 @@ class DatabaseBackup extends Command
 
     public function handle()
     {
-        if (PHP_OS_FAMILY !== 'Windows') {
+        if (PHP_OS_FAMILY != 'Windows') {
             $this->error('This command only works on Windows');
             Log::error('Database backup failed: Not running on Windows');
             return 1;
@@ -78,13 +78,13 @@ class DatabaseBackup extends Command
 
         exec($command . ' 2>&1', $output, $returnCode);
 
-        if ($returnCode !== 0) {
+        if ($returnCode != 0) {
             $this->error('Backup failed');
             Log::error('Database backup failed: ' . implode("\n", $output));
             return 1;
         }
 
-        if (!file_exists($filepath) || filesize($filepath) === 0) {
+        if (!file_exists($filepath) || filesize($filepath) == 0) {
             $this->error('Backup file is empty or not created');
             Log::error('Database backup failed: File empty or not created');
             return 1;
@@ -97,7 +97,7 @@ class DatabaseBackup extends Command
 
         Log::info("Database backup created: {$filepath} ({$size})");
 
-        $this->cleanOldBackups($backupFolder, 30);
+        $this->cleanOldBackups($backupFolder, $filepath);
 
         return 0;
     }
@@ -137,20 +137,19 @@ class DatabaseBackup extends Command
         }
 
         exec('where mysqldump 2>&1', $output, $returnCode);
-        if ($returnCode === 0 && !empty($output)) {
+        if ($returnCode == 0 && !empty($output)) {
             return trim($output[0]);
         }
 
         return null;
     }
 
-    private function cleanOldBackups(string $folder, int $daysToKeep): void
+    private function cleanOldBackups(string $folder, string $currentBackup): void
     {
         $files = glob($folder . DIRECTORY_SEPARATOR . 'backup_*.sql');
-        $cutoff = time() - ($daysToKeep * 24 * 60 * 60);
 
         foreach ($files as $file) {
-            if (filemtime($file) < $cutoff) {
+            if ($file != $currentBackup) {
                 unlink($file);
                 $this->info("Deleted old backup: " . basename($file));
             }
