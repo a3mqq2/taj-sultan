@@ -872,6 +872,33 @@ class CashierController extends Controller
         return view('cashier.special-order-print', compact('order'));
     }
 
+    public function cancelSpecialOrder($id)
+    {
+        $order = SpecialOrder::findOrFail($id);
+
+        if ($order->status === SpecialOrder::STATUS_CANCELLED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذه الطلبية ملغية مسبقاً'
+            ]);
+        }
+
+        if ($order->status === SpecialOrder::STATUS_COMPLETED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن إلغاء طلبية مكتملة'
+            ]);
+        }
+
+        $order->status = SpecialOrder::STATUS_CANCELLED;
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إلغاء الطلبية بنجاح'
+        ]);
+    }
+
     public function searchCustomers(Request $request)
     {
         $search = $request->get('q', '');
