@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>ستيكر - {{ $barcode }}</title>
-<script src="{{ asset('assets/js/jsbarcode.min.js') }}"></script>
+<script src="{{ asset('js/barcode/jsbarcode.min.js') }}"></script>
 
 <style>
 *{

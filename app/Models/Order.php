@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Order extends Model
 {
@@ -19,6 +20,7 @@ class Order extends Model
         'delivery_type',
         'delivery_phone',
         'status',
+        'merged_into',
         'paid_at',
         'paid_by',
         'payment_method_id',
@@ -71,6 +73,33 @@ class Order extends Model
         return $this->hasMany(OrderPayment::class);
     }
 
+    public function mergedIntoOrder(): BelongsTo
+    {
+        return $this->belongsTo(Order::class, 'merged_into');
+    }
+
+    public function mergeRecordsAsParent(): HasMany
+    {
+        return $this->hasMany(OrderMerge::class, 'parent_order_id');
+    }
+
+    public function mergeRecordAsChild(): BelongsTo
+    {
+        return $this->belongsTo(OrderMerge::class, 'id', 'child_order_id');
+    }
+
+    public function mergedOrders(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Order::class,
+            OrderMerge::class,
+            'parent_order_id',
+            'id',
+            'id',
+            'child_order_id'
+        );
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
@@ -91,6 +120,11 @@ class Order extends Model
         return $query->where('credit_amount', '>', 0);
     }
 
+    public function scopeNotMerged($query)
+    {
+        return $query->whereNull('merged_into');
+    }
+
     public function isPending(): bool
     {
         return $this->status === 'pending';
@@ -99,6 +133,11 @@ class Order extends Model
     public function isPaid(): bool
     {
         return $this->status === 'paid';
+    }
+
+    public function isMerged(): bool
+    {
+        return $this->merged_into !== null;
     }
 
     public function hasCredit(): bool

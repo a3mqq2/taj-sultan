@@ -949,7 +949,7 @@
 
             const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
             <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
-            <script src="{{ asset('assets/js/jsbarcode.min.js') }}"><\/script>
+            <script src="{{ asset('js/barcode/jsbarcode.min.js') }}"><\/script>
             <style>
                 @page{margin:0;size:72mm auto}
                 *{margin:0;padding:0;box-sizing:border-box}

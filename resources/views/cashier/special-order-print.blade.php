@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلبية خاصة #{{ $order->id }}</title>
     <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
-    <script src="{{ asset('assets/js/jsbarcode.min.js') }}"></script>
+    <script src="{{ asset('js/barcode/jsbarcode.min.js') }}"></script>
     <style>
         @page {
             margin: 0;

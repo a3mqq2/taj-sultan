@@ -138,6 +138,9 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::post('/special-orders/fetch', [CashierController::class, 'fetchSpecialOrder'])->name('special-orders.fetch');
     Route::post('/special-orders/payment', [CashierController::class, 'addSpecialOrderPayment'])->name('special-orders.payment');
     Route::get('/special-orders/{id}/print', [CashierController::class, 'printSpecialOrder'])->name('special-orders.print');
+
+    Route::post('/fetch-order-for-merge', [CashierController::class, 'fetchOrderForMerge'])->name('fetch-order-for-merge');
+    Route::post('/merge-orders', [CashierController::class, 'mergeOrders'])->name('merge-orders');
 });
 
 Route::prefix('pos')->name('pos.')->group(function () {

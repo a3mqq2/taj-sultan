@@ -789,6 +789,10 @@
         <div class="header">
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan"></div>
             <div class="header-left">
+                <button type="button" class="special-order-btn" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);" id="mergeBtn">
+                    <i class="ti ti-git-merge"></i>
+                    دمج فواتير
+                </button>
                 <a href="{{ route('cashier.customers') }}" class="special-order-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);">
                     <i class="ti ti-users"></i>
                     الزبائن والديون
@@ -1003,6 +1007,45 @@
         </div>
     </div>
 
+    <div class="modal" id="mergeModal">
+        <div class="modal-content" style="max-width:550px;">
+            <div class="modal-header">
+                <div class="modal-title"><i class="ti ti-git-merge" style="color:#0ea5e9;"></i> دمج الفواتير</div>
+                <button class="modal-close" id="closeMergeModal"><i class="ti ti-x"></i></button>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">مسح باركود الفاتورة أو إدخال الرقم</label>
+                <div style="display:flex;gap:8px;">
+                    <input type="text" class="form-input" id="mergeOrderInput" placeholder="رقم الفاتورة..." style="font-size:14px;text-align:center;flex:1;">
+                    <button type="button" class="modal-btn" id="addMergeOrderBtn" style="background:#0ea5e9;color:#fff;flex:0;padding:12px 20px;">
+                        <i class="ti ti-plus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="mergeOrdersList" style="max-height:250px;overflow-y:auto;margin-bottom:12px;"></div>
+
+            <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+                <div style="display:flex;justify-content:space-between;padding:6px 0;">
+                    <span style="color:#64748b;">عدد الفواتير</span>
+                    <span style="font-weight:700;" id="mergeOrdersCount">0</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px dashed #e2e8f0;margin-top:4px;">
+                    <span style="font-weight:700;">إجمالي المبلغ</span>
+                    <span style="font-weight:800;font-size:16px;color:#0ea5e9;" id="mergeTotalAmount">0.000</span>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" id="cancelMergeModal">إلغاء</button>
+                <button class="modal-btn" id="confirmMerge" style="background:#0ea5e9;color:#fff;" disabled>
+                    <i class="ti ti-git-merge"></i> دمج الفواتير
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const BASE_URL = "{{ url('/') }}";
         const WEIGHT_PREFIX = '99';
@@ -1015,6 +1058,7 @@
         let discount = 0;
         let selectedCustomer = null;
         let isCredit = false;
+        let mergeOrders = [];
 
         document.addEventListener('DOMContentLoaded', init);
 
@@ -1050,6 +1094,15 @@
             document.getElementById('saveNewCustomer').addEventListener('click', saveNewCustomer);
             document.getElementById('creditPaidAmount').addEventListener('input', updateCreditRemaining);
             document.getElementById('confirmCredit').addEventListener('click', processCreditPayment);
+
+            document.getElementById('mergeBtn').addEventListener('click', openMergeModal);
+            document.getElementById('closeMergeModal').addEventListener('click', closeMergeModal);
+            document.getElementById('cancelMergeModal').addEventListener('click', closeMergeModal);
+            document.getElementById('addMergeOrderBtn').addEventListener('click', addMergeOrder);
+            document.getElementById('mergeOrderInput').addEventListener('keydown', e => {
+                if (e.key === 'Enter') addMergeOrder();
+            });
+            document.getElementById('confirmMerge').addEventListener('click', confirmMergeOrders);
         }
 
         function debounce(func, wait) {
@@ -2299,6 +2352,181 @@ ${creditHtml}
             clearPayments();
             updateSummary();
             document.getElementById('invoiceInput').focus();
+        }
+
+        function openMergeModal() {
+            mergeOrders = [];
+            document.getElementById('mergeModal').classList.add('active');
+            document.getElementById('mergeOrderInput').value = '';
+            document.getElementById('mergeOrdersList').innerHTML = '';
+            updateMergeSummary();
+            document.getElementById('mergeOrderInput').focus();
+        }
+
+        function closeMergeModal() {
+            document.getElementById('mergeModal').classList.remove('active');
+            mergeOrders = [];
+        }
+
+        async function addMergeOrder() {
+            const input = document.getElementById('mergeOrderInput');
+            const orderNum = input.value.trim();
+            if (!orderNum) return;
+
+            if (mergeOrders.some(o => o.order_number === orderNum || o.id.toString() === orderNum)) {
+                toast('هذه الفاتورة مضافة مسبقاً', 'error');
+                input.value = '';
+                input.focus();
+                return;
+            }
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/fetch-order-for-merge', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ order_number: orderNum })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (mergeOrders.some(o => o.id === data.data.id)) {
+                        toast('هذه الفاتورة مضافة مسبقاً', 'error');
+                        input.value = '';
+                        input.focus();
+                        return;
+                    }
+                    mergeOrders.push(data.data);
+                    renderMergeOrders();
+                    updateMergeSummary();
+                    input.value = '';
+                    input.focus();
+                    toast('تم إضافة الفاتورة', 'success');
+                } else {
+                    toast(data.message, 'error');
+                }
+            } catch (err) {
+                console.error('addMergeOrder error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
+            }
+        }
+
+        function renderMergeOrders() {
+            const container = document.getElementById('mergeOrdersList');
+            if (mergeOrders.length === 0) {
+                container.innerHTML = '<div style="text-align:center;color:#64748b;padding:20px;">أضف فاتورتين على الأقل للدمج</div>';
+                return;
+            }
+
+            container.innerHTML = mergeOrders.map((order, index) => `
+                <div style="border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:8px;background:#fff;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                        <div style="font-weight:700;color:#0ea5e9;">#${order.order_number}</div>
+                        <button onclick="removeMergeOrder(${index})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:16px;"><i class="ti ti-x"></i></button>
+                    </div>
+                    <div style="font-size:12px;color:#64748b;margin-bottom:4px;">${order.pos_point || 'POS'} - ${order.created_at}</div>
+                    <div style="font-size:13px;max-height:80px;overflow-y:auto;">
+                        ${order.items.map(item => `
+                            <div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #f1f5f9;">
+                                <span>${item.product_name}</span>
+                                <span style="color:#64748b;">${item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity} × ${parseFloat(item.price).toFixed(3)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #e2e8f0;font-weight:700;">
+                        <span>الإجمالي</span>
+                        <span>${parseFloat(order.total).toFixed(3)} د.ل</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function removeMergeOrder(index) {
+            mergeOrders.splice(index, 1);
+            renderMergeOrders();
+            updateMergeSummary();
+        }
+
+        function updateMergeSummary() {
+            const count = mergeOrders.length;
+            const total = mergeOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
+            document.getElementById('mergeOrdersCount').textContent = count;
+            document.getElementById('mergeTotalAmount').textContent = total.toFixed(3);
+            document.getElementById('confirmMerge').disabled = count < 2;
+        }
+
+        async function confirmMergeOrders() {
+            if (mergeOrders.length < 2) {
+                toast('يجب إضافة فاتورتين على الأقل', 'error');
+                return;
+            }
+
+            const total = mergeOrders.reduce((sum, o) => sum + parseFloat(o.total), 0);
+            const ordersHtml = mergeOrders.map(o => `
+                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
+                    <span style="color:#64748b;">#${o.order_number}</span>
+                    <span style="font-weight:600;">${parseFloat(o.total).toFixed(3)} د.ل</span>
+                </div>
+            `).join('');
+
+            const confirm = await Swal.fire({
+                title: '<i class="ti ti-git-merge" style="color:#0ea5e9;font-size:28px;"></i><br>تأكيد دمج الفواتير',
+                html: `
+                    <div style="text-align:right;font-size:15px;direction:rtl;font-family:'Cairo',sans-serif;">
+                        <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
+                            <div style="font-weight:700;margin-bottom:8px;color:#475569;font-size:13px;">الفواتير المراد دمجها</div>
+                            ${ordersHtml}
+                        </div>
+                        <div style="display:flex;justify-content:space-between;padding:12px;background:#e0f2fe;border:2px solid #0ea5e9;border-radius:8px;">
+                            <span style="font-weight:700;">إجمالي الفاتورة المدمجة</span>
+                            <span style="font-weight:800;font-size:18px;color:#0284c7;">${total.toFixed(3)} د.ل</span>
+                        </div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="ti ti-git-merge"></i> تأكيد الدمج',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#0ea5e9',
+                cancelButtonColor: '#64748b',
+                customClass: {
+                    popup: 'swal-rtl',
+                    title: 'swal-title-rtl'
+                }
+            });
+
+            if (!confirm.isConfirmed) return;
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/merge-orders', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        order_ids: mergeOrders.map(o => o.id)
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    closeMergeModal();
+                    toast('تم دمج الفواتير بنجاح', 'success');
+
+                    currentOrder = data.data;
+                    isDirectMode = false;
+                    directItems = [];
+                    payments = [];
+                    discount = parseFloat(data.data.discount) || 0;
+                    renderOrder();
+                    updateSummary();
+                } else {
+                    toast(data.message, 'error');
+                }
+            } catch (err) {
+                console.error('confirmMergeOrders error:', err);
+                toast('خطأ في الاتصال: ' + err.message, 'error');
+            }
         }
 
         function toast(msg, type = 'info') {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
+use App\Models\OrderMerge;
 use App\Models\Product;
 use App\Models\PaymentMethod;
 use App\Models\Customer;
@@ -1031,6 +1032,191 @@ class CashierController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'حدث خطأ أثناء تسجيل الدفعة',
+            ], 500);
+        }
+    }
+
+    public function fetchOrderForMerge(Request $request)
+    {
+        $request->validate([
+            'order_number' => 'required|string',
+        ]);
+
+        $orderNumber = trim($request->order_number);
+
+        if (strlen($orderNumber) === 8 && is_numeric($orderNumber)) {
+            $orderId = (int) ltrim($orderNumber, '0');
+            $order = Order::with('items')->find($orderId);
+        } else {
+            $order = Order::with('items')
+                ->where('order_number', $orderNumber)
+                ->first();
+        }
+
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'الفاتورة غير موجودة',
+            ], 404);
+        }
+
+        if ($order->status === 'paid') {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذه الفاتورة مدفوعة مسبقاً',
+            ], 400);
+        }
+
+        if ($order->status === 'cancelled') {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذه الفاتورة ملغية',
+            ], 400);
+        }
+
+        if ($order->isMerged()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذه الفاتورة مدمجة مسبقاً في فاتورة أخرى',
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'id' => $order->id,
+                'order_number' => $order->order_number,
+                'total' => $order->total,
+                'discount' => $order->discount,
+                'status' => $order->status,
+                'pos_point' => $order->posPoint ? $order->posPoint->name : null,
+                'created_at' => $order->created_at->format('Y-m-d H:i'),
+                'items' => $order->items->map(function ($item) {
+                    return [
+                        'id' => $item->id,
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product_name,
+                        'quantity' => $item->quantity,
+                        'price' => $item->price,
+                        'total' => $item->total,
+                        'is_weight' => $item->is_weight,
+                    ];
+                }),
+            ],
+        ]);
+    }
+
+    public function mergeOrders(Request $request)
+    {
+        $validated = $request->validate([
+            'order_ids' => 'required|array|min:2',
+            'order_ids.*' => 'required|exists:orders,id',
+        ]);
+
+        $orderIds = $validated['order_ids'];
+
+        $orders = Order::with('items')->whereIn('id', $orderIds)->get();
+
+        foreach ($orders as $order) {
+            if ($order->status === 'paid') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "الفاتورة رقم {$order->order_number} مدفوعة مسبقاً",
+                ], 400);
+            }
+
+            if ($order->status === 'cancelled') {
+                return response()->json([
+                    'success' => false,
+                    'message' => "الفاتورة رقم {$order->order_number} ملغية",
+                ], 400);
+            }
+
+            if ($order->isMerged()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "الفاتورة رقم {$order->order_number} مدمجة مسبقاً",
+                ], 400);
+            }
+        }
+
+        try {
+            $mergedOrder = DB::transaction(function () use ($orders) {
+                $totalItems = collect();
+                $totalDiscount = 0;
+
+                foreach ($orders as $order) {
+                    foreach ($order->items as $item) {
+                        $totalItems->push($item);
+                    }
+                    $totalDiscount += $order->discount ?? 0;
+                }
+
+                $grossTotal = $totalItems->sum('total');
+                $netTotal = $grossTotal - $totalDiscount;
+
+                $newOrder = Order::create([
+                    'order_number' => Order::generateOrderNumber(),
+                    'user_id' => auth()->id(),
+                    'total' => $netTotal,
+                    'discount' => $totalDiscount,
+                    'status' => 'pending',
+                ]);
+
+                foreach ($totalItems as $item) {
+                    OrderItem::create([
+                        'order_id' => $newOrder->id,
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product_name,
+                        'price' => $item->price,
+                        'quantity' => $item->quantity,
+                        'is_weight' => $item->is_weight,
+                        'total' => $item->total,
+                    ]);
+                }
+
+                foreach ($orders as $order) {
+                    $order->update(['merged_into' => $newOrder->id]);
+
+                    OrderMerge::create([
+                        'parent_order_id' => $newOrder->id,
+                        'child_order_id' => $order->id,
+                        'merged_by' => auth()->id(),
+                    ]);
+                }
+
+                return $newOrder;
+            });
+
+            $mergedOrder->load('items');
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'id' => $mergedOrder->id,
+                    'order_number' => $mergedOrder->order_number,
+                    'total' => $mergedOrder->total,
+                    'discount' => $mergedOrder->discount,
+                    'status' => $mergedOrder->status,
+                    'created_at' => $mergedOrder->created_at->format('Y-m-d H:i'),
+                    'items' => $mergedOrder->items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product_name' => $item->product_name,
+                            'quantity' => $item->quantity,
+                            'price' => $item->price,
+                            'total' => $item->total,
+                            'is_weight' => $item->is_weight,
+                        ];
+                    }),
+                    'merged_orders_count' => count($orders),
+                ],
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('mergeOrders error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء دمج الفواتير',
             ], 500);
         }
     }
