@@ -104,11 +104,16 @@ class DatabaseBackup extends Command
 
     private function findUsbDrive(): ?string
     {
-        for ($letter = 'D'; $letter <= 'Z'; $letter++) {
+        for ($letter = 'E'; $letter <= 'Z'; $letter++) {
             $drive = $letter . ':\\';
             if (is_dir($drive) && is_writable($drive)) {
                 return $drive;
             }
+        }
+
+        $fallbackDrive = 'D:\\';
+        if (is_dir($fallbackDrive) && is_writable($fallbackDrive)) {
+            return $fallbackDrive;
         }
 
         return null;
