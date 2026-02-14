@@ -87,6 +87,8 @@ class CashierController extends Controller
             'gross_total' => 'nullable|numeric|min:0',
             'discount' => 'nullable|numeric|min:0|max:5',
             'total' => 'required|numeric|min:0',
+            'merged_order_ids' => 'nullable|array',
+            'merged_order_ids.*' => 'exists:orders,id',
         ]);
 
         try {
@@ -110,6 +112,21 @@ class CashierController extends Controller
                         'is_weight' => $product->type === 'weight',
                         'total' => $product->price * $item['quantity'],
                     ]);
+                }
+
+                if (!empty($validated['merged_order_ids'])) {
+                    foreach ($validated['merged_order_ids'] as $mergedOrderId) {
+                        $mergedOrder = Order::find($mergedOrderId);
+                        if ($mergedOrder && !$mergedOrder->isMerged() && $mergedOrder->status === 'pending') {
+                            $mergedOrder->update(['merged_into' => $order->id]);
+
+                            OrderMerge::create([
+                                'parent_order_id' => $order->id,
+                                'child_order_id' => $mergedOrderId,
+                                'merged_by' => auth()->id(),
+                            ]);
+                        }
+                    }
                 }
 
                 return $order;
