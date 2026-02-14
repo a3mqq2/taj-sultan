@@ -927,7 +927,7 @@
 
             const receiptContent = `
             <div class="receipt">
-            <div class="header"><img src="/logo-dark.png" alt="تاج السلطان" class="logo"><div class="subtitle">طلبية خاصة</div></div>
+            <div class="header"><div class="title">تاج السلطان - طلبية خاصة</div></div>
             <div class="barcode-section"><svg class="barcode-svg"></svg><div class="order-id">#${data.id}</div></div>
             <div class="section">
                 <div class="info"><span class="label">التاريخ:</span><span>${data.created_at}</span></div>
@@ -937,14 +937,13 @@
                 <div class="info"><span class="label">المناسبة:</span><span>${data.event_type}</span></div>
                 <div class="info"><span class="label">التسليم:</span><span>${data.delivery_date}</span></div>
             </div>
-            <div class="section-title">الأصناف</div>
             <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>
             <div class="total-box"><span>الإجمالي</span><span>${parseFloat(data.total_amount).toFixed(3)} د.ل</span></div>
             <div class="paid-box"><span>المدفوع</span><span>${parseFloat(data.paid_amount).toFixed(3)} د.ل</span></div>
             <div class="remaining-box"><span>المتبقي</span><span>${parseFloat(data.remaining_amount).toFixed(3)} د.ل</span></div>
             ${paymentsHtml}
             <div class="thanks">شكراً لتعاملكم معنا</div>
-            <div style="text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;color:#333"><img src="/hulul.jpg" alt="Hulul" style="height:30px;width:auto;filter:grayscale(100%)"><span>حلول لتقنية المعلومات</span></div>
+            <div class="footer"><img src="/hulul.jpg"><span>حلول لتقنية المعلومات</span></div>
             </div>`;
 
             const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
@@ -953,33 +952,34 @@
             <style>
                 @page{margin:0;size:72mm auto}
                 *{margin:0;padding:0;box-sizing:border-box}
-                body{font-family:'Cairo',sans-serif;font-size:12px;padding:10px;width:72mm;color:#000}
+                body{font-family:'Cairo',sans-serif;font-size:8px;line-height:1;padding:1mm;width:72mm;color:#000}
                 .receipt{page-break-after:always}
                 .receipt:last-child{page-break-after:auto}
-                .header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}
-                .header .logo{max-width:220px;height:auto;margin:0 auto 10px;display:block;filter:grayscale(100%) contrast(2) brightness(0.1)}
-                .header .subtitle{font-size:14px;font-weight:700;border:2px solid #000;display:inline-block;padding:2px 12px}
-                .barcode-section{text-align:center;margin:8px 0;padding:5px 0;border-bottom:1px dashed #000}
+                .header{text-align:center;border-bottom:1px dashed #000}
+                .header .title{font-size:10px;font-weight:700}
+                .barcode-section{text-align:center;border-bottom:1px dashed #000}
                 .barcode-svg{display:block;margin:0 auto}
-                .order-id{font-size:16px;font-weight:700;margin-top:3px}
-                .info{font-size:11px;display:flex;justify-content:space-between;padding:3px 0}
+                .order-id{font-size:9px;font-weight:700}
+                .info{font-size:7px;display:flex;justify-content:space-between}
                 .info .label{font-weight:700}
-                .section{margin:10px 0;padding-bottom:10px;border-bottom:1px dashed #000}
-                table{width:100%;border-collapse:collapse;margin:8px 0}
-                th{background:#000;color:#fff;padding:6px;font-size:11px}
-                td{padding:6px;font-size:11px;border-bottom:1px dotted #000}
-                .total-box{border:2px solid #000;padding:10px;margin:10px 0;display:flex;justify-content:space-between;font-size:16px;font-weight:800}
-                .paid-box{border-bottom:1px solid #000;padding:8px 0;display:flex;justify-content:space-between;font-size:14px;font-weight:700}
-                .remaining-box{border:2px dashed #000;padding:8px;margin:8px 0;display:flex;justify-content:space-between;font-size:14px;font-weight:700}
-                .payments-section{margin-top:10px;border-top:1px dashed #000;padding-top:10px}
-                .section-title{background:#000;color:#fff;text-align:center;padding:3px;font-weight:700;font-size:12px;margin-bottom:8px}
-                .payment-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
-                .thanks{text-align:center;font-size:13px;font-weight:700;padding:12px 0;border-top:2px dashed #000;margin-top:10px}
+                .section{border-bottom:1px dashed #000}
+                table{width:100%;border-collapse:collapse}
+                th{background:#000;color:#fff;padding:1px;font-size:7px}
+                td{padding:1px;font-size:7px;border-bottom:1px dotted #ccc}
+                .total-box{border:1px solid #000;padding:2px;display:flex;justify-content:space-between;font-size:10px;font-weight:800}
+                .paid-box{display:flex;justify-content:space-between;font-size:8px;font-weight:700}
+                .remaining-box{border:1px dashed #000;padding:1px;display:flex;justify-content:space-between;font-size:9px;font-weight:700}
+                .payments-section{border-top:1px dashed #000}
+                .section-title{background:#000;color:#fff;text-align:center;font-weight:700;font-size:7px}
+                .payment-row{display:flex;justify-content:space-between;font-size:7px}
+                .thanks{text-align:center;font-size:8px;font-weight:700;border-top:1px dashed #000}
+                .footer{text-align:center;display:flex;align-items:center;justify-content:center;gap:3px;font-size:7px;color:#333}
+                .footer img{height:14px;width:auto;filter:grayscale(100%)}
             </style></head><body>
             ${receiptContent}
             ${receiptContent}
             <script>
-                JsBarcode(".barcode-svg", "${barcodeValue}", {format:"CODE128",width:2,height:50,displayValue:false,margin:10,background:"#ffffff",lineColor:"#000000"});
+                JsBarcode(".barcode-svg", "${barcodeValue}", {format:"CODE128",width:1.2,height:28,displayValue:false,margin:2,background:"#ffffff",lineColor:"#000000"});
             <\/script>
             </body></html>`;
 
