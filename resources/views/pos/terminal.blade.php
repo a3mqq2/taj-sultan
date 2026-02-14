@@ -785,7 +785,7 @@
             <div class="search-bar">
                 <div class="search-input-wrapper">
                     <i class="ti ti-barcode"></i>
-                    <input type="text" class="search-input" id="searchInput" placeholder="مسح الباركود أو البحث..." autofocus>
+                    <input type="text" class="search-input" id="searchInput" placeholder="   البحث..." autofocus>
                 </div>
             </div>
 
