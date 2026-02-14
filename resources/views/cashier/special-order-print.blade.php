@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلبية خاصة #{{ $order->id }}</title>
     <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
-    <link href="{{ asset('assets/fonts/libre-barcode-128/libre-barcode-128.css') }}" rel="stylesheet">
+    <script src="{{ asset('assets/js/jsbarcode.min.js') }}"></script>
     <style>
         @page {
             margin: 0;
@@ -73,13 +73,9 @@
             border-bottom: 1px dashed #000;
         }
 
-        .barcode {
-            font-family: 'Libre Barcode 128', cursive;
-            font-size: 72px;
-            line-height: 1;
-            padding: 0 15px;
-            display: inline-block;
-            background: #fff;
+        .barcode-svg {
+            display: block;
+            margin: 0 auto;
         }
 
         .order-id {
@@ -246,7 +242,7 @@
         </div>
 
         <div class="barcode-section">
-            <div class="barcode">{{ str_pad($order->id, 8, '0', STR_PAD_LEFT) }}</div>
+            <svg class="barcode-svg barcode1"></svg>
             <div class="order-id">#{{ $order->id }}</div>
         </div>
 
@@ -369,7 +365,7 @@
         </div>
 
         <div class="barcode-section">
-            <div class="barcode">{{ str_pad($order->id, 8, '0', STR_PAD_LEFT) }}</div>
+            <svg class="barcode-svg barcode2"></svg>
             <div class="order-id">#{{ $order->id }}</div>
         </div>
 
@@ -486,6 +482,18 @@
     </div>
 
     <script>
+        var barcodeValue = "{{ str_pad($order->id, 8, '0', STR_PAD_LEFT) }}";
+        var barcodeOptions = {
+            format: "CODE128",
+            width: 2,
+            height: 50,
+            displayValue: false,
+            margin: 10,
+            background: "#ffffff",
+            lineColor: "#000000"
+        };
+        JsBarcode(".barcode1", barcodeValue, barcodeOptions);
+        JsBarcode(".barcode2", barcodeValue, barcodeOptions);
         window.onload = function() {
             if (window.printer && window.printer.print) {
                 window.printer.print();

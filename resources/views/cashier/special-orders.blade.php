@@ -90,6 +90,8 @@
         .empty-state i { font-size: 64px; margin-bottom: 16px; }
         .empty-state h4 { font-size: 18px; margin-bottom: 8px; color: #64748b; }
         .hidden { display: none !important; }
+        .validation-error { border-color: #ef4444 !important; background: #fef2f2 !important; }
+        .validation-error:focus { border-color: #ef4444 !important; box-shadow: 0 0 0 3px rgba(239,68,68,0.2); }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
         .modal-content { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
@@ -418,7 +420,16 @@
                 btn.addEventListener('click', () => selectPaymentMethod(btn));
             });
 
-            document.getElementById('customerName').addEventListener('input', searchCustomers);
+            document.getElementById('customerName').addEventListener('input', function() {
+                searchCustomers();
+                this.classList.remove('validation-error');
+            });
+            document.getElementById('eventType').addEventListener('change', function() {
+                this.classList.remove('validation-error');
+            });
+            document.getElementById('deliveryDate').addEventListener('change', function() {
+                this.classList.remove('validation-error');
+            });
             document.getElementById('customerName').addEventListener('focus', () => {
                 if (document.getElementById('customerResults').innerHTML) {
                     document.getElementById('customerResults').classList.add('show');
@@ -751,15 +762,58 @@
 
         document.getElementById('amountInput').addEventListener('input', updateSummary);
 
-        async function saveOrder() {
-            const customerName = document.getElementById('customerName').value.trim();
-            const eventType = document.getElementById('eventType').value;
-            const deliveryDate = document.getElementById('deliveryDate').value;
+        function clearValidation() {
+            document.querySelectorAll('.validation-error').forEach(el => el.classList.remove('validation-error'));
+        }
 
-            if (!customerName) return toast('أدخل اسم الزبون', 'error');
-            if (!eventType) return toast('اختر نوع المناسبة', 'error');
-            if (!deliveryDate) return toast('حدد تاريخ التسليم', 'error');
-            if (orderItems.length === 0) return toast('أضف صنف واحد على الأقل', 'error');
+        function markInvalid(elementId) {
+            const el = document.getElementById(elementId);
+            if (el) {
+                el.classList.add('validation-error');
+                el.focus();
+            }
+        }
+
+        async function saveOrder() {
+            clearValidation();
+
+            const customerNameEl = document.getElementById('customerName');
+            const eventTypeEl = document.getElementById('eventType');
+            const deliveryDateEl = document.getElementById('deliveryDate');
+
+            const customerName = customerNameEl.value.trim();
+            const eventType = eventTypeEl.value;
+            const deliveryDate = deliveryDateEl.value;
+
+            let errors = [];
+
+            if (!customerName) {
+                errors.push('اسم الزبون');
+                customerNameEl.classList.add('validation-error');
+            }
+            if (!eventType) {
+                errors.push('نوع المناسبة');
+                eventTypeEl.classList.add('validation-error');
+            }
+            if (!deliveryDate) {
+                errors.push('تاريخ التسليم');
+                deliveryDateEl.classList.add('validation-error');
+            }
+            if (orderItems.length === 0) {
+                errors.push('أضف صنف واحد على الأقل');
+            }
+
+            if (errors.length > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'بيانات ناقصة',
+                    html: '<ul style="text-align:right;margin:0;padding-right:20px">' + errors.map(e => '<li>' + e + '</li>').join('') + '</ul>',
+                    confirmButtonText: 'حسناً'
+                });
+                const firstInvalid = document.querySelector('.validation-error');
+                if (firstInvalid) firstInvalid.focus();
+                return;
+            }
 
             const total = orderItems.reduce((sum, item) => sum + item.total, 0);
             const payment = parseFloat(document.getElementById('amountInput').value) || 0;
@@ -869,10 +923,12 @@
                 paymentsHtml += '</div>';
             }
 
+            const barcodeValue = String(data.id).padStart(8, '0');
+
             const receiptContent = `
             <div class="receipt">
             <div class="header"><img src="/logo-dark.png" alt="تاج السلطان" class="logo"><div class="subtitle">طلبية خاصة</div></div>
-            <div class="barcode-section"><div class="barcode">${String(data.id).padStart(8, '0')}</div><div class="order-id">#${data.id}</div></div>
+            <div class="barcode-section"><svg class="barcode-svg"></svg><div class="order-id">#${data.id}</div></div>
             <div class="section">
                 <div class="info"><span class="label">التاريخ:</span><span>${data.created_at}</span></div>
                 <div class="info"><span class="label">الكاشير:</span><span>${data.cashier_name}</span></div>
@@ -893,7 +949,7 @@
 
             const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
             <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
-            <link href="{{ asset('assets/fonts/libre-barcode-128/libre-barcode-128.css') }}" rel="stylesheet">
+            <script src="{{ asset('assets/js/jsbarcode.min.js') }}"><\/script>
             <style>
                 @page{margin:0;size:72mm auto}
                 *{margin:0;padding:0;box-sizing:border-box}
@@ -904,7 +960,7 @@
                 .header .logo{max-width:220px;height:auto;margin:0 auto 10px;display:block;filter:grayscale(100%) contrast(2) brightness(0.1)}
                 .header .subtitle{font-size:14px;font-weight:700;border:2px solid #000;display:inline-block;padding:2px 12px}
                 .barcode-section{text-align:center;margin:8px 0;padding:5px 0;border-bottom:1px dashed #000}
-                .barcode{font-family:'Libre Barcode 128',cursive;font-size:72px;line-height:1;padding:0 15px;display:inline-block;background:#fff}
+                .barcode-svg{display:block;margin:0 auto}
                 .order-id{font-size:16px;font-weight:700;margin-top:3px}
                 .info{font-size:11px;display:flex;justify-content:space-between;padding:3px 0}
                 .info .label{font-weight:700}
@@ -922,6 +978,9 @@
             </style></head><body>
             ${receiptContent}
             ${receiptContent}
+            <script>
+                JsBarcode(".barcode-svg", "${barcodeValue}", {format:"CODE128",width:2,height:50,displayValue:false,margin:10,background:"#ffffff",lineColor:"#000000"});
+            <\/script>
             </body></html>`;
 
             const win = window.open('', '_blank', 'width=400,height=600');
