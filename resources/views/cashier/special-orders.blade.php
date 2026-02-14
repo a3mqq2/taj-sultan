@@ -869,6 +869,28 @@
                 paymentsHtml += '</div>';
             }
 
+            const receiptContent = `
+            <div class="receipt">
+            <div class="header"><img src="/logo-dark.png" alt="تاج السلطان" class="logo"><div class="subtitle">طلبية خاصة</div></div>
+            <div class="barcode-section"><div class="barcode">${String(data.id).padStart(8, '0')}</div><div class="order-id">#${data.id}</div></div>
+            <div class="section">
+                <div class="info"><span class="label">التاريخ:</span><span>${data.created_at}</span></div>
+                <div class="info"><span class="label">الكاشير:</span><span>${data.cashier_name}</span></div>
+                <div class="info"><span class="label">الزبون:</span><span><strong>${data.customer_name}</strong></span></div>
+                <div class="info"><span class="label">الهاتف:</span><span>${data.phone || '-'}</span></div>
+                <div class="info"><span class="label">المناسبة:</span><span>${data.event_type}</span></div>
+                <div class="info"><span class="label">التسليم:</span><span>${data.delivery_date}</span></div>
+            </div>
+            <div class="section-title">الأصناف</div>
+            <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>
+            <div class="total-box"><span>الإجمالي</span><span>${parseFloat(data.total_amount).toFixed(3)} د.ل</span></div>
+            <div class="paid-box"><span>المدفوع</span><span>${parseFloat(data.paid_amount).toFixed(3)} د.ل</span></div>
+            <div class="remaining-box"><span>المتبقي</span><span>${parseFloat(data.remaining_amount).toFixed(3)} د.ل</span></div>
+            ${paymentsHtml}
+            <div class="thanks">شكراً لتعاملكم معنا</div>
+            <div style="text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;color:#333"><img src="/hulul.jpg" alt="Hulul" style="height:30px;width:auto;filter:grayscale(100%)"><span>حلول لتقنية المعلومات</span></div>
+            </div>`;
+
             const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8">
             <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
             <link href="{{ asset('assets/fonts/libre-barcode-128/libre-barcode-128.css') }}" rel="stylesheet">
@@ -876,6 +898,8 @@
                 @page{margin:0;size:72mm auto}
                 *{margin:0;padding:0;box-sizing:border-box}
                 body{font-family:'Cairo',sans-serif;font-size:12px;padding:10px;width:72mm;color:#000}
+                .receipt{page-break-after:always}
+                .receipt:last-child{page-break-after:auto}
                 .header{text-align:center;padding:10px 0;border-bottom:2px dashed #000;margin-bottom:10px}
                 .header .logo{max-width:220px;height:auto;margin:0 auto 10px;display:block;filter:grayscale(100%) contrast(2) brightness(0.1)}
                 .header .subtitle{font-size:14px;font-weight:700;border:2px solid #000;display:inline-block;padding:2px 12px}
@@ -896,49 +920,23 @@
                 .payment-row{display:flex;justify-content:space-between;font-size:11px;padding:3px 0}
                 .thanks{text-align:center;font-size:13px;font-weight:700;padding:12px 0;border-top:2px dashed #000;margin-top:10px}
             </style></head><body>
-            <div class="header"><img src="/logo-dark.png" alt="تاج السلطان" class="logo"><div class="subtitle">طلبية خاصة</div></div>
-            <div class="barcode-section"><div class="barcode">${String(data.id).padStart(8, '0')}</div><div class="order-id">#${data.id}</div></div>
-            <div class="section">
-                <div class="info"><span class="label">التاريخ:</span><span>${data.created_at}</span></div>
-                <div class="info"><span class="label">الكاشير:</span><span>${data.cashier_name}</span></div>
-                <div class="info"><span class="label">الزبون:</span><span><strong>${data.customer_name}</strong></span></div>
-                <div class="info"><span class="label">الهاتف:</span><span>${data.phone || '-'}</span></div>
-                <div class="info"><span class="label">المناسبة:</span><span>${data.event_type}</span></div>
-                <div class="info"><span class="label">التسليم:</span><span>${data.delivery_date}</span></div>
-            </div>
-            <div class="section-title">الأصناف</div>
-            <table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>
-            <div class="total-box"><span>الإجمالي</span><span>${parseFloat(data.total_amount).toFixed(3)} د.ل</span></div>
-            <div class="paid-box"><span>المدفوع</span><span>${parseFloat(data.paid_amount).toFixed(3)} د.ل</span></div>
-            <div class="remaining-box"><span>المتبقي</span><span>${parseFloat(data.remaining_amount).toFixed(3)} د.ل</span></div>
-            ${paymentsHtml}
-            <div class="thanks">شكراً لتعاملكم معنا</div>
-            <div style="text-align:center;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;color:#333"><img src="/hulul.jpg" alt="Hulul" style="height:30px;width:auto;filter:grayscale(100%)"><span>حلول لتقنية المعلومات</span></div>
+            ${receiptContent}
+            ${receiptContent}
             </body></html>`;
 
             const win = window.open('', '_blank', 'width=400,height=600');
             if (win) {
                 win.document.write(html);
                 win.document.close();
-                let printCount = 0;
-                const totalCopies = 2;
-                const printCopy = () => {
-                    if (printCount < totalCopies) {
-                        win.focus();
-                        if (window.printer && window.printer.print) {
-                            window.printer.print();
-                        } else {
-                            win.print();
-                        }
-                        printCount++;
-                        if (printCount < totalCopies) {
-                            setTimeout(printCopy, 500);
-                        } else {
-                            setTimeout(() => win.close(), 250);
-                        }
+                setTimeout(() => {
+                    win.focus();
+                    if (window.printer && window.printer.print) {
+                        window.printer.print();
+                    } else {
+                        win.print();
                     }
-                };
-                setTimeout(printCopy, 250);
+                    setTimeout(() => win.close(), 250);
+                }, 250);
             }
         }
 

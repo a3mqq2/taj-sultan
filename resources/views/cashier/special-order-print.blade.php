@@ -33,6 +33,11 @@
 
         .receipt {
             width: 100%;
+            page-break-after: always;
+        }
+
+        .receipt:last-child {
+            page-break-after: auto;
         }
 
         .header {
@@ -354,28 +359,136 @@
         </div>
     </div>
 
+    <div class="receipt">
+        <div class="header">
+            <img src="{{ asset('logo-dark.png') }}" alt="تاج السلطان" class="logo">
+            <div class="subtitle">طلبية خاصة</div>
+        </div>
+
+        <div class="barcode-section">
+            <div class="barcode">{{ str_pad($order->id, 8, '0', STR_PAD_LEFT) }}</div>
+            <div class="order-id">#{{ $order->id }}</div>
+        </div>
+
+        <div class="order-info">
+            <div class="info-row">
+                <span class="label">العميل:</span>
+                <span>{{ $order->display_name }}</span>
+            </div>
+            @if($order->display_phone)
+            <div class="info-row">
+                <span class="label">الهاتف:</span>
+                <span>{{ $order->display_phone }}</span>
+            </div>
+            @endif
+            <div class="info-row">
+                <span class="label">المناسبة:</span>
+                <span>{{ $order->event_type_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">تاريخ التسليم:</span>
+                <span>{{ $order->delivery_date->format('Y-m-d') }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">تاريخ الطلب:</span>
+                <span>{{ $order->created_at->format('Y-m-d H:i') }}</span>
+            </div>
+            <div class="info-row">
+                <span class="label">الكاشير:</span>
+                <span>{{ $order->user->name ?? '-' }}</span>
+            </div>
+        </div>
+
+        <div class="status-box">{{ $order->status_name }}</div>
+
+        @if($order->description)
+        <div class="notes">
+            <div class="notes-title">الوصف:</div>
+            {{ $order->description }}
+        </div>
+        @endif
+
+        <div class="section-title">الأصناف</div>
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>الصنف</th>
+                    <th class="qty">الكمية</th>
+                    <th class="price">السعر</th>
+                    <th class="price">الإجمالي</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($order->items as $item)
+                <tr>
+                    <td>{{ $item->product_name }}</td>
+                    <td class="qty">
+                        @if($item->is_weight)
+                            {{ number_format($item->quantity, 3) }} كجم
+                        @else
+                            {{ number_format($item->quantity) }}
+                        @endif
+                    </td>
+                    <td class="price">{{ number_format($item->unit_price, 2) }}</td>
+                    <td class="price">{{ number_format($item->total_price, 2) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <div class="totals">
+            <div class="total-row grand">
+                <span>الإجمالي:</span>
+                <span>{{ number_format($order->total_amount, 3) }} د.ل</span>
+            </div>
+            <div class="total-row paid">
+                <span>المدفوع:</span>
+                <span>{{ number_format($order->paid_amount, 3) }} د.ل</span>
+            </div>
+            @if($order->remaining_amount > 0)
+            <div class="total-row remaining">
+                <span>المتبقي:</span>
+                <span>{{ number_format($order->remaining_amount, 3) }} د.ل</span>
+            </div>
+            @endif
+        </div>
+
+        @if($order->payments->count() > 0)
+        <div class="payments">
+            <div class="section-title">سجل المدفوعات</div>
+            @foreach($order->payments as $payment)
+            <div class="payment-item">
+                <span>{{ $payment->paymentMethod->name ?? '-' }} {{ $payment->notes ? "({$payment->notes})" : '' }}</span>
+                <span>{{ number_format($payment->amount, 3) }} د.ل</span>
+            </div>
+            <div class="payment-date">{{ $payment->created_at->format('Y-m-d H:i') }}</div>
+            @endforeach
+        </div>
+        @endif
+
+        @if($order->notes)
+        <div class="notes">
+            <div class="notes-title">ملاحظات:</div>
+            {{ $order->notes }}
+        </div>
+        @endif
+
+        <div class="footer">
+            <div class="thanks">شكراً لتعاملكم معنا</div>
+            <div style="margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; color: #333;">
+                <img src="{{ asset('hulul.jpg') }}" alt="Hulul" style="height: 30px; width: auto; filter: grayscale(100%);">
+                <span>حلول لتقنية المعلومات</span>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function silentPrint() {
+        window.onload = function() {
             if (window.printer && window.printer.print) {
                 window.printer.print();
             } else {
                 window.print();
             }
-        }
-
-        window.onload = function() {
-            let printCount = 0;
-            const totalCopies = 2;
-            const printCopy = () => {
-                if (printCount < totalCopies) {
-                    silentPrint();
-                    printCount++;
-                    if (printCount < totalCopies) {
-                        setTimeout(printCopy, 500);
-                    }
-                }
-            };
-            printCopy();
         };
     </script>
 </body>
