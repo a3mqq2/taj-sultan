@@ -9,34 +9,34 @@
     <style>
         @page{margin:0;size:72mm auto}
         *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Cairo',sans-serif;font-size:8px;line-height:1;padding:1mm;width:72mm;color:#000;direction:rtl}
+        body{font-family:'Cairo',sans-serif;font-size:9px;line-height:1.2;padding:2mm;width:72mm;color:#000;direction:rtl}
         .receipt{page-break-after:always}
         .receipt:last-child{page-break-after:auto}
-        .header{text-align:center;border-bottom:1px dashed #000}
-        .header .title{font-size:10px;font-weight:700}
-        .barcode-section{text-align:center;border-bottom:1px dashed #000}
+        .header{text-align:center;border-bottom:1px dashed #000;padding-bottom:4px;margin-bottom:4px}
+        .header .title{font-size:11px;font-weight:700}
+        .barcode-section{text-align:center;border-bottom:1px dashed #000;padding:3px 0}
         .barcode-svg{display:block;margin:0 auto}
-        .order-id{font-size:9px;font-weight:700}
-        .order-info{border-bottom:1px dashed #000;font-size:7px}
-        .info-row{display:flex;justify-content:space-between}
+        .order-id{font-size:10px;font-weight:700}
+        .order-info{border-bottom:1px dashed #000;padding-bottom:4px;margin-bottom:4px;font-size:9px}
+        .info-row{display:flex;justify-content:space-between;padding:1px 0}
         .info-row .label{font-weight:700}
-        .status-box{text-align:center;padding:1px;border:1px solid #000;font-weight:700;font-size:9px}
-        .items-table{width:100%;border-collapse:collapse}
-        .items-table th,.items-table td{padding:1px;text-align:right;font-size:7px;border-bottom:1px dotted #ccc}
+        .status-box{text-align:center;padding:3px;border:1px solid #000;font-weight:700;font-size:10px;margin:4px 0}
+        .items-table{width:100%;border-collapse:collapse;margin:4px 0}
+        .items-table th,.items-table td{padding:3px;text-align:right;font-size:8px;border-bottom:1px dotted #ccc}
         .items-table th{border-bottom:1px solid #000}
-        .items-table .qty{text-align:center;width:35px}
-        .items-table .price{text-align:left;width:40px}
-        .totals{border-top:1px dashed #000}
-        .total-row{display:flex;justify-content:space-between;font-size:8px}
-        .total-row.grand{font-size:10px;font-weight:700;border:1px solid #000;padding:2px}
-        .total-row.remaining{font-weight:700;border:1px dashed #000;padding:1px}
-        .payments{font-size:7px;border-top:1px dashed #000}
-        .payment-item{display:flex;justify-content:space-between}
-        .notes{padding:1px;border:1px dashed #000;font-size:7px}
-        .footer{text-align:center;font-size:8px;border-top:1px dashed #000}
-        .brand{text-align:center;display:flex;align-items:center;justify-content:center;gap:3px;font-size:7px;color:#333}
-        .brand img{height:14px;width:auto;filter:grayscale(100%)}
-        @media print{body{padding:1mm;width:72mm}}
+        .items-table .qty{text-align:center;width:40px}
+        .items-table .price{text-align:left;width:45px}
+        .totals{border-top:1px dashed #000;padding-top:4px;margin-top:4px}
+        .total-row{display:flex;justify-content:space-between;font-size:9px;padding:2px 0}
+        .total-row.grand{font-size:11px;font-weight:700;border:1px solid #000;padding:4px;margin:4px 0}
+        .total-row.remaining{font-weight:700;border:1px dashed #000;padding:3px;margin-top:2px}
+        .payments{font-size:8px;border-top:1px dashed #000;padding-top:4px;margin-top:4px}
+        .payment-item{display:flex;justify-content:space-between;padding:1px 0}
+        .notes{padding:3px;border:1px dashed #000;font-size:8px;margin-top:4px}
+        .footer{text-align:center;font-size:9px;border-top:1px dashed #000;padding:4px 0}
+        .brand{text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;font-size:8px;color:#333;padding-top:2px}
+        .brand img{height:18px;width:auto;filter:grayscale(100%)}
+        @media print{body{padding:2mm;width:72mm}}
     </style>
 </head>
 <body>
@@ -106,7 +106,7 @@
 
     <script>
         var barcodeValue = "{{ str_pad($order->id, 8, '0', STR_PAD_LEFT) }}";
-        var opts = {format:"CODE128",width:1.2,height:25,displayValue:false,margin:0};
+        var opts = {format:"CODE128",width:1.5,height:35,displayValue:false,margin:3};
         JsBarcode(".barcode1", barcodeValue, opts);
         JsBarcode(".barcode2", barcodeValue, opts);
         window.onload = function(){window.printer&&window.printer.print?window.printer.print():window.print();};
