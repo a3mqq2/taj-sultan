@@ -216,27 +216,12 @@ class ProductController extends Controller
 
     public function exportExcel(Request $request)
     {
-        $query = Product::with('category');
+        $products = Product::where('type', 'weight')
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get();
 
-        if ($request->filled('search')) {
-            $query->search($request->search);
-        }
-
-        if ($request->filled('category_id')) {
-            $query->byCategory($request->category_id);
-        }
-
-        if ($request->filled('status')) {
-            if ($request->status === 'active') {
-                $query->active();
-            } elseif ($request->status === 'inactive') {
-                $query->inactive();
-            }
-        }
-
-        $products = $query->orderBy('name')->get();
-
-        $filename = 'products_' . now()->format('Y-m-d_H-i') . '.csv';
+        $filename = 'weight_products_' . now()->format('Y-m-d_H-i') . '.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
@@ -250,21 +235,13 @@ class ProductController extends Controller
 
             fputcsv($file, [
                 'الاسم',
-                'القسم',
-                'السعر',
-                'النوع',
-                'الباركود',
-                'الحالة'
+                'السعر'
             ]);
 
             foreach ($products as $product) {
                 fputcsv($file, [
                     $product->name,
-                    $product->category?->name ?? '-',
-                    number_format($product->price, 3),
-                    $product->type === 'piece' ? 'قطعة' : 'وزن',
-                    $product->barcode ?? '-',
-                    $product->is_active ? 'مفعل' : 'موقوف'
+                    number_format($product->price, 3)
                 ]);
             }
 
