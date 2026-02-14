@@ -373,7 +373,7 @@ class CashierController extends Controller
         $customerId = $isCredit ? $validated['customer_id'] : null;
 
         try {
-            DB::transaction(function () use ($order, $payments, $totalPayments, $discount, $expectedTotal, $isCredit, $creditAmount, $customerId) {
+            DB::transaction(function () use ($order, $payments, $totalPayments, $discount, $expectedTotal, $isCredit, $creditAmount, $customerId, $validated) {
                 foreach ($payments as $payment) {
                     if ($payment['amount'] > 0) {
                         OrderPayment::create([
