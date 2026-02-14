@@ -3,18 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\PosPoint;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class PosPointController extends Controller
 {
     public function index()
     {
-        return view('pos-points.index');
+        $categories = Category::orderBy('name')->get();
+        return view('pos-points.index', compact('categories'));
     }
 
     public function data(Request $request)
     {
-        $query = PosPoint::query();
+        $query = PosPoint::with('categories');
 
         $sortField = $request->get('sort', 'id');
         $sortDirection = $request->get('direction', 'asc');
@@ -34,6 +36,8 @@ class PosPointController extends Controller
                 'active' => $point->active,
                 'require_login' => $point->require_login,
                 'is_default' => $point->is_default,
+                'categories' => $point->categories->pluck('name')->toArray(),
+                'category_ids' => $point->categories->pluck('id')->toArray(),
             ];
         });
 
@@ -45,6 +49,7 @@ class PosPointController extends Controller
 
     public function show(PosPoint $posPoint)
     {
+        $posPoint->load('categories');
         return response()->json([
             'success' => true,
             'data' => [
@@ -54,6 +59,7 @@ class PosPointController extends Controller
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
                 'is_default' => $posPoint->is_default,
+                'category_ids' => $posPoint->categories->pluck('id')->toArray(),
             ]
         ]);
     }
@@ -63,12 +69,20 @@ class PosPointController extends Controller
         $validated = $request->validate([
             'active' => 'boolean',
             'require_login' => 'boolean',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
         ]);
 
         $posPoint->update([
             'active' => $request->boolean('active', $posPoint->active),
             'require_login' => $request->boolean('require_login', $posPoint->require_login),
         ]);
+
+        if ($request->has('category_ids')) {
+            $posPoint->categories()->sync($request->input('category_ids', []));
+        }
+
+        $posPoint->load('categories');
 
         return response()->json([
             'success' => true,
@@ -80,6 +94,8 @@ class PosPointController extends Controller
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
                 'is_default' => $posPoint->is_default,
+                'categories' => $posPoint->categories->pluck('name')->toArray(),
+                'category_ids' => $posPoint->categories->pluck('id')->toArray(),
             ]
         ]);
     }

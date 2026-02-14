@@ -328,7 +328,8 @@
             <table class="table mb-0">
                 <thead>
                     <tr>
-                        <th style="width: 35%">نقطة البيع</th>
+                        <th style="width: 25%">نقطة البيع</th>
+                        <th>الأقسام</th>
                         <th>الحالة</th>
                         <th>يتطلب تسجيل دخول</th>
                         <th style="width: 100px">الإجراءات</th>
@@ -367,13 +368,26 @@
                         </div>
                     </div>
 
-                    <div class="d-flex align-items-center justify-content-between p-3 status-box">
+                    <div class="d-flex align-items-center justify-content-between p-3 status-box mb-3">
                         <div>
                             <span class="fw-semibold">يتطلب تسجيل دخول</span>
                             <p class="text-muted mb-0 small">إلزام المستخدم بتسجيل الدخول</p>
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input status-switch" type="checkbox" id="itemRequireLogin">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">الأقسام المتاحة</label>
+                        <p class="text-muted small mb-2">اختر الأقسام التي ستظهر في نقطة البيع هذه (اتركها فارغة لإظهار جميع الأقسام)</p>
+                        <div id="categoriesCheckboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+                            @foreach($categories as $category)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input category-checkbox" type="checkbox" value="{{ $category->id }}" id="cat_{{ $category->id }}">
+                                <label class="form-check-label" for="cat_{{ $category->id }}">{{ $category->name }}</label>
+                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -441,6 +455,11 @@ function renderData(items) {
                 <div class="pos-slug">/${item.slug}</div>
             </td>
             <td>
+                ${item.categories && item.categories.length > 0
+                    ? item.categories.map(c => `<span class="badge bg-primary me-1 mb-1">${escapeHtml(c)}</span>`).join('')
+                    : '<span class="text-muted">جميع الأقسام</span>'}
+            </td>
+            <td>
                 <span class="badge-${item.active ? 'active' : 'inactive'}">
                     ${item.active ? 'مفعل' : 'متوقف'}
                 </span>
@@ -477,6 +496,10 @@ async function openEditModal(id) {
             document.getElementById('itemActive').checked = item.active;
             document.getElementById('itemRequireLogin').checked = item.require_login;
 
+            document.querySelectorAll('.category-checkbox').forEach(cb => {
+                cb.checked = item.category_ids && item.category_ids.includes(parseInt(cb.value));
+            });
+
             editModal.show();
         }
     } catch (error) {
@@ -491,9 +514,15 @@ async function handleSubmit(e) {
 
     const itemId = document.getElementById('itemId').value;
 
+    const selectedCategories = [];
+    document.querySelectorAll('.category-checkbox:checked').forEach(cb => {
+        selectedCategories.push(parseInt(cb.value));
+    });
+
     const data = {
         active: document.getElementById('itemActive').checked,
         require_login: document.getElementById('itemRequireLogin').checked,
+        category_ids: selectedCategories,
     };
 
     setSubmitting(true);

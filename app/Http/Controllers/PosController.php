@@ -24,8 +24,15 @@ class PosController extends Controller
             return redirect()->route('pos.login', $slug);
         }
 
-        $categories = Category::orderBy('name')->get();
-        $products = Product::active()->where('type', 'piece')->orderBy('name')->get();
+        $categoryIds = $posPoint->categories()->pluck('categories.id')->toArray();
+
+        if (count($categoryIds) > 0) {
+            $categories = Category::whereIn('id', $categoryIds)->orderBy('name')->get();
+            $products = Product::active()->where('type', 'piece')->whereIn('category_id', $categoryIds)->orderBy('name')->get();
+        } else {
+            $categories = Category::orderBy('name')->get();
+            $products = Product::active()->where('type', 'piece')->orderBy('name')->get();
+        }
 
         return view('pos.terminal', [
             'posPoint' => $posPoint,
@@ -82,7 +89,14 @@ class PosController extends Controller
 
     public function products(string $slug, Request $request)
     {
+        $posPoint = PosPoint::where('slug', $slug)->firstOrFail();
+        $categoryIds = $posPoint->categories()->pluck('categories.id')->toArray();
+
         $query = Product::active()->where('type', 'piece');
+
+        if (count($categoryIds) > 0) {
+            $query->whereIn('category_id', $categoryIds);
+        }
 
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
@@ -111,7 +125,16 @@ class PosController extends Controller
 
     public function categories(string $slug)
     {
-        $categories = Category::orderBy('name')->get()->map(function ($category) {
+        $posPoint = PosPoint::where('slug', $slug)->firstOrFail();
+        $categoryIds = $posPoint->categories()->pluck('categories.id')->toArray();
+
+        if (count($categoryIds) > 0) {
+            $categories = Category::whereIn('id', $categoryIds)->orderBy('name')->get();
+        } else {
+            $categories = Category::orderBy('name')->get();
+        }
+
+        $categories = $categories->map(function ($category) {
             return [
                 'id' => $category->id,
                 'name' => $category->name,

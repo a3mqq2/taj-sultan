@@ -43,6 +43,11 @@ class Category extends Model
         return $this->hasMany(Product::class)->where('is_active', true);
     }
 
+    public function posPoints()
+    {
+        return $this->belongsToMany(PosPoint::class, 'category_pos_point');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
