@@ -68,21 +68,24 @@
 
         .barcode-section {
             text-align: center;
-            margin: 15px 0;
-            padding: 10px 0;
+            margin: 8px 0;
+            padding: 5px 0;
             border-bottom: 1px dashed #000;
         }
 
         .barcode {
             font-family: 'Libre Barcode 128', cursive;
-            font-size: 64px;
+            font-size: 72px;
             line-height: 1;
+            padding: 0 15px;
+            display: inline-block;
+            background: #fff;
         }
 
         .order-id {
             font-size: 16px;
             font-weight: bold;
-            margin-top: 5px;
+            margin-top: 3px;
         }
 
         .order-info {
