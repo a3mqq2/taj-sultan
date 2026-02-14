@@ -904,7 +904,7 @@
                 .header .logo{max-width:220px;height:auto;margin:0 auto 10px;display:block;filter:grayscale(100%) contrast(2) brightness(0.1)}
                 .header .subtitle{font-size:14px;font-weight:700;border:2px solid #000;display:inline-block;padding:2px 12px}
                 .barcode-section{text-align:center;margin:15px 0;padding:10px 0;border-bottom:1px dashed #000}
-                .barcode{font-family:'Libre Barcode 128',cursive;font-size:48px;line-height:1}
+                .barcode{font-family:'Libre Barcode 128',cursive;font-size:64px;line-height:1}
                 .order-id{font-size:16px;font-weight:700;margin-top:5px}
                 .info{font-size:11px;display:flex;justify-content:space-between;padding:3px 0}
                 .info .label{font-weight:700}

@@ -75,7 +75,7 @@
 
         .barcode {
             font-family: 'Libre Barcode 128', cursive;
-            font-size: 48px;
+            font-size: 64px;
             line-height: 1;
         }
 
