@@ -364,7 +364,18 @@
         }
 
         window.onload = function() {
-            silentPrint();
+            let printCount = 0;
+            const totalCopies = 2;
+            const printCopy = () => {
+                if (printCount < totalCopies) {
+                    silentPrint();
+                    printCount++;
+                    if (printCount < totalCopies) {
+                        setTimeout(printCopy, 500);
+                    }
+                }
+            };
+            printCopy();
         };
     </script>
 </body>
