@@ -14,6 +14,7 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\Admin\BackupController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SettingController;
 
 Route::redirect('/', 'login');
 
@@ -120,6 +121,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     });
 
     Route::post('/backup', [BackupController::class, 'create'])->name('admin.backup');
+
+    Route::get('/settings/general', [SettingController::class, 'index'])->name('settings.general');
+    Route::post('/settings/general', [SettingController::class, 'update'])->name('settings.general.update');
 });
 
 Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->group(function () {
@@ -154,6 +158,7 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::post('/merge-orders', [CashierController::class, 'mergeOrders'])->name('merge-orders');
     Route::post('/find-invoice', [CashierController::class, 'findInvoice'])->name('find-invoice');
     Route::post('/delete-invoice/{id}', [CashierController::class, 'deleteInvoice'])->name('delete-invoice');
+    Route::post('/verify-cancel-code', [SettingController::class, 'verifyCancelCode'])->name('verify-cancel-code');
 });
 
 Route::prefix('pos')->name('pos.')->group(function () {

@@ -162,8 +162,11 @@
                                                 </div>
                                             </div>
 
-                                            <div class="d-grid">
+                                            <div class="d-grid gap-2">
                                                 <button type="submit" class="btn btn-primary fw-semibold py-2">دخول</button>
+                                                <button type="button" class="btn btn-outline-danger fw-semibold py-2" onclick="closeWindow()">
+                                                    <i class="ti ti-x me-1"></i> إغلاق
+                                                </button>
                                             </div>
                                         </form>
                                     </div>
@@ -186,5 +189,17 @@
 
         <!-- App js -->
         <script src="{{ asset('assets/js/app.js') }}"></script>
+        <script>
+        function closeWindow() {
+            if (window.electronAPI && window.electronAPI.closeWindow) {
+                window.electronAPI.closeWindow();
+            } else if (window.require) {
+                const { remote } = window.require('electron');
+                remote.getCurrentWindow().close();
+            } else {
+                window.close();
+            }
+        }
+        </script>
     </body>
 </html>

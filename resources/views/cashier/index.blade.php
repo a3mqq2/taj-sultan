@@ -665,6 +665,7 @@
             direction: rtl !important;
             border-radius: 16px !important;
             padding: 24px !important;
+            border: 2px solid #e2e8f0 !important;
         }
 
         .swal2-popup .swal-title-rtl {
@@ -1195,36 +1196,6 @@
                         return;
                     }
 
-                    const action = await Swal.fire({
-                        title: `فاتورة #${fetchedOrder.order_number}`,
-                        html: `<div style="text-align:right;font-size:14px;">
-                            <p><strong>الإجمالي:</strong> ${parseFloat(fetchedOrder.total).toFixed(3)} د.ل</p>
-                            <p><strong>عدد الأصناف:</strong> ${fetchedOrder.items.length}</p>
-                        </div>`,
-                        icon: 'question',
-                        showDenyButton: true,
-                        showCancelButton: true,
-                        confirmButtonText: '<i class="ti ti-shopping-cart-plus"></i> إضافة للسلة',
-                        denyButtonText: '<i class="ti ti-trash"></i> إلغاء الطلبية',
-                        cancelButtonText: 'إغلاق',
-                        confirmButtonColor: '#22c55e',
-                        denyButtonColor: '#ef4444',
-                        cancelButtonColor: '#64748b',
-                        customClass: {
-                            popup: 'swal-rtl',
-                            title: 'swal-title-rtl'
-                        }
-                    });
-
-                    if (action.isDismissed) {
-                        return;
-                    }
-
-                    if (action.isDenied) {
-                        await cancelSpecialOrder(fetchedOrder.id);
-                        return;
-                    }
-
                     if (!isDirectMode && directItems.length === 0 && !currentOrder) {
                         isDirectMode = true;
                     }
@@ -1344,29 +1315,45 @@
                 }
 
                 const order = data.data;
-                let itemsList = order.items.map(item => `<li>${item.product_name} × ${item.quantity}</li>`).join('');
 
-                const confirm = await Swal.fire({
-                    title: `فاتورة #${order.order_number}`,
-                    html: `<div style="text-align:right;font-size:14px;">
-                        <p><strong>التاريخ:</strong> ${order.paid_at}</p>
-                        <p><strong>الإجمالي:</strong> ${parseFloat(order.total).toFixed(3)} د.ل</p>
-                        <p><strong>الأصناف:</strong></p>
-                        <ul style="margin:5px 20px;text-align:right;">${itemsList}</ul>
-                    </div>`,
-                    icon: 'warning',
+                const { value: cancelCode } = await Swal.fire({
+                    title: 'كود الإلغاء',
+                    input: 'password',
+                    inputLabel: 'أدخل كود إلغاء الفاتورة',
+                    inputPlaceholder: 'كود الإلغاء...',
                     showCancelButton: true,
-                    confirmButtonText: '<i class="ti ti-ban"></i> إلغاء الفاتورة',
+                    confirmButtonText: '<i class="ti ti-check"></i> تأكيد',
                     cancelButtonText: 'رجوع',
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#64748b',
                     customClass: {
                         popup: 'swal-rtl',
-                        title: 'swal-title-rtl'
+                        title: 'swal-title-rtl',
+                        input: 'swal-input-rtl'
+                    },
+                    inputValidator: (value) => {
+                        if (!value) {
+                            return 'يرجى إدخال كود الإلغاء';
+                        }
                     }
                 });
 
-                if (!confirm.isConfirmed) return;
+                if (!cancelCode) return;
+
+                const verifyRes = await fetch(BASE_URL + '/cashier/verify-cancel-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ code: cancelCode })
+                });
+                const verifyData = await verifyRes.json();
+
+                if (!verifyData.success) {
+                    toast(verifyData.message, 'error');
+                    return;
+                }
 
                 const deleteRes = await fetch(BASE_URL + '/cashier/delete-invoice/' + order.id, {
                     method: 'POST',
@@ -1586,6 +1573,14 @@
                 return;
             }
             discount = val;
+            const newNet = getGrossTotal() - val;
+            if (getPaid() > newNet + 0.001) {
+                clearPayments();
+                updateSummary();
+                closeDiscountModal();
+                toast('تم تطبيق الخصم وحذف المدفوعات لأن المبلغ المدفوع أكبر من الصافي الجديد', 'info');
+                return;
+            }
             closeDiscountModal();
             updateSummary();
             if (val > 0) {
@@ -1661,106 +1656,9 @@
                 return toast('المدفوعات لا تساوي الإجمالي', 'error');
             }
 
-            let paymentsHtml = '';
-            payments.forEach(p => {
-                paymentsHtml += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;"><span style="color:#64748b;">${p.method_name}</span><span style="font-weight:700;">${parseFloat(p.amount).toFixed(3)} د.ل</span></div>`;
-            });
-
             const grossTotal = getGrossTotal();
-            let discountHtml = '';
-            if (discount > 0) {
-                discountHtml = `
-                    <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
-                        <span style="color:#f59e0b;">الخصم</span>
-                        <span style="color:#f59e0b;font-weight:700;">-${discount.toFixed(3)} د.ل</span>
-                    </div>`;
-            }
-
-            const confirm = await Swal.fire({
-                title: '<i class="ti ti-cash" style="color:#10b981;font-size:28px;"></i><br>تأكيد الدفع',
-                html: `
-                    <div style="text-align:right;font-size:15px;direction:rtl;font-family:'Cairo',sans-serif;">
-                        <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
-                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
-                                <span style="color:#64748b;">إجمالي الفاتورة</span>
-                                <span style="font-weight:700;">${grossTotal.toFixed(3)} د.ل</span>
-                            </div>
-                            ${discountHtml}
-                            <div style="display:flex;justify-content:space-between;padding:8px 0;margin-top:4px;">
-                                <span style="font-weight:700;">الصافي</span>
-                                <span style="font-weight:800;font-size:16px;color:#10b981;">${total.toFixed(3)} د.ل</span>
-                            </div>
-                        </div>
-                        <div style="background:#f0fdf4;border-radius:8px;padding:12px;margin-bottom:12px;">
-                            <div style="font-weight:700;margin-bottom:8px;color:#15803d;font-size:13px;">المدفوعات</div>
-                            ${paymentsHtml}
-                        </div>
-                        <div style="background:#fff;border:2px solid #e2e8f0;border-radius:8px;padding:12px;">
-                            <div style="font-weight:700;margin-bottom:10px;color:#475569;font-size:13px;">نوع الاستلام</div>
-                            <div style="display:flex;gap:10px;margin-bottom:10px;">
-                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;cursor:pointer;font-weight:600;">
-                                    <input type="radio" name="deliveryType" value="pickup" checked style="width:18px;height:18px;">
-                                    <i class="ti ti-building-store" style="font-size:18px;"></i> استلام
-                                </label>
-                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;font-weight:600;" id="deliveryLabel">
-                                    <input type="radio" name="deliveryType" value="delivery" style="width:18px;height:18px;">
-                                    <i class="ti ti-truck-delivery" style="font-size:18px;"></i> توصيل
-                                </label>
-                            </div>
-                            <div id="deliveryPhoneBox" style="display:none;">
-                                <input type="text" id="deliveryPhoneInput" placeholder="رقم الهاتف للتوصيل" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;text-align:center;">
-                            </div>
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '<i class="ti ti-check"></i> تأكيد الدفع',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#10b981',
-                cancelButtonColor: '#64748b',
-                customClass: {
-                    popup: 'swal-rtl',
-                    title: 'swal-title-rtl'
-                },
-                didOpen: () => {
-                    const radios = document.querySelectorAll('input[name="deliveryType"]');
-                    const phoneBox = document.getElementById('deliveryPhoneBox');
-                    const pickupLabel = radios[0].closest('label');
-                    const deliveryLabel = radios[1].closest('label');
-                    radios.forEach(radio => {
-                        radio.addEventListener('change', () => {
-                            if (radio.value === 'delivery') {
-                                phoneBox.style.display = 'block';
-                                deliveryLabel.style.background = '#fef3c7';
-                                deliveryLabel.style.borderColor = '#f59e0b';
-                                pickupLabel.style.background = '#f8fafc';
-                                pickupLabel.style.borderColor = '#e2e8f0';
-                                document.getElementById('deliveryPhoneInput').focus();
-                            } else {
-                                phoneBox.style.display = 'none';
-                                pickupLabel.style.background = '#f0fdf4';
-                                pickupLabel.style.borderColor = '#22c55e';
-                                deliveryLabel.style.background = '#f8fafc';
-                                deliveryLabel.style.borderColor = '#e2e8f0';
-                            }
-                        });
-                    });
-                },
-                preConfirm: () => {
-                    const deliveryType = document.querySelector('input[name="deliveryType"]:checked').value;
-                    const deliveryPhone = document.getElementById('deliveryPhoneInput').value.trim();
-                    if (deliveryType === 'delivery' && !deliveryPhone) {
-                        Swal.showValidationMessage('أدخل رقم الهاتف للتوصيل');
-                        return false;
-                    }
-                    return { deliveryType, deliveryPhone };
-                }
-            });
-
-            if (!confirm.isConfirmed) return;
-
-            const deliveryType = confirm.value.deliveryType;
-            const deliveryPhone = confirm.value.deliveryPhone;
+            const deliveryType = 'pickup';
+            const deliveryPhone = '';
 
             try {
                 let orderId;

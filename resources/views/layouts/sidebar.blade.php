@@ -46,13 +46,18 @@
         @endif
 
         <li class="side-nav-item">
-            <a class="side-nav-link {{ request()->routeIs('payment-methods.*') || request()->routeIs('users.*') || request()->routeIs('pos-points.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#settingsMenu" role="button" aria-expanded="{{ request()->routeIs('payment-methods.*') || request()->routeIs('users.*') || request()->routeIs('pos-points.*') ? 'true' : 'false' }}" aria-controls="settingsMenu">
+            <a class="side-nav-link {{ request()->routeIs('payment-methods.*') || request()->routeIs('users.*') || request()->routeIs('pos-points.*') || request()->routeIs('settings.*') ? 'active' : '' }}" data-bs-toggle="collapse" href="#settingsMenu" role="button" aria-expanded="{{ request()->routeIs('payment-methods.*') || request()->routeIs('users.*') || request()->routeIs('pos-points.*') || request()->routeIs('settings.*') ? 'true' : 'false' }}" aria-controls="settingsMenu">
                 <span class="menu-icon"><i class="ti ti-settings"></i></span>
                 <span class="menu-text">الإعدادات</span>
                 <span class="menu-arrow"></span>
             </a>
-            <div class="collapse {{ request()->routeIs('payment-methods.*') || request()->routeIs('users.*') || request()->routeIs('pos-points.*') ? 'show' : '' }}" id="settingsMenu">
+            <div class="collapse {{ request()->routeIs('payment-methods.*') || request()->routeIs('users.*') || request()->routeIs('pos-points.*') || request()->routeIs('settings.*') ? 'show' : '' }}" id="settingsMenu">
                 <ul class="sub-menu">
+                    <li class="side-nav-item">
+                        <a href="{{ route('settings.general') }}" class="side-nav-link {{ request()->routeIs('settings.general') ? 'active' : '' }}">
+                            <span class="menu-text">إعدادات عامة</span>
+                        </a>
+                    </li>
                     <li class="side-nav-item">
                         <a href="{{ route('payment-methods.index') }}" class="side-nav-link {{ request()->routeIs('payment-methods.*') ? 'active' : '' }}">
                             <span class="menu-text">طرق الدفع</span>
