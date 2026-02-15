@@ -165,16 +165,6 @@
         color: #6b7280;
     }
 
-    .badge-default {
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-weight: 500;
-        font-size: 11px;
-        background: rgba(245, 158, 11, 0.1);
-        color: #f59e0b;
-        margin-right: 8px;
-    }
-
     .modal-content {
         border-radius: 16px;
         border: 1px solid #e5e7eb;
@@ -517,12 +507,9 @@ function renderData(items) {
     tbody.innerHTML = items.map(item => `
         <tr data-id="${item.id}">
             <td>
-                <div class="d-flex align-items-center">
-                    ${item.is_default ? '<span class="badge-default">افتراضي</span>' : ''}
-                    <div>
-                        <div class="pos-name">${escapeHtml(item.name)}</div>
-                        <div class="pos-slug">/${item.slug}</div>
-                    </div>
+                <div>
+                    <div class="pos-name">${escapeHtml(item.name)}</div>
+                    <div class="pos-slug">/${item.slug}</div>
                 </div>
             </td>
             <td>
@@ -540,11 +527,9 @@ function renderData(items) {
                     <button type="button" class="btn action-btn btn-edit" onclick="openEditModal(${item.id})" title="تعديل">
                         <i class="ti ti-pencil fs-16"></i>
                     </button>
-                    ${!item.is_default ? `
                     <button type="button" class="btn action-btn btn-delete" onclick="openDeleteModal(${item.id}, '${escapeHtml(item.name)}')" title="حذف">
                         <i class="ti ti-trash fs-16"></i>
                     </button>
-                    ` : ''}
                 </div>
             </td>
         </tr>
@@ -581,7 +566,7 @@ async function openEditModal(id) {
             const item = result.data;
             document.getElementById('itemId').value = item.id;
             document.getElementById('itemName').value = item.name;
-            document.getElementById('itemName').disabled = true;
+            document.getElementById('itemName').disabled = false;
             document.getElementById('itemActive').checked = item.active;
             document.getElementById('itemRequireLogin').checked = item.require_login;
 

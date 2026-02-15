@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\PosPoint;
 use App\Models\Product;
-use App\Models\Category;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
@@ -24,20 +23,14 @@ class PosController extends Controller
             return redirect()->route('pos.login', $slug);
         }
 
-        $productIds = $posPoint->products()->pluck('products.id')->toArray();
-
-        if (count($productIds) > 0) {
-            $products = Product::active()->where('type', 'piece')->whereIn('id', $productIds)->orderBy('name')->get();
-            $categoryIds = $products->pluck('category_id')->unique()->toArray();
-            $categories = Category::whereIn('id', $categoryIds)->orderBy('name')->get();
-        } else {
-            $categories = Category::orderBy('name')->get();
-            $products = Product::active()->where('type', 'piece')->orderBy('name')->get();
-        }
+        $products = Product::active()
+            ->where('type', 'piece')
+            ->where('pos_point_id', $posPoint->id)
+            ->orderBy('name')
+            ->get();
 
         return view('pos.terminal', [
             'posPoint' => $posPoint,
-            'categories' => $categories,
             'products' => $products,
         ]);
     }
@@ -91,17 +84,10 @@ class PosController extends Controller
     public function products(string $slug, Request $request)
     {
         $posPoint = PosPoint::where('slug', $slug)->firstOrFail();
-        $productIds = $posPoint->products()->pluck('products.id')->toArray();
 
-        $query = Product::active()->where('type', 'piece');
-
-        if (count($productIds) > 0) {
-            $query->whereIn('id', $productIds);
-        }
-
-        if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
-        }
+        $query = Product::active()
+            ->where('type', 'piece')
+            ->where('pos_point_id', $posPoint->id);
 
         if ($request->filled('search')) {
             $query->search($request->search);
@@ -114,38 +100,12 @@ class PosController extends Controller
                 'price' => $product->price,
                 'type' => $product->type,
                 'barcode' => $product->barcode,
-                'category_id' => $product->category_id,
             ];
         });
 
         return response()->json([
             'success' => true,
             'data' => $products,
-        ]);
-    }
-
-    public function categories(string $slug)
-    {
-        $posPoint = PosPoint::where('slug', $slug)->firstOrFail();
-        $productIds = $posPoint->products()->pluck('products.id')->toArray();
-
-        if (count($productIds) > 0) {
-            $categoryIds = Product::whereIn('id', $productIds)->pluck('category_id')->unique()->toArray();
-            $categories = Category::whereIn('id', $categoryIds)->orderBy('name')->get();
-        } else {
-            $categories = Category::orderBy('name')->get();
-        }
-
-        $categories = $categories->map(function ($category) {
-            return [
-                'id' => $category->id,
-                'name' => $category->name,
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'data' => $categories,
         ]);
     }
 

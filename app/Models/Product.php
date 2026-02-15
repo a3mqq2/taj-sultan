@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -17,6 +16,7 @@ class Product extends Model
         'slug',
         'price',
         'category_id',
+        'pos_point_id',
         'type',
         'barcode',
         'description',
@@ -52,9 +52,9 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function posPoints(): BelongsToMany
+    public function posPoint(): BelongsTo
     {
-        return $this->belongsToMany(PosPoint::class, 'pos_point_product');
+        return $this->belongsTo(PosPoint::class);
     }
 
     public function scopeActive($query)
@@ -74,9 +74,7 @@ class Product extends Model
 
     public function scopeForPosPoint($query, $posPointId)
     {
-        return $query->whereHas('posPoints', function ($q) use ($posPointId) {
-            $q->where('pos_points.id', $posPointId);
-        });
+        return $query->where('pos_point_id', $posPointId);
     }
 
     public function scopeSearch($query, $term)

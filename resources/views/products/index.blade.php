@@ -628,11 +628,11 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <label class="form-label">القسم</label>
-                <select class="form-select filter-select" id="categoryFilter">
-                    <option value="">جميع الأقسام</option>
-                    @foreach($categories as $category)
-                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                <label class="form-label">نقطة البيع</label>
+                <select class="form-select filter-select" id="posPointFilter">
+                    <option value="">الكل</option>
+                    @foreach($posPoints as $posPoint)
+                        <option value="{{ $posPoint->id }}">{{ $posPoint->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -675,7 +675,7 @@
                     <tr>
                         <th style="width: 35%">الصنف</th>
                         <th>السعر</th>
-                        <th>القسم</th>
+                        <th>نقطة البيع</th>
                         <th>النوع</th>
                         <th>الحالة</th>
                     </tr>
@@ -755,14 +755,14 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">القسم <span class="text-danger">*</span></label>
-                        <select class="form-select" id="productCategory" name="category_id">
-                            <option value="">اختر القسم</option>
-                            @foreach($categories as $category)
-                                <option value="{{ $category->id }}">{{ $category->name }}</option>
+                        <label class="form-label">نقطة البيع <span class="text-danger">*</span></label>
+                        <select class="form-select" id="productPosPoint" name="pos_point_id">
+                            <option value="">اختر نقطة البيع</option>
+                            @foreach($posPoints as $posPoint)
+                                <option value="{{ $posPoint->id }}">{{ $posPoint->name }}</option>
                             @endforeach
                         </select>
-                        <div class="invalid-feedback" id="categoryError"></div>
+                        <div class="invalid-feedback" id="pos_point_idError"></div>
                     </div>
 
                     <div class="mb-3">
@@ -776,19 +776,6 @@
                             </button>
                         </div>
                         <div class="invalid-feedback" id="barcodeError"></div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">نقاط البيع</label>
-                        <p class="text-muted small mb-2">اختر نقاط البيع التي سيظهر فيها هذا الصنف (اتركها فارغة للظهور في الجميع)</p>
-                        <div id="posPointsCheckboxes" style="max-height: 150px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
-                            @foreach($posPoints as $posPoint)
-                            <div class="form-check mb-2">
-                                <input class="form-check-input pos-point-checkbox" type="checkbox" value="{{ $posPoint->id }}" id="pos_{{ $posPoint->id }}">
-                                <label class="form-check-label" for="pos_{{ $posPoint->id }}">{{ $posPoint->name }}</label>
-                            </div>
-                            @endforeach
-                        </div>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between p-3 rounded-3 status-box">
@@ -887,7 +874,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // الفلاتر
-    ['categoryFilter', 'statusFilter', 'sortFilter'].forEach(id => {
+    ['posPointFilter', 'statusFilter', 'sortFilter'].forEach(id => {
         document.getElementById(id).addEventListener('change', function() {
             currentPage = 1;
             loadProducts();
@@ -941,7 +928,7 @@ async function loadProducts() {
     const params = new URLSearchParams({
         page: currentPage,
         search: document.getElementById('searchInput').value,
-        category_id: document.getElementById('categoryFilter').value,
+        pos_point_id: document.getElementById('posPointFilter').value,
         status: document.getElementById('statusFilter').value,
     });
 
@@ -1005,8 +992,8 @@ function renderProducts(products) {
             </td>
             <td>
                 <span class="product-category">
-                    <i class="ti ti-folder fs-14"></i>
-                    ${escapeHtml(product.category?.name || '-')}
+                    <i class="ti ti-device-desktop fs-14"></i>
+                    ${escapeHtml(product.pos_point?.name || '-')}
                 </span>
             </td>
             <td>
@@ -1104,16 +1091,12 @@ async function openEditModal(id) {
             document.getElementById('productName').value = product.name;
             document.getElementById('productPrice').value = product.price;
             document.getElementById('productType').value = product.type;
-            document.getElementById('productCategory').value = product.category_id;
+            document.getElementById('productPosPoint').value = product.pos_point_id || '';
             document.getElementById('productBarcode').value = product.barcode || '';
             document.getElementById('productStatus').checked = product.is_active;
             document.getElementById('saveProductBtn').querySelector('.btn-text').textContent = 'حفظ التعديلات';
             document.getElementById('deleteProductBtn').classList.remove('d-none');
             updatePriceUnit();
-
-            document.querySelectorAll('.pos-point-checkbox').forEach(cb => {
-                cb.checked = product.pos_point_ids && product.pos_point_ids.includes(parseInt(cb.value));
-            });
 
             productModal.show();
         }
@@ -1134,19 +1117,13 @@ async function handleProductSubmit(e) {
     const productId = document.getElementById('productId').value;
     const isEdit = !!productId;
 
-    const selectedPosPoints = [];
-    document.querySelectorAll('.pos-point-checkbox:checked').forEach(cb => {
-        selectedPosPoints.push(parseInt(cb.value));
-    });
-
     const data = {
         name: document.getElementById('productName').value,
         price: document.getElementById('productPrice').value,
         type: document.getElementById('productType').value,
-        category_id: document.getElementById('productCategory').value,
+        pos_point_id: document.getElementById('productPosPoint').value,
         barcode: document.getElementById('productBarcode').value || null,
         is_active: document.getElementById('productStatus').checked,
-        pos_point_ids: selectedPosPoints
     };
 
     setSubmitting(true);
@@ -1274,7 +1251,7 @@ async function toggleStatus(id, checkbox) {
 // إعادة تعيين الفلاتر
 function resetFilters() {
     document.getElementById('searchInput').value = '';
-    document.getElementById('categoryFilter').value = '';
+    document.getElementById('posPointFilter').value = '';
     document.getElementById('statusFilter').value = '';
     document.getElementById('sortFilter').value = 'created_at-desc';
     currentPage = 1;
@@ -1285,11 +1262,11 @@ function resetFilters() {
 function updateExportUrl() {
     const params = new URLSearchParams();
     const search = document.getElementById('searchInput').value;
-    const categoryId = document.getElementById('categoryFilter').value;
+    const posPointId = document.getElementById('posPointFilter').value;
     const status = document.getElementById('statusFilter').value;
 
     if (search) params.append('search', search);
-    if (categoryId) params.append('category_id', categoryId);
+    if (posPointId) params.append('pos_point_id', posPointId);
     if (status) params.append('status', status);
 
     const baseUrl = '{{ route('products.export') }}';
@@ -1303,7 +1280,7 @@ function resetForm() {
     document.getElementById('productId').value = '';
     document.getElementById('productStatus').checked = true;
     document.getElementById('priceUnit').textContent = 'د.ل';
-    document.querySelectorAll('.pos-point-checkbox').forEach(cb => cb.checked = false);
+    document.getElementById('productPosPoint').value = '';
     clearErrors();
 }
 

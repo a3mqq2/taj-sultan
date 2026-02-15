@@ -34,7 +34,6 @@ class PosPointController extends Controller
                 'slug' => $point->slug,
                 'active' => $point->active,
                 'require_login' => $point->require_login,
-                'is_default' => $point->is_default,
             ];
         });
 
@@ -80,7 +79,6 @@ class PosPointController extends Controller
                 'slug' => $posPoint->slug,
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
-                'is_default' => $posPoint->is_default,
             ]
         ], 201);
     }
@@ -95,7 +93,6 @@ class PosPointController extends Controller
                 'slug' => $posPoint->slug,
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
-                'is_default' => $posPoint->is_default,
             ]
         ]);
     }
@@ -103,14 +100,32 @@ class PosPointController extends Controller
     public function update(Request $request, PosPoint $posPoint)
     {
         $request->validate([
+            'name' => 'sometimes|required|string|max:255|unique:pos_points,name,' . $posPoint->id,
             'active' => 'boolean',
             'require_login' => 'boolean',
+        ], [
+            'name.required' => 'اسم نقطة البيع مطلوب',
+            'name.unique' => 'اسم نقطة البيع موجود مسبقاً',
         ]);
 
-        $posPoint->update([
+        $data = [
             'active' => $request->boolean('active', $posPoint->active),
             'require_login' => $request->boolean('require_login', $posPoint->require_login),
-        ]);
+        ];
+
+        if ($request->filled('name') && $request->name !== $posPoint->name) {
+            $data['name'] = $request->name;
+            $slug = Str::slug($request->name);
+            $originalSlug = $slug;
+            $counter = 1;
+            while (PosPoint::where('slug', $slug)->where('id', '!=', $posPoint->id)->exists()) {
+                $slug = $originalSlug . '-' . $counter;
+                $counter++;
+            }
+            $data['slug'] = $slug;
+        }
+
+        $posPoint->update($data);
 
         return response()->json([
             'success' => true,
@@ -121,7 +136,6 @@ class PosPointController extends Controller
                 'slug' => $posPoint->slug,
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
-                'is_default' => $posPoint->is_default,
             ]
         ]);
     }
@@ -144,22 +158,8 @@ class PosPointController extends Controller
 
     public function destroy(PosPoint $posPoint)
     {
-        if ($posPoint->is_default) {
-            return response()->json([
-                'success' => false,
-                'message' => 'لا يمكن حذف نقطة البيع الافتراضية'
-            ], 422);
-        }
-
-        if ($posPoint->users()->count() > 0) {
-            return response()->json([
-                'success' => false,
-                'message' => 'لا يمكن حذف نقطة البيع لوجود مستخدمين مرتبطين بها'
-            ], 422);
-        }
-
         $name = $posPoint->name;
-        $posPoint->products()->detach();
+        $posPoint->products()->update(['pos_point_id' => null]);
         $posPoint->delete();
 
         return response()->json([

@@ -731,6 +731,35 @@
             font-family: 'Almarai', sans-serif;
         }
 
+        .refresh-products-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #eff6ff;
+            border: none;
+            border-radius: 24px;
+            color: #3b82f6;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Almarai', sans-serif;
+        }
+
+        .refresh-products-btn:hover {
+            background: #dbeafe;
+        }
+
+        .refresh-products-btn.spinning i {
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         .hidden {
             display: none !important;
         }
@@ -762,6 +791,10 @@
                     <div class="pos-name">{{ $posPoint->name }}</div>
                 </div>
                 <div class="session-info">
+                    <button type="button" class="refresh-products-btn" id="refreshProductsBtn" onclick="refreshProducts()" title="تحديث المنتجات (F5)">
+                        <i class="ti ti-refresh"></i>
+                        <span>تحديث</span>
+                    </button>
                     <div class="status">
                         <span class="status-dot"></span>
                         <span>متصل</span>
@@ -796,8 +829,7 @@
                      data-name="{{ $product->name }}"
                      data-price="{{ $product->price }}"
                      data-type="{{ $product->type }}"
-                     data-barcode="{{ $product->barcode }}"
-                     data-category="{{ $product->category_id }}">
+                     data-barcode="{{ $product->barcode }}">
                     <div class="product-name">{{ $product->name }}</div>
                     <div class="product-price">{{ number_format($product->price, 3) }}</div>
                     @if($product->type === 'weight')
@@ -813,6 +845,7 @@
                     <span>تم تنفيذ النظام بواسطة شركة حلول لتقنية المعلومات</span>
                 </div>
                 <div class="shortcuts-hint">
+                    <div class="shortcut"><kbd>F5</kbd> تحديث</div>
                     <div class="shortcut"><kbd>F8</kbd> طباعة</div>
                     <div class="shortcut"><kbd>Esc</kbd> مسح</div>
                     <div class="shortcut"><kbd>Space</kbd> بحث</div>
@@ -1157,6 +1190,54 @@
             renderCart();
         }
 
+        async function refreshProducts() {
+            const btn = document.getElementById('refreshProductsBtn');
+            btn.classList.add('spinning');
+            btn.disabled = true;
+
+            try {
+                const res = await fetch(BASE_URL + '/pos/' + posSlug + '/products', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    const grid = document.getElementById('productsGrid');
+                    grid.innerHTML = '';
+
+                    data.data.forEach(function(product) {
+                        const card = document.createElement('div');
+                        card.className = 'product-card' + (product.type === 'weight' ? ' weight-product' : '');
+                        card.dataset.id = product.id;
+                        card.dataset.name = product.name;
+                        card.dataset.price = product.price;
+                        card.dataset.type = product.type;
+                        card.dataset.barcode = product.barcode || '';
+
+                        let html = '<div class="product-name">' + product.name + '</div>';
+                        html += '<div class="product-price">' + parseFloat(product.price).toFixed(3) + '</div>';
+                        if (product.type === 'weight') {
+                            html += '<div class="product-type">بالوزن</div>';
+                        }
+                        card.innerHTML = html;
+
+                        card.addEventListener('click', function() {
+                            addToCart(this);
+                        });
+
+                        grid.appendChild(card);
+                    });
+
+                    document.getElementById('searchInput').value = '';
+                }
+            } catch (err) {
+            }
+
+            btn.classList.remove('spinning');
+            btn.disabled = false;
+            document.getElementById('searchInput').focus();
+        }
+
         function initKeyboardShortcuts() {
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
@@ -1165,6 +1246,11 @@
                     } else {
                         clearCart();
                     }
+                }
+
+                if (e.key === 'F5') {
+                    e.preventDefault();
+                    refreshProducts();
                 }
 
                 if (e.key === 'F8') {
