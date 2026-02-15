@@ -192,6 +192,26 @@
             background: #fff;
         }
 
+        .clear-all-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: #fee2e2;
+            border-radius: 6px;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.15s;
+        }
+
+        .clear-all-btn:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
         .items-title {
             font-size: 16px;
             font-weight: 700;
@@ -825,6 +845,9 @@
                 <div class="items-section">
                     <div class="items-header">
                         <div class="items-title">الأصناف</div>
+                        <button type="button" class="clear-all-btn" id="clearAllBtn" onclick="cancelAllItems()" title="تصفير (Esc)">
+                            <i class="ti ti-x"></i>
+                        </button>
                     </div>
                     <div class="items-body">
                         <div class="empty-state" id="emptyState">
