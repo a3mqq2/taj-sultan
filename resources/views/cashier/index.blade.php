@@ -1745,7 +1745,7 @@
         }
 
         function printReceipt(data) {
-            const items = isDirectMode ? directItems : (currentOrder?.items || data.items);
+            const items = data.items || (isDirectMode ? directItems : currentOrder?.items) || [];
             let itemsHtml = '';
             items.forEach(i => {
                 const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
@@ -2089,7 +2089,7 @@
         }
 
         function printCreditReceipt(data) {
-            const items = isDirectMode ? directItems : (currentOrder?.items || data.items);
+            const items = data.items || (isDirectMode ? directItems : currentOrder?.items) || [];
             let itemsHtml = '';
             items.forEach(i => {
                 const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
