@@ -644,6 +644,63 @@
             color: #059669;
         }
 
+        .delivery-section {
+            padding: 8px 10px;
+            border-top: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .delivery-toggle {
+            display: flex;
+            gap: 6px;
+        }
+
+        .delivery-btn {
+            flex: 1;
+            padding: 7px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            background: #f8fafc;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: all 0.15s;
+        }
+
+        .delivery-btn.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .delivery-btn:hover {
+            border-color: #93c5fd;
+        }
+
+        .delivery-phone-row {
+            margin-top: 6px;
+        }
+
+        .delivery-phone-input {
+            width: 100%;
+            padding: 8px 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .delivery-phone-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
         .pay-section {
             padding: 10px;
             border-top: 1px solid #e2e8f0;
@@ -938,6 +995,20 @@
                         </div>
                     </div>
 
+                    <div class="delivery-section">
+                        <div class="delivery-toggle">
+                            <button type="button" class="delivery-btn active" id="pickupBtn" onclick="setDeliveryType('pickup')">
+                                <i class="ti ti-building-store"></i> استلام
+                            </button>
+                            <button type="button" class="delivery-btn" id="deliveryBtn" onclick="setDeliveryType('delivery')">
+                                <i class="ti ti-truck-delivery"></i> توصيل
+                            </button>
+                        </div>
+                        <div class="delivery-phone-row hidden" id="deliveryPhoneRow">
+                            <input type="text" class="delivery-phone-input" id="deliveryPhoneInput" placeholder="رقم الهاتف للتوصيل">
+                        </div>
+                    </div>
+
                     <div class="pay-section">
                         <button class="pay-btn" id="payBtn" disabled>
                             <i class="ti ti-check"></i>
@@ -1044,6 +1115,7 @@
         let selectedCustomer = null;
         let isCredit = false;
         let mergedOrderIds = [];
+        let currentDeliveryType = 'pickup';
 
         document.addEventListener('DOMContentLoaded', init);
 
@@ -1616,6 +1688,20 @@
             updateSummary();
         }
 
+        function setDeliveryType(type) {
+            currentDeliveryType = type;
+            document.getElementById('pickupBtn').classList.toggle('active', type === 'pickup');
+            document.getElementById('deliveryBtn').classList.toggle('active', type === 'delivery');
+            const phoneRow = document.getElementById('deliveryPhoneRow');
+            if (type === 'delivery') {
+                phoneRow.classList.remove('hidden');
+                document.getElementById('deliveryPhoneInput').focus();
+            } else {
+                phoneRow.classList.add('hidden');
+                document.getElementById('deliveryPhoneInput').value = '';
+            }
+        }
+
         function round3(n) {
             return Math.round(n * 1000) / 1000;
         }
@@ -1684,8 +1770,12 @@
             }
 
             const grossTotal = getGrossTotal();
-            const deliveryType = 'pickup';
-            const deliveryPhone = '';
+            const deliveryType = currentDeliveryType;
+            const deliveryPhone = document.getElementById('deliveryPhoneInput').value.trim();
+
+            if (deliveryType === 'delivery' && !deliveryPhone) {
+                return toast('أدخل رقم الهاتف للتوصيل', 'error');
+            }
 
             try {
                 let orderId;
@@ -2418,6 +2508,7 @@ ${creditHtml}
             document.getElementById('itemsBody').innerHTML = '';
             document.getElementById('invoiceTotal').textContent = '0.000';
             clearPayments();
+            setDeliveryType('pickup');
             updateSummary();
             document.getElementById('invoiceInput').focus();
         }
