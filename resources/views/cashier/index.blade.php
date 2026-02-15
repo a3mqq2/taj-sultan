@@ -875,6 +875,10 @@
                     <i class="ti ti-users"></i>
                     الزبائن والديون
                 </a>
+                <a href="{{ route('cashier.deliveries') }}" class="special-order-btn" style="background:linear-gradient(135deg,#10b981,#059669);">
+                    <i class="ti ti-truck-delivery"></i>
+                    التوصيل
+                </a>
                 <a href="{{ route('cashier.special-orders') }}" class="special-order-btn">
                     <i class="ti ti-cake"></i>
                     طلبيات خاصة

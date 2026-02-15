@@ -24,7 +24,7 @@ class SalesReportController extends Controller
     public function data(Request $request)
     {
         $query = Order::with(['posPoint', 'payments.paymentMethod'])
-            ->where('status', 'paid');
+            ->whereIn('status', ['paid', 'delivering']);
 
         $this->applyFilters($query, $request);
 
@@ -112,7 +112,7 @@ class SalesReportController extends Controller
 
         $paymentQuery = OrderPayment::query()
             ->whereHas('order', function ($q) use ($request) {
-                $q->where('status', 'paid');
+                $q->whereIn('status', ['paid', 'delivering']);
                 $this->applyFilters($q, $request);
             })
             ->join('payment_methods', 'order_payments.payment_method_id', '=', 'payment_methods.id')
@@ -138,7 +138,7 @@ class SalesReportController extends Controller
     {
         $query = OrderItem::query()
             ->whereHas('order', function ($q) use ($request) {
-                $q->where('status', 'paid');
+                $q->whereIn('status', ['paid', 'delivering']);
                 $this->applyFilters($q, $request);
             })
             ->selectRaw('
@@ -239,7 +239,7 @@ class SalesReportController extends Controller
     {
         $products = OrderItem::query()
             ->whereHas('order', function ($q) use ($request) {
-                $q->where('status', 'paid');
+                $q->whereIn('status', ['paid', 'delivering']);
                 $this->applyFilters($q, $request);
             })
             ->selectRaw('
@@ -287,7 +287,7 @@ class SalesReportController extends Controller
     public function exportExcel(Request $request)
     {
         $query = Order::with(['posPoint', 'payments.paymentMethod'])
-            ->where('status', 'paid');
+            ->whereIn('status', ['paid', 'delivering']);
 
         $this->applyFilters($query, $request);
         $query->orderBy('created_at', 'desc');
@@ -390,7 +390,7 @@ class SalesReportController extends Controller
     public function print(Request $request)
     {
         $query = Order::with(['posPoint', 'payments.paymentMethod'])
-            ->where('status', 'paid');
+            ->whereIn('status', ['paid', 'delivering']);
 
         $this->applyFilters($query, $request);
         $query->orderBy('created_at', 'desc');

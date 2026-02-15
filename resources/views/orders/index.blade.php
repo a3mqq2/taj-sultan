@@ -90,6 +90,7 @@
     .badge-pending { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
     .badge-paid { background: rgba(16, 185, 129, 0.1); color: #10b981; }
     .badge-cancelled { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+    .badge-delivering { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
 
     .badge-delivery { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
     .badge-pickup { background: rgba(139, 92, 246, 0.1); color: #8b5cf6; }
@@ -474,7 +475,8 @@ const statuses = @json($statuses);
 const statusLabels = {
     'pending': 'قيد الانتظار',
     'paid': 'مدفوع',
-    'cancelled': 'ملغي'
+    'cancelled': 'ملغي',
+    'delivering': 'قيد التوصيل'
 };
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -115,6 +115,16 @@ class Order extends Model
         return $query->where('status', 'cancelled');
     }
 
+    public function scopeDelivering($query)
+    {
+        return $query->where('status', 'delivering');
+    }
+
+    public function scopePaidOrDelivering($query)
+    {
+        return $query->whereIn('status', ['paid', 'delivering']);
+    }
+
     public function scopeHasCredit($query)
     {
         return $query->where('credit_amount', '>', 0);
@@ -157,6 +167,16 @@ class Order extends Model
     public function cancel(): void
     {
         $this->update(['status' => 'cancelled']);
+    }
+
+    public function isDelivering(): bool
+    {
+        return $this->status === 'delivering';
+    }
+
+    public function markAsDelivered(): void
+    {
+        $this->update(['status' => 'paid']);
     }
 
     public static function generateOrderNumber(): string

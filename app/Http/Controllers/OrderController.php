@@ -15,6 +15,7 @@ class OrderController extends Controller
         $statuses = [
             'pending' => 'قيد الانتظار',
             'paid' => 'مدفوع',
+            'delivering' => 'قيد التوصيل',
             'cancelled' => 'ملغي',
         ];
 
@@ -175,7 +176,7 @@ class OrderController extends Controller
             $sheet->setCellValueByColumnAndRow(5, $row, $order->discount ?? 0);
             $sheet->setCellValueByColumnAndRow(6, $row, $order->credit_amount ?? 0);
             $sheet->setCellValueByColumnAndRow(7, $row, $order->delivery_type === 'delivery' ? 'توصيل' : 'استلام');
-            $sheet->setCellValueByColumnAndRow(8, $row, $order->status === 'paid' ? 'مدفوع' : ($order->status === 'cancelled' ? 'ملغي' : 'قيد الانتظار'));
+            $sheet->setCellValueByColumnAndRow(8, $row, $order->status === 'paid' ? 'مدفوع' : ($order->status === 'delivering' ? 'قيد التوصيل' : ($order->status === 'cancelled' ? 'ملغي' : 'قيد الانتظار')));
             $sheet->setCellValueByColumnAndRow(9, $row, $order->paidByUser ? $order->paidByUser->name : '-');
             $sheet->setCellValueByColumnAndRow(10, $row, $order->paid_at ? $order->paid_at->format('Y-m-d H:i') : '-');
             $row++;

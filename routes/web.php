@@ -159,6 +159,10 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::post('/find-invoice', [CashierController::class, 'findInvoice'])->name('find-invoice');
     Route::post('/delete-invoice/{id}', [CashierController::class, 'deleteInvoice'])->name('delete-invoice');
     Route::post('/verify-cancel-code', [SettingController::class, 'verifyCancelCode'])->name('verify-cancel-code');
+
+    Route::get('/deliveries', [CashierController::class, 'deliveries'])->name('deliveries');
+    Route::get('/deliveries/data', [CashierController::class, 'deliveriesData'])->name('deliveries.data');
+    Route::post('/deliveries/mark-delivered', [CashierController::class, 'markDelivered'])->name('deliveries.mark-delivered');
 });
 
 Route::prefix('pos')->name('pos.')->group(function () {

@@ -20,11 +20,11 @@ class DashboardController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek();
         $startOfMonth = Carbon::now()->startOfMonth();
 
-        $todaySales = Order::paid()->whereDate('paid_at', $today)->sum('total');
-        $todayOrders = Order::paid()->whereDate('paid_at', $today)->count();
+        $todaySales = Order::paidOrDelivering()->whereDate('paid_at', $today)->sum('total');
+        $todayOrders = Order::paidOrDelivering()->whereDate('paid_at', $today)->count();
 
-        $weekSales = Order::paid()->where('paid_at', '>=', $startOfWeek)->sum('total');
-        $monthSales = Order::paid()->where('paid_at', '>=', $startOfMonth)->sum('total');
+        $weekSales = Order::paidOrDelivering()->where('paid_at', '>=', $startOfWeek)->sum('total');
+        $monthSales = Order::paidOrDelivering()->where('paid_at', '>=', $startOfMonth)->sum('total');
 
         $productsCount = Product::count();
         $activeProducts = Product::active()->count();
@@ -71,7 +71,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        $salesData = Order::paid()
+        $salesData = Order::paidOrDelivering()
             ->where('paid_at', '>=', Carbon::now()->subDays(6)->startOfDay())
             ->select(DB::raw('DATE(paid_at) as date'), DB::raw('SUM(total) as total'))
             ->groupBy('date')

@@ -42,7 +42,7 @@ class CashierController extends Controller
             ], 404);
         }
 
-        if ($order->status === 'paid') {
+        if ($order->status === 'paid' || $order->status === 'delivering') {
             return response()->json([
                 'success' => false,
                 'message' => 'هذا الطلب مدفوع مسبقاً',
@@ -327,7 +327,7 @@ class CashierController extends Controller
 
         $order = Order::with('items')->find($validated['order_id']);
 
-        if ($order->status === 'paid') {
+        if ($order->status === 'paid' || $order->status === 'delivering') {
             return response()->json([
                 'success' => false,
                 'message' => 'هذا الطلب مدفوع مسبقاً',
@@ -386,8 +386,11 @@ class CashierController extends Controller
                     }
                 }
 
+                $deliveryType = $validated['delivery_type'] ?? 'pickup';
+                $orderStatus = ($deliveryType === 'delivery') ? 'delivering' : 'paid';
+
                 $order->update([
-                    'status' => 'paid',
+                    'status' => $orderStatus,
                     'paid_at' => now(),
                     'paid_by' => auth()->id(),
                     'amount_received' => $totalPayments,
@@ -395,7 +398,7 @@ class CashierController extends Controller
                     'total' => $expectedTotal,
                     'customer_id' => $customerId,
                     'credit_amount' => $creditAmount,
-                    'delivery_type' => $validated['delivery_type'] ?? 'pickup',
+                    'delivery_type' => $deliveryType,
                     'delivery_phone' => $validated['delivery_phone'] ?? null,
                 ]);
 
@@ -1173,7 +1176,7 @@ class CashierController extends Controller
             ], 404);
         }
 
-        if ($order->status === 'paid') {
+        if ($order->status === 'paid' || $order->status === 'delivering') {
             return response()->json([
                 'success' => false,
                 'message' => 'هذه الفاتورة مدفوعة مسبقاً',
@@ -1231,7 +1234,7 @@ class CashierController extends Controller
         $orders = Order::with('items')->whereIn('id', $orderIds)->get();
 
         foreach ($orders as $order) {
-            if ($order->status === 'paid') {
+            if ($order->status === 'paid' || $order->status === 'delivering') {
                 return response()->json([
                     'success' => false,
                     'message' => "الفاتورة رقم {$order->order_number} مدفوعة مسبقاً",
@@ -1332,5 +1335,85 @@ class CashierController extends Controller
                 'message' => 'حدث خطأ أثناء دمج الفواتير',
             ], 500);
         }
+    }
+
+    public function deliveries()
+    {
+        return view('cashier.deliveries');
+    }
+
+    public function deliveriesData(Request $request)
+    {
+        $query = Order::with(['items', 'payments.paymentMethod', 'customer', 'paidByUser'])
+            ->where('status', 'delivering')
+            ->whereNull('merged_into');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('order_number', 'like', "%{$search}%")
+                    ->orWhere('delivery_phone', 'like', "%{$search}%")
+                    ->orWhereHas('customer', function ($cq) use ($search) {
+                        $cq->where('name', 'like', "%{$search}%")
+                            ->orWhere('phone', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $orders = $query->orderBy('paid_at', 'desc')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $orders->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'delivery_phone' => $order->delivery_phone,
+                    'total' => $order->total,
+                    'discount' => $order->discount,
+                    'paid_at' => $order->paid_at ? $order->paid_at->format('Y-m-d H:i') : null,
+                    'customer_name' => $order->customer ? $order->customer->name : null,
+                    'cashier_name' => $order->paidByUser ? $order->paidByUser->name : null,
+                    'items' => $order->items->map(function ($item) {
+                        return [
+                            'product_name' => $item->product_name,
+                            'quantity' => $item->quantity,
+                            'price' => $item->price,
+                            'total' => $item->total,
+                            'is_weight' => $item->is_weight,
+                        ];
+                    }),
+                    'payments' => $order->payments->map(function ($payment) {
+                        return [
+                            'method' => $payment->paymentMethod->name,
+                            'amount' => $payment->amount,
+                        ];
+                    }),
+                ];
+            }),
+        ]);
+    }
+
+    public function markDelivered(Request $request)
+    {
+        $request->validate([
+            'order_id' => 'required|exists:orders,id',
+        ]);
+
+        $order = Order::find($request->order_id);
+
+        if ($order->status !== 'delivering') {
+            return response()->json([
+                'success' => false,
+                'message' => 'هذا الطلب ليس في حالة التوصيل',
+            ], 400);
+        }
+
+        $order->markAsDelivered();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تأكيد التوصيل',
+        ]);
     }
 }
