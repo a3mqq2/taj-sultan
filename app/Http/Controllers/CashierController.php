@@ -354,12 +354,7 @@ class CashierController extends Controller
                 ], 400);
             }
 
-            if (abs($totalPayments - $expectedTotal) > 0.001) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'مجموع المدفوعات لا يساوي الإجمالي',
-                ], 400);
-            }
+       
         }
 
         if ($isCredit && $totalPayments > $expectedTotal) {
