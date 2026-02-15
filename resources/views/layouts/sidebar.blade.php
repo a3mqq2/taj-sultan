@@ -14,6 +14,14 @@
             </a>
         </li>
 
+
+          <li class="side-nav-item">
+            <a href="{{ route('orders.index') }}" class="side-nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                <span class="menu-icon"><i class="ti ti-receipt"></i></span>
+                <span class="menu-text">الطلبيات</span>
+            </a>
+        </li>
+        
         <li class="side-nav-item">
             <a href="{{ route('special-orders.index') }}" class="side-nav-link {{ request()->routeIs('special-orders.*') ? 'active' : '' }}">
                 <span class="menu-icon"><i class="ti ti-cake"></i></span>
@@ -21,7 +29,12 @@
             </a>
         </li>
 
-
+        <li class="side-nav-item">
+            <a href="{{ route('customers.index') }}" class="side-nav-link {{ request()->routeIs('customers.*') ? 'active' : '' }}">
+                <span class="menu-icon"><i class="ti ti-users"></i></span>
+                <span class="menu-text">الزبائن والديون</span>
+            </a>
+        </li>
 
         @if(auth()->user()->hasPermission('reports.view'))
         <li class="side-nav-item">

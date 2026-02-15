@@ -1356,8 +1356,8 @@
                     </div>`,
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: '<i class="ti ti-trash"></i> حذف الفاتورة',
-                    cancelButtonText: 'إلغاء',
+                    confirmButtonText: '<i class="ti ti-ban"></i> إلغاء الفاتورة',
+                    cancelButtonText: 'رجوع',
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#64748b',
                     customClass: {

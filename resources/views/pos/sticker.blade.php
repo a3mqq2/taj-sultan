@@ -45,14 +45,14 @@ justify-content:center;
 
 .barcode svg{
 width:30mm;
-height:18mm;
+height:16mm;
 }
 
 .barcode-text{
 font-family:monospace;
 font-size:9px;
 font-weight:bold;
-margin-top:-1mm;
+margin-top:-2mm !important;
 line-height:1;
 text-align:center;
 }

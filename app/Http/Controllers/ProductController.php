@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\PosPoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -13,25 +14,23 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $categories = Category::active()->ordered()->get();
+        $posPoints = PosPoint::orderBy('name')->get();
 
-        return view('products.index', compact('categories'));
+        return view('products.index', compact('categories', 'posPoints'));
     }
 
     public function data(Request $request)
     {
-        $query = Product::with('category');
+        $query = Product::with(['category', 'posPoints']);
 
-        // البحث
         if ($request->filled('search')) {
             $query->search($request->search);
         }
 
-        // فلترة حسب القسم
         if ($request->filled('category_id')) {
             $query->byCategory($request->category_id);
         }
 
-        // فلترة حسب الحالة
         if ($request->filled('status')) {
             if ($request->status === 'active') {
                 $query->active();
@@ -40,7 +39,10 @@ class ProductController extends Controller
             }
         }
 
-        // الترتيب
+        if ($request->filled('pos_point_id')) {
+            $query->forPosPoint($request->pos_point_id);
+        }
+
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
 
@@ -49,13 +51,32 @@ class ProductController extends Controller
             $query->orderBy($sortField, $sortDirection);
         }
 
-        // Pagination
         $perPage = $request->get('per_page', 15);
         $products = $query->paginate($perPage);
 
+        $data = $products->getCollection()->map(function ($product) {
+            return [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => $product->price,
+                'category_id' => $product->category_id,
+                'category' => $product->category,
+                'type' => $product->type,
+                'barcode' => $product->barcode,
+                'description' => $product->description,
+                'is_active' => $product->is_active,
+                'stock' => $product->stock,
+                'pos_point_ids' => $product->posPoints->pluck('id')->toArray(),
+                'pos_points' => $product->posPoints->pluck('name')->toArray(),
+                'created_at' => $product->created_at,
+                'updated_at' => $product->updated_at,
+            ];
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $products->items(),
+            'data' => $data,
             'pagination' => [
                 'current_page' => $products->currentPage(),
                 'last_page' => $products->lastPage(),
@@ -77,6 +98,8 @@ class ProductController extends Controller
             'barcode' => 'nullable|string|max:100|unique:products,barcode',
             'description' => 'nullable|string',
             'is_active' => 'boolean',
+            'pos_point_ids' => 'nullable|array',
+            'pos_point_ids.*' => 'exists:pos_points,id',
         ], [
             'name.required' => 'اسم الصنف مطلوب',
             'name.max' => 'اسم الصنف يجب ألا يتجاوز 255 حرف',
@@ -94,22 +117,54 @@ class ProductController extends Controller
         $validated['is_active'] = $request->boolean('is_active', true);
 
         $product = Product::create($validated);
-        $product->load('category');
+
+        if ($request->has('pos_point_ids')) {
+            $product->posPoints()->sync($request->input('pos_point_ids', []));
+        }
+
+        $product->load(['category', 'posPoints']);
 
         return response()->json([
             'success' => true,
             'message' => 'تم إضافة الصنف بنجاح',
-            'data' => $product
+            'data' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => $product->price,
+                'category_id' => $product->category_id,
+                'category' => $product->category,
+                'type' => $product->type,
+                'barcode' => $product->barcode,
+                'description' => $product->description,
+                'is_active' => $product->is_active,
+                'stock' => $product->stock,
+                'pos_point_ids' => $product->posPoints->pluck('id')->toArray(),
+                'pos_points' => $product->posPoints->pluck('name')->toArray(),
+            ]
         ], 201);
     }
 
     public function show(Product $product)
     {
-        $product->load('category');
+        $product->load(['category', 'posPoints']);
 
         return response()->json([
             'success' => true,
-            'data' => $product
+            'data' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => $product->price,
+                'category_id' => $product->category_id,
+                'category' => $product->category,
+                'type' => $product->type,
+                'barcode' => $product->barcode,
+                'description' => $product->description,
+                'is_active' => $product->is_active,
+                'stock' => $product->stock,
+                'pos_point_ids' => $product->posPoints->pluck('id')->toArray(),
+            ]
         ]);
     }
 
@@ -128,6 +183,8 @@ class ProductController extends Controller
             ],
             'description' => 'nullable|string',
             'is_active' => 'boolean',
+            'pos_point_ids' => 'nullable|array',
+            'pos_point_ids.*' => 'exists:pos_points,id',
         ], [
             'name.required' => 'اسم الصنف مطلوب',
             'name.max' => 'اسم الصنف يجب ألا يتجاوز 255 حرف',
@@ -144,18 +201,38 @@ class ProductController extends Controller
         $validated['is_active'] = $request->boolean('is_active', $product->is_active);
 
         $product->update($validated);
-        $product->load('category');
+
+        if ($request->has('pos_point_ids')) {
+            $product->posPoints()->sync($request->input('pos_point_ids', []));
+        }
+
+        $product->load(['category', 'posPoints']);
 
         return response()->json([
             'success' => true,
             'message' => 'تم تحديث الصنف بنجاح',
-            'data' => $product
+            'data' => [
+                'id' => $product->id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'price' => $product->price,
+                'category_id' => $product->category_id,
+                'category' => $product->category,
+                'type' => $product->type,
+                'barcode' => $product->barcode,
+                'description' => $product->description,
+                'is_active' => $product->is_active,
+                'stock' => $product->stock,
+                'pos_point_ids' => $product->posPoints->pluck('id')->toArray(),
+                'pos_points' => $product->posPoints->pluck('name')->toArray(),
+            ]
         ]);
     }
 
     public function destroy(Product $product)
     {
         $productName = $product->name;
+        $product->posPoints()->detach();
         $product->delete();
 
         return response()->json([
@@ -186,6 +263,11 @@ class ProductController extends Controller
             'ids' => 'required|array',
             'ids.*' => 'exists:products,id'
         ]);
+
+        $products = Product::whereIn('id', $validated['ids'])->get();
+        foreach ($products as $product) {
+            $product->posPoints()->detach();
+        }
 
         $count = Product::whereIn('id', $validated['ids'])->delete();
 

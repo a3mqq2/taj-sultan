@@ -201,14 +201,6 @@
                 <span><i class="ti ti-clock me-1"></i> <span id="current-time">{{ now()->format('H:i') }}</span></span>
             </div>
         </div>
-        <div>
-            @if($pendingOrders > 0)
-                <span class="badge bg-warning fs-6">
-                    <i class="ti ti-clock me-1"></i>
-                    {{ $pendingOrders }} طلب معلق
-                </span>
-            @endif
-        </div>
     </div>
 </div>
 

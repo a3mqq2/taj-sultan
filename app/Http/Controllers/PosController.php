@@ -24,11 +24,12 @@ class PosController extends Controller
             return redirect()->route('pos.login', $slug);
         }
 
-        $categoryIds = $posPoint->categories()->pluck('categories.id')->toArray();
+        $productIds = $posPoint->products()->pluck('products.id')->toArray();
 
-        if (count($categoryIds) > 0) {
+        if (count($productIds) > 0) {
+            $products = Product::active()->where('type', 'piece')->whereIn('id', $productIds)->orderBy('name')->get();
+            $categoryIds = $products->pluck('category_id')->unique()->toArray();
             $categories = Category::whereIn('id', $categoryIds)->orderBy('name')->get();
-            $products = Product::active()->where('type', 'piece')->whereIn('category_id', $categoryIds)->orderBy('name')->get();
         } else {
             $categories = Category::orderBy('name')->get();
             $products = Product::active()->where('type', 'piece')->orderBy('name')->get();
@@ -90,12 +91,12 @@ class PosController extends Controller
     public function products(string $slug, Request $request)
     {
         $posPoint = PosPoint::where('slug', $slug)->firstOrFail();
-        $categoryIds = $posPoint->categories()->pluck('categories.id')->toArray();
+        $productIds = $posPoint->products()->pluck('products.id')->toArray();
 
         $query = Product::active()->where('type', 'piece');
 
-        if (count($categoryIds) > 0) {
-            $query->whereIn('category_id', $categoryIds);
+        if (count($productIds) > 0) {
+            $query->whereIn('id', $productIds);
         }
 
         if ($request->filled('category')) {
@@ -126,9 +127,10 @@ class PosController extends Controller
     public function categories(string $slug)
     {
         $posPoint = PosPoint::where('slug', $slug)->firstOrFail();
-        $categoryIds = $posPoint->categories()->pluck('categories.id')->toArray();
+        $productIds = $posPoint->products()->pluck('products.id')->toArray();
 
-        if (count($categoryIds) > 0) {
+        if (count($productIds) > 0) {
+            $categoryIds = Product::whereIn('id', $productIds)->pluck('category_id')->unique()->toArray();
             $categories = Category::whereIn('id', $categoryIds)->orderBy('name')->get();
         } else {
             $categories = Category::orderBy('name')->get();

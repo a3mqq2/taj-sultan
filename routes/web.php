@@ -13,6 +13,7 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\CashierController;
 use App\Http\Controllers\SalesReportController;
 use App\Http\Controllers\Admin\BackupController;
+use App\Http\Controllers\OrderController;
 
 Route::redirect('/', 'login');
 
@@ -78,6 +79,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/payments/{payment}/print', [SpecialOrderController::class, 'printPaymentReceipt'])->name('print-payment');
     });
 
+    Route::prefix('orders')->name('orders.')->group(function () {
+        Route::get('/', [OrderController::class, 'index'])->name('index');
+        Route::get('/data', [OrderController::class, 'data'])->name('data');
+        Route::get('/export', [OrderController::class, 'export'])->name('export');
+        Route::get('/{order}', [OrderController::class, 'show'])->name('show');
+    });
+
     Route::prefix('users')->name('users.')->middleware('permission:user.view')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('index');
         Route::get('/data', [UserController::class, 'data'])->name('data');
@@ -91,8 +99,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::prefix('pos-points')->name('pos-points.')->middleware('permission:pos_point.view')->group(function () {
         Route::get('/', [PosPointController::class, 'index'])->name('index');
         Route::get('/data', [PosPointController::class, 'data'])->name('data');
+        Route::post('/', [PosPointController::class, 'store'])->middleware('permission:pos_point.edit')->name('store');
         Route::get('/{posPoint}', [PosPointController::class, 'show'])->name('show');
         Route::put('/{posPoint}', [PosPointController::class, 'update'])->middleware('permission:pos_point.edit')->name('update');
+        Route::delete('/{posPoint}', [PosPointController::class, 'destroy'])->middleware('permission:pos_point.edit')->name('destroy');
     });
 
     Route::prefix('reports')->name('reports.')->middleware('permission:reports.view')->group(function () {

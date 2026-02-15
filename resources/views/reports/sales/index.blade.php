@@ -1239,5 +1239,124 @@ function printReport() {
     const params = new URLSearchParams(getFilters());
     window.open(`{{ route('reports.sales.print') }}?${params}`, '_blank');
 }
+
+async function loadSpecialOrdersSummary() {
+    const params = new URLSearchParams(getFilters());
+
+    try {
+        const response = await fetch(`{{ route('reports.sales.special-orders.summary') }}?${params}`);
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('specialTotalSales').textContent = result.data.total_sales + ' د.ل';
+            document.getElementById('specialOrdersCount').textContent = result.data.orders_count;
+            document.getElementById('specialAverageOrder').textContent = result.data.average_order + ' د.ل';
+            document.getElementById('specialTotalPaid').textContent = result.data.total_paid + ' د.ل';
+        }
+    } catch (error) {
+        console.error('Error loading special orders summary:', error);
+    }
+}
+
+async function loadSpecialOrders() {
+    const tableLoading = document.getElementById('specialTableLoading');
+    tableLoading.classList.remove('d-none');
+
+    const params = new URLSearchParams({
+        ...getFilters(),
+        page: specialCurrentPage
+    });
+
+    try {
+        const response = await fetch(`{{ route('reports.sales.special-orders.data') }}?${params}`);
+        const result = await response.json();
+
+        if (result.success) {
+            renderSpecialOrders(result.data);
+            renderSpecialPagination(result.pagination);
+        }
+    } catch (error) {
+        console.error('Error loading special orders:', error);
+    } finally {
+        tableLoading.classList.add('d-none');
+    }
+}
+
+function renderSpecialOrders(orders) {
+    const tbody = document.getElementById('specialOrdersTableBody');
+    const emptyState = document.getElementById('specialEmptyState');
+    const paginationWrapper = document.getElementById('specialPaginationWrapper');
+
+    if (orders.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('d-none');
+        paginationWrapper.classList.add('d-none');
+        return;
+    }
+
+    emptyState.classList.add('d-none');
+    paginationWrapper.classList.remove('d-none');
+
+    tbody.innerHTML = orders.map(order => `
+        <tr>
+            <td><strong>${order.customer}</strong></td>
+            <td>${order.event_type}</td>
+            <td>${order.delivery_date}</td>
+            <td>${order.total}</td>
+            <td class="text-success fw-bold">${order.paid}</td>
+            <td><small class="text-muted">${order.payment_methods}</small></td>
+        </tr>
+    `).join('');
+}
+
+function renderSpecialPagination(pagination) {
+    document.getElementById('specialPaginationFrom').textContent = pagination.from || 0;
+    document.getElementById('specialPaginationTo').textContent = pagination.to || 0;
+    document.getElementById('specialPaginationTotal').textContent = pagination.total;
+
+    const nav = document.getElementById('specialPaginationNav');
+    let html = '';
+
+    html += `
+        <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="goToSpecialPage(${pagination.current_page - 1}); return false;">
+                <i class="ti ti-chevron-right"></i>
+            </a>
+        </li>
+    `;
+
+    for (let i = 1; i <= pagination.last_page; i++) {
+        if (i === 1 || i === pagination.last_page ||
+            (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
+            html += `
+                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="goToSpecialPage(${i}); return false;">${i}</a>
+                </li>
+            `;
+        } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
+            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+        }
+    }
+
+    html += `
+        <li class="page-item ${pagination.current_page === pagination.last_page ? 'disabled' : ''}">
+            <a class="page-link" href="#" onclick="goToSpecialPage(${pagination.current_page + 1}); return false;">
+                <i class="ti ti-chevron-left"></i>
+            </a>
+        </li>
+    `;
+
+    nav.innerHTML = html;
+}
+
+function goToSpecialPage(page) {
+    specialCurrentPage = page;
+    loadSpecialOrders();
+}
+
+function exportSpecialOrdersExcel() {
+    const params = new URLSearchParams(getFilters());
+    window.location.href = `{{ route('reports.sales.special-orders.export') }}?${params}`;
+}
 </script>
 @endpush

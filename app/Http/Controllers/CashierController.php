@@ -957,13 +957,12 @@ class CashierController extends Controller
             ]);
         }
 
-        $order->items()->delete();
-        $order->payments()->delete();
-        $order->delete();
+        $order->status = 'cancelled';
+        $order->save();
 
         return response()->json([
             'success' => true,
-            'message' => 'تم حذف الفاتورة بنجاح'
+            'message' => 'تم إلغاء الفاتورة بنجاح'
         ]);
     }
 

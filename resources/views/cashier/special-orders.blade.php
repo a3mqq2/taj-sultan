@@ -134,6 +134,7 @@
         .footer-tip kbd { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-family: inherit; border: 1px solid #e2e8f0; }
         .footer-brand { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #94a3b8; }
         .footer-brand img { height: 24px; width: auto; opacity: 0.7; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -373,7 +374,12 @@
                 <div class="modal-title">إضافة صنف</div>
                 <button class="modal-close" id="closeProductModal"><i class="ti ti-x"></i></button>
             </div>
-            <input type="text" class="form-control" id="productSearch" placeholder="ابحث عن صنف..." style="margin-bottom: 12px;">
+            <div style="display:flex;gap:8px;margin-bottom:12px;">
+                <input type="text" class="form-control" id="productSearch" placeholder="ابحث عن صنف..." style="flex:1;">
+                <button type="button" id="refreshProductsBtn" style="padding:8px 12px;background:#3b82f6;color:#fff;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:4px;font-family:inherit;font-weight:600;">
+                    <i class="ti ti-refresh"></i>
+                </button>
+            </div>
             <div class="product-list" id="productList"></div>
             <div id="productSearchHint" style="text-align: center; padding: 20px; color: #94a3b8;">
                 <i class="ti ti-search" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>
@@ -455,11 +461,9 @@
                 }
             });
 
-            const res = await fetch(BASE_URL + '/cashier/special-orders/products');
-            const data = await res.json();
-            if (data.success) {
-                allProducts = data.data;
-            }
+            await loadProducts();
+
+            document.getElementById('refreshProductsBtn').addEventListener('click', loadProducts);
 
             document.addEventListener('keydown', e => {
                 if (e.key === 'F4') {
@@ -470,6 +474,23 @@
                     closeProductModal();
                 }
             });
+        }
+
+        async function loadProducts() {
+            const btn = document.getElementById('refreshProductsBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ti ti-loader" style="animation:spin 1s linear infinite;"></i>';
+            try {
+                const res = await fetch(BASE_URL + '/cashier/special-orders/products');
+                const data = await res.json();
+                if (data.success) {
+                    allProducts = data.data;
+                }
+            } catch (err) {
+                console.error('loadProducts error:', err);
+            }
+            btn.disabled = false;
+            btn.innerHTML = '<i class="ti ti-refresh"></i>';
         }
 
         async function searchCustomers() {

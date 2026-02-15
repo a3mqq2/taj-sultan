@@ -94,6 +94,18 @@
         border-color: #3b82f6;
     }
 
+    .action-btn.btn-delete {
+        background: rgba(239, 68, 68, 0.1);
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    .action-btn.btn-delete:hover {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+    }
+
     .status-switch {
         width: 50px;
         height: 26px;
@@ -151,6 +163,16 @@
         font-size: 13px;
         background: rgba(156, 163, 175, 0.1);
         color: #6b7280;
+    }
+
+    .badge-default {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 11px;
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        margin-right: 8px;
     }
 
     .modal-content {
@@ -305,19 +327,41 @@
         background: rgba(0,0,0,0.7);
     }
 
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
     .page-description {
         color: #6b7280;
         font-size: 14px;
-        margin-bottom: 24px;
+        margin: 0;
+    }
+
+    .btn-add {
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 </style>
 @endpush
 
 @section('content')
 <div class="">
-    <p class="page-description">
-        إدارة نقاط البيع وتحديد حالتها وإعداداتها
-    </p>
+    <div class="page-header">
+        <p class="page-description">
+            إدارة نقاط البيع وتحديد حالتها وإعداداتها
+        </p>
+        <button type="button" class="btn btn-primary btn-add" onclick="openAddModal()">
+            <i class="ti ti-plus"></i>
+            إضافة نقطة بيع
+        </button>
+    </div>
 
     <div class="card pos-points-table position-relative">
         <div id="loadingOverlay" class="loading-overlay d-none">
@@ -328,11 +372,10 @@
             <table class="table mb-0">
                 <thead>
                     <tr>
-                        <th style="width: 25%">نقطة البيع</th>
-                        <th>الأقسام</th>
+                        <th style="width: 30%">نقطة البيع</th>
                         <th>الحالة</th>
                         <th>يتطلب تسجيل دخول</th>
-                        <th style="width: 100px">الإجراءات</th>
+                        <th style="width: 120px">الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -342,20 +385,20 @@
     </div>
 </div>
 
-<div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static">
+<div class="modal fade" id="itemModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">تعديل نقطة البيع</h5>
+                <h5 class="modal-title" id="modalTitle">إضافة نقطة بيع</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form id="editForm">
+            <form id="itemForm">
                 <div class="modal-body">
                     <input type="hidden" id="itemId">
 
                     <div class="mb-4">
-                        <label class="form-label">اسم نقطة البيع</label>
-                        <input type="text" class="form-control" id="itemName" disabled>
+                        <label class="form-label">اسم نقطة البيع <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="itemName" required>
                     </div>
 
                     <div class="d-flex align-items-center justify-content-between p-3 status-box mb-3">
@@ -364,7 +407,7 @@
                             <p class="text-muted mb-0 small">تفعيل أو إيقاف نقطة البيع</p>
                         </div>
                         <div class="form-check form-switch">
-                            <input class="form-check-input status-switch" type="checkbox" id="itemActive">
+                            <input class="form-check-input status-switch" type="checkbox" id="itemActive" checked>
                         </div>
                     </div>
 
@@ -375,19 +418,6 @@
                         </div>
                         <div class="form-check form-switch">
                             <input class="form-check-input status-switch" type="checkbox" id="itemRequireLogin">
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">الأقسام المتاحة</label>
-                        <p class="text-muted small mb-2">اختر الأقسام التي ستظهر في نقطة البيع هذه (اتركها فارغة لإظهار جميع الأقسام)</p>
-                        <div id="categoriesCheckboxes" style="max-height: 200px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
-                            @foreach($categories as $category)
-                            <div class="form-check mb-2">
-                                <input class="form-check-input category-checkbox" type="checkbox" value="{{ $category->id }}" id="cat_{{ $category->id }}">
-                                <label class="form-check-label" for="cat_{{ $category->id }}">{{ $category->name }}</label>
-                            </div>
-                            @endforeach
                         </div>
                     </div>
                 </div>
@@ -406,19 +436,55 @@
     </div>
 </div>
 
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center pt-0">
+                <div class="mb-3">
+                    <i class="ti ti-trash text-danger" style="font-size: 48px;"></i>
+                </div>
+                <h5 class="mb-2">حذف نقطة البيع</h5>
+                <p class="text-muted mb-0">هل أنت متأكد من حذف <strong id="deleteItemName"></strong>؟</p>
+            </div>
+            <div class="modal-footer border-0 justify-content-center gap-2">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger px-4" id="confirmDeleteBtn" onclick="confirmDelete()">
+                    <span class="btn-text">حذف</span>
+                    <span class="btn-loading d-none">
+                        <span class="spinner-border spinner-border-sm"></span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 @endsection
 
 @push('scripts')
 <script>
 let isSubmitting = false;
+let editingId = null;
+let deleteId = null;
 
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+const itemModal = new bootstrap.Modal(document.getElementById('itemModal'));
+const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 
 document.addEventListener('DOMContentLoaded', function() {
     loadData();
-    document.getElementById('editForm').addEventListener('submit', handleSubmit);
+    document.getElementById('itemForm').addEventListener('submit', handleSubmit);
+
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 'n') {
+            e.preventDefault();
+            openAddModal();
+        }
+    });
 });
 
 async function loadData() {
@@ -451,13 +517,13 @@ function renderData(items) {
     tbody.innerHTML = items.map(item => `
         <tr data-id="${item.id}">
             <td>
-                <div class="pos-name">${escapeHtml(item.name)}</div>
-                <div class="pos-slug">/${item.slug}</div>
-            </td>
-            <td>
-                ${item.categories && item.categories.length > 0
-                    ? item.categories.map(c => `<span class="badge bg-primary me-1 mb-1">${escapeHtml(c)}</span>`).join('')
-                    : '<span class="text-muted">جميع الأقسام</span>'}
+                <div class="d-flex align-items-center">
+                    ${item.is_default ? '<span class="badge-default">افتراضي</span>' : ''}
+                    <div>
+                        <div class="pos-name">${escapeHtml(item.name)}</div>
+                        <div class="pos-slug">/${item.slug}</div>
+                    </div>
+                </div>
             </td>
             <td>
                 <span class="badge-${item.active ? 'active' : 'inactive'}">
@@ -470,15 +536,37 @@ function renderData(items) {
                 </span>
             </td>
             <td>
-                <button type="button" class="btn action-btn btn-edit" onclick="openEditModal(${item.id})" title="تعديل">
-                    <i class="ti ti-pencil fs-16"></i>
-                </button>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn action-btn btn-edit" onclick="openEditModal(${item.id})" title="تعديل">
+                        <i class="ti ti-pencil fs-16"></i>
+                    </button>
+                    ${!item.is_default ? `
+                    <button type="button" class="btn action-btn btn-delete" onclick="openDeleteModal(${item.id}, '${escapeHtml(item.name)}')" title="حذف">
+                        <i class="ti ti-trash fs-16"></i>
+                    </button>
+                    ` : ''}
+                </div>
             </td>
         </tr>
     `).join('');
 }
 
+function openAddModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'إضافة نقطة بيع';
+    document.getElementById('itemForm').reset();
+    document.getElementById('itemId').value = '';
+    document.getElementById('itemName').disabled = false;
+    document.getElementById('itemActive').checked = true;
+    document.getElementById('itemRequireLogin').checked = false;
+    itemModal.show();
+    setTimeout(() => document.getElementById('itemName').focus(), 300);
+}
+
 async function openEditModal(id) {
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'تعديل نقطة البيع';
+
     try {
         const response = await fetch(`{{ url('pos-points') }}/${id}`, {
             headers: {
@@ -493,14 +581,11 @@ async function openEditModal(id) {
             const item = result.data;
             document.getElementById('itemId').value = item.id;
             document.getElementById('itemName').value = item.name;
+            document.getElementById('itemName').disabled = true;
             document.getElementById('itemActive').checked = item.active;
             document.getElementById('itemRequireLogin').checked = item.require_login;
 
-            document.querySelectorAll('.category-checkbox').forEach(cb => {
-                cb.checked = item.category_ids && item.category_ids.includes(parseInt(cb.value));
-            });
-
-            editModal.show();
+            itemModal.show();
         }
     } catch (error) {
         console.error('Error:', error);
@@ -508,28 +593,76 @@ async function openEditModal(id) {
     }
 }
 
+function openDeleteModal(id, name) {
+    deleteId = id;
+    document.getElementById('deleteItemName').textContent = name;
+    deleteModal.show();
+}
+
+async function confirmDelete() {
+    if (!deleteId || isSubmitting) return;
+
+    const btn = document.getElementById('confirmDeleteBtn');
+    btn.querySelector('.btn-text').classList.add('d-none');
+    btn.querySelector('.btn-loading').classList.remove('d-none');
+    btn.disabled = true;
+    isSubmitting = true;
+
+    try {
+        const response = await fetch(`{{ url('pos-points') }}/${deleteId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+            deleteModal.hide();
+            loadData();
+            showToast(result.message, 'success');
+        } else {
+            showToast(result.message || 'حدث خطأ', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('حدث خطأ في الحذف', 'error');
+    } finally {
+        btn.querySelector('.btn-text').classList.remove('d-none');
+        btn.querySelector('.btn-loading').classList.add('d-none');
+        btn.disabled = false;
+        isSubmitting = false;
+        deleteId = null;
+    }
+}
+
 async function handleSubmit(e) {
     e.preventDefault();
     if (isSubmitting) return;
 
-    const itemId = document.getElementById('itemId').value;
-
-    const selectedCategories = [];
-    document.querySelectorAll('.category-checkbox:checked').forEach(cb => {
-        selectedCategories.push(parseInt(cb.value));
-    });
-
     const data = {
+        name: document.getElementById('itemName').value,
         active: document.getElementById('itemActive').checked,
         require_login: document.getElementById('itemRequireLogin').checked,
-        category_ids: selectedCategories,
     };
 
     setSubmitting(true);
 
     try {
-        const response = await fetch(`{{ url('pos-points') }}/${itemId}`, {
-            method: 'PUT',
+        let url, method;
+        if (editingId) {
+            url = `{{ url('pos-points') }}/${editingId}`;
+            method = 'PUT';
+        } else {
+            url = `{{ route('pos-points.store') }}`;
+            method = 'POST';
+        }
+
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json',
@@ -542,11 +675,16 @@ async function handleSubmit(e) {
         const result = await response.json();
 
         if (response.ok && result.success) {
-            editModal.hide();
+            itemModal.hide();
             loadData();
             showToast(result.message, 'success');
         } else {
-            showToast(result.message || 'حدث خطأ', 'error');
+            if (result.errors) {
+                const firstError = Object.values(result.errors)[0];
+                showToast(Array.isArray(firstError) ? firstError[0] : firstError, 'error');
+            } else {
+                showToast(result.message || 'حدث خطأ', 'error');
+            }
         }
     } catch (error) {
         console.error('Error:', error);

@@ -35,6 +35,11 @@ class PosPoint extends Model
         return $this->belongsToMany(Category::class, 'category_pos_point');
     }
 
+    public function products(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'pos_point_product');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('active', true);

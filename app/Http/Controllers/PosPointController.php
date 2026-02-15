@@ -3,20 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\PosPoint;
-use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PosPointController extends Controller
 {
     public function index()
     {
-        $categories = Category::orderBy('name')->get();
-        return view('pos-points.index', compact('categories'));
+        return view('pos-points.index');
     }
 
     public function data(Request $request)
     {
-        $query = PosPoint::with('categories');
+        $query = PosPoint::query();
 
         $sortField = $request->get('sort', 'id');
         $sortDirection = $request->get('direction', 'asc');
@@ -36,8 +35,6 @@ class PosPointController extends Controller
                 'active' => $point->active,
                 'require_login' => $point->require_login,
                 'is_default' => $point->is_default,
-                'categories' => $point->categories->pluck('name')->toArray(),
-                'category_ids' => $point->categories->pluck('id')->toArray(),
             ];
         });
 
@@ -47,9 +44,49 @@ class PosPointController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:pos_points,name',
+            'active' => 'boolean',
+            'require_login' => 'boolean',
+        ], [
+            'name.required' => 'اسم نقطة البيع مطلوب',
+            'name.unique' => 'اسم نقطة البيع موجود مسبقاً',
+            'name.max' => 'اسم نقطة البيع يجب ألا يتجاوز 255 حرف',
+        ]);
+
+        $slug = Str::slug($validated['name']);
+        $originalSlug = $slug;
+        $counter = 1;
+        while (PosPoint::where('slug', $slug)->exists()) {
+            $slug = $originalSlug . '-' . $counter;
+            $counter++;
+        }
+
+        $posPoint = PosPoint::create([
+            'name' => $validated['name'],
+            'slug' => $slug,
+            'active' => $request->boolean('active', true),
+            'require_login' => $request->boolean('require_login', false),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إضافة نقطة البيع بنجاح',
+            'data' => [
+                'id' => $posPoint->id,
+                'name' => $posPoint->name,
+                'slug' => $posPoint->slug,
+                'active' => $posPoint->active,
+                'require_login' => $posPoint->require_login,
+                'is_default' => $posPoint->is_default,
+            ]
+        ], 201);
+    }
+
     public function show(PosPoint $posPoint)
     {
-        $posPoint->load('categories');
         return response()->json([
             'success' => true,
             'data' => [
@@ -59,30 +96,21 @@ class PosPointController extends Controller
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
                 'is_default' => $posPoint->is_default,
-                'category_ids' => $posPoint->categories->pluck('id')->toArray(),
             ]
         ]);
     }
 
     public function update(Request $request, PosPoint $posPoint)
     {
-        $validated = $request->validate([
+        $request->validate([
             'active' => 'boolean',
             'require_login' => 'boolean',
-            'category_ids' => 'nullable|array',
-            'category_ids.*' => 'exists:categories,id',
         ]);
 
         $posPoint->update([
             'active' => $request->boolean('active', $posPoint->active),
             'require_login' => $request->boolean('require_login', $posPoint->require_login),
         ]);
-
-        if ($request->has('category_ids')) {
-            $posPoint->categories()->sync($request->input('category_ids', []));
-        }
-
-        $posPoint->load('categories');
 
         return response()->json([
             'success' => true,
@@ -94,8 +122,6 @@ class PosPointController extends Controller
                 'active' => $posPoint->active,
                 'require_login' => $posPoint->require_login,
                 'is_default' => $posPoint->is_default,
-                'categories' => $posPoint->categories->pluck('name')->toArray(),
-                'category_ids' => $posPoint->categories->pluck('id')->toArray(),
             ]
         ]);
     }
@@ -113,6 +139,32 @@ class PosPointController extends Controller
             'data' => [
                 'active' => $posPoint->active
             ]
+        ]);
+    }
+
+    public function destroy(PosPoint $posPoint)
+    {
+        if ($posPoint->is_default) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن حذف نقطة البيع الافتراضية'
+            ], 422);
+        }
+
+        if ($posPoint->users()->count() > 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن حذف نقطة البيع لوجود مستخدمين مرتبطين بها'
+            ], 422);
+        }
+
+        $name = $posPoint->name;
+        $posPoint->products()->detach();
+        $posPoint->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "تم حذف نقطة البيع ({$name}) بنجاح"
         ]);
     }
 }

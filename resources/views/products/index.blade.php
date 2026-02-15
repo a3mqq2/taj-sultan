@@ -778,6 +778,19 @@
                         <div class="invalid-feedback" id="barcodeError"></div>
                     </div>
 
+                    <div class="mb-3">
+                        <label class="form-label">نقاط البيع</label>
+                        <p class="text-muted small mb-2">اختر نقاط البيع التي سيظهر فيها هذا الصنف (اتركها فارغة للظهور في الجميع)</p>
+                        <div id="posPointsCheckboxes" style="max-height: 150px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;">
+                            @foreach($posPoints as $posPoint)
+                            <div class="form-check mb-2">
+                                <input class="form-check-input pos-point-checkbox" type="checkbox" value="{{ $posPoint->id }}" id="pos_{{ $posPoint->id }}">
+                                <label class="form-check-label" for="pos_{{ $posPoint->id }}">{{ $posPoint->name }}</label>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <div class="d-flex align-items-center justify-content-between p-3 rounded-3 status-box">
                         <div>
                             <span class="fw-semibold">حالة الصنف</span>
@@ -1098,6 +1111,10 @@ async function openEditModal(id) {
             document.getElementById('deleteProductBtn').classList.remove('d-none');
             updatePriceUnit();
 
+            document.querySelectorAll('.pos-point-checkbox').forEach(cb => {
+                cb.checked = product.pos_point_ids && product.pos_point_ids.includes(parseInt(cb.value));
+            });
+
             productModal.show();
         }
     } catch (error) {
@@ -1117,13 +1134,19 @@ async function handleProductSubmit(e) {
     const productId = document.getElementById('productId').value;
     const isEdit = !!productId;
 
+    const selectedPosPoints = [];
+    document.querySelectorAll('.pos-point-checkbox:checked').forEach(cb => {
+        selectedPosPoints.push(parseInt(cb.value));
+    });
+
     const data = {
         name: document.getElementById('productName').value,
         price: document.getElementById('productPrice').value,
         type: document.getElementById('productType').value,
         category_id: document.getElementById('productCategory').value,
         barcode: document.getElementById('productBarcode').value || null,
-        is_active: document.getElementById('productStatus').checked
+        is_active: document.getElementById('productStatus').checked,
+        pos_point_ids: selectedPosPoints
     };
 
     setSubmitting(true);
@@ -1280,6 +1303,7 @@ function resetForm() {
     document.getElementById('productId').value = '';
     document.getElementById('productStatus').checked = true;
     document.getElementById('priceUnit').textContent = 'د.ل';
+    document.querySelectorAll('.pos-point-checkbox').forEach(cb => cb.checked = false);
     clearErrors();
 }
 
