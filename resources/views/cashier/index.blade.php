@@ -1698,7 +1698,7 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
                         body: JSON.stringify({
-                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price })),
                             gross_total: grossTotal,
                             discount: discount,
                             total: total,
@@ -2036,7 +2036,7 @@
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         },
                         body: JSON.stringify({
-                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity })),
+                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price })),
                             gross_total: grossTotal,
                             discount: discount,
                             total: total,

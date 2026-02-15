@@ -84,6 +84,7 @@ class CashierController extends Controller
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|numeric|min:0.001',
+            'items.*.price' => 'required|numeric|min:0',
             'gross_total' => 'nullable|numeric|min:0',
             'discount' => 'nullable|numeric|min:0|max:5',
             'total' => 'required|numeric|min:0',
@@ -103,14 +104,15 @@ class CashierController extends Controller
 
                 foreach ($validated['items'] as $item) {
                     $product = Product::find($item['product_id']);
+                    $price = $item['price'];
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $product->id,
                         'product_name' => $product->name,
-                        'price' => $product->price,
+                        'price' => $price,
                         'quantity' => $item['quantity'],
                         'is_weight' => $product->type === 'weight',
-                        'total' => $product->price * $item['quantity'],
+                        'total' => $price * $item['quantity'],
                     ]);
                 }
 
@@ -354,7 +356,12 @@ class CashierController extends Controller
                 ], 400);
             }
 
-       
+            if (abs($totalPayments - $expectedTotal) > 0.01) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'المدفوعات لا تساوي الإجمالي',
+                ], 400);
+            }
         }
 
         if ($isCredit && $totalPayments > $expectedTotal) {
