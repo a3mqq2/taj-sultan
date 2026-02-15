@@ -1593,19 +1593,23 @@
             updateSummary();
         }
 
+        function round3(n) {
+            return Math.round(n * 1000) / 1000;
+        }
+
         function getGrossTotal() {
             if (isDirectMode) {
-                return directItems.reduce((s, i) => s + parseFloat(i.total), 0);
+                return round3(directItems.reduce((s, i) => s + parseFloat(i.total), 0));
             }
             return currentOrder ? parseFloat(currentOrder.total) : 0;
         }
 
         function getTotal() {
-            return Math.max(0, getGrossTotal() - discount);
+            return round3(Math.max(0, getGrossTotal() - discount));
         }
 
         function getPaid() {
-            return payments.reduce((s, p) => s + parseFloat(p.amount), 0);
+            return round3(payments.reduce((s, p) => s + parseFloat(p.amount), 0));
         }
 
         function getRemaining() {
