@@ -1934,7 +1934,6 @@
             const paidAmount = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
             const creditAmount = total - paidAmount;
 
-            if (paidAmount > total) return toast('المبلغ المدفوع أكبر من الإجمالي', 'error');
 
             const confirm = await Swal.fire({
                 title: '<i class="ti ti-clock-dollar" style="color:#f97316;font-size:28px;"></i><br>تأكيد البيع بالآجل',
