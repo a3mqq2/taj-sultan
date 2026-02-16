@@ -798,6 +798,10 @@
                         </span>
                     </button>
                     <div class="d-flex gap-2 me-auto" id="modalActionsRight">
+                        <button type="button" class="btn btn-outline-secondary d-none" id="printBarcodeBtn" onclick="printBarcode()">
+                            <i class="ti ti-barcode me-1"></i>
+                            طباعة باركود
+                        </button>
                         <button type="button" class="btn btn-light btn-modal-cancel" data-bs-dismiss="modal">إلغاء</button>
                         <button type="submit" class="btn btn-primary btn-modal-save" id="saveProductBtn">
                             <span class="btn-text">حفظ الصنف</span>
@@ -1068,6 +1072,7 @@ function openAddModal() {
     document.getElementById('productId').value = '';
     document.getElementById('saveProductBtn').querySelector('.btn-text').textContent = 'حفظ الصنف';
     document.getElementById('deleteProductBtn').classList.add('d-none');
+    document.getElementById('printBarcodeBtn').classList.add('d-none');
     productModal.show();
 }
 
@@ -1096,6 +1101,11 @@ async function openEditModal(id) {
             document.getElementById('productStatus').checked = product.is_active;
             document.getElementById('saveProductBtn').querySelector('.btn-text').textContent = 'حفظ التعديلات';
             document.getElementById('deleteProductBtn').classList.remove('d-none');
+            if (product.barcode) {
+                document.getElementById('printBarcodeBtn').classList.remove('d-none');
+            } else {
+                document.getElementById('printBarcodeBtn').classList.add('d-none');
+            }
             updatePriceUnit();
 
             productModal.show();
@@ -1374,6 +1384,71 @@ function updatePriceUnit() {
     const type = document.getElementById('productType').value;
     const priceUnit = document.getElementById('priceUnit');
     priceUnit.textContent = type === 'weight' ? 'د.ل / كجم' : 'د.ل';
+}
+
+function printBarcode() {
+    const name = document.getElementById('productName').value;
+    const barcode = document.getElementById('productBarcode').value;
+    const price = document.getElementById('productPrice').value;
+    const type = document.getElementById('productType').value;
+
+    if (!barcode) {
+        showToast('لا يوجد باركود لهذا الصنف', 'error');
+        return;
+    }
+
+    const priceText = parseFloat(price).toFixed(2) + (type === 'weight' ? ' د.ل/كجم' : ' د.ل');
+
+    const html = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>ستيكر - ${escapeHtml(name)}</title>
+<script src="{{ asset('js/barcode/jsbarcode.min.js') }}"><\/script>
+<style>
+*{margin:0!important;padding:0!important;box-sizing:border-box}
+html,body{margin:0!important;padding:0!important;width:35mm;height:30mm}
+body{font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center}
+.sticker{width:35mm;height:30mm;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5mm;overflow:hidden}
+.product-name{font-size:8px;font-weight:bold;text-align:center;line-height:1.2;max-height:4mm;overflow:hidden;width:100%}
+.barcode{display:flex;align-items:center;justify-content:center}
+.barcode svg{width:30mm;height:13mm}
+.barcode-num{font-family:monospace;font-size:8px;font-weight:bold;margin-top:-1.5mm!important;line-height:1;text-align:center}
+.product-price{font-size:9px;font-weight:bold;text-align:center;margin-top:0.5mm!important}
+@media print{
+@page{size:35mm 30mm;margin:0!important}
+html,body{width:35mm!important;height:30mm!important}
+.no-print{display:none!important}
+}
+@media screen{
+.sticker{border:1px dashed #ccc;margin:10px auto!important;background:white}
+}
+</style>
+</head>
+<body>
+<div class="no-print" style="text-align:center;padding:10px!important">
+<button onclick="window.print()" style="padding:10px 30px!important;font-size:16px;cursor:pointer">طباعة</button>
+<p style="margin-top:10px!important;color:#666">35mm x 30mm</p>
+</div>
+<div class="sticker">
+<div class="product-name">${escapeHtml(name)}</div>
+<div class="barcode"><svg id="barcode"></svg></div>
+<div class="barcode-num">${escapeHtml(barcode)}</div>
+<div class="product-price">${priceText}</div>
+</div>
+<script>
+JsBarcode("#barcode","${barcode}",{format:"CODE128",width:0.7,height:18,displayValue:false,margin:0});
+window.onload=function(){setTimeout(function(){window.print()},300)};
+window.onafterprint=function(){window.close()};
+<\/script>
+</body>
+</html>`;
+
+    const win = window.open('', '_blank', 'width=400,height=400');
+    if (win) {
+        win.document.write(html);
+        win.document.close();
+    }
 }
 </script>
 @endpush

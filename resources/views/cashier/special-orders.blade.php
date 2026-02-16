@@ -106,8 +106,12 @@
         .product-price { font-size: 14px; color: #64748b; }
         .product-item.selected .product-price { color: rgba(255,255,255,0.8); }
         .qty-input-group { display: flex; gap: 8px; margin-top: 16px; }
-        .qty-input { flex: 1; padding: 12px; font-size: 18px; font-weight: 700; text-align: center; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
+        .qty-input-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .qty-input-label { font-size: 11px; font-weight: 600; color: #64748b; text-align: center; }
+        .qty-input { width: 100%; padding: 12px; font-size: 18px; font-weight: 700; text-align: center; border: 2px solid #e2e8f0; border-radius: 8px; font-family: inherit; }
         .qty-input:focus { outline: none; border-color: #8b5cf6; }
+        .price-inline { width: 90px; padding: 6px 8px; font-size: 13px; font-weight: 700; text-align: center; border: 2px solid #e2e8f0; border-radius: 6px; font-family: inherit; background: #faf5ff; }
+        .price-inline:focus { outline: none; border-color: #8b5cf6; }
         .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
         .modal-btn { flex: 1; padding: 12px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; }
         .modal-btn-cancel { background: #f1f5f9; color: #64748b; }
@@ -386,7 +390,14 @@
                 اكتب للبحث عن صنف
             </div>
             <div class="qty-input-group hidden" id="qtySection">
-                <input type="number" class="qty-input" id="qtyInput" step="0.001" placeholder="الكمية">
+                <div class="qty-input-wrap">
+                    <div class="qty-input-label">الكمية</div>
+                    <input type="number" class="qty-input" id="qtyInput" step="0.001" placeholder="الكمية">
+                </div>
+                <div class="qty-input-wrap">
+                    <div class="qty-input-label">السعر</div>
+                    <input type="number" class="qty-input" id="priceInput" step="0.001" placeholder="0.000">
+                </div>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-cancel" id="cancelProductModal">إلغاء</button>
@@ -448,6 +459,13 @@
             });
 
             document.getElementById('qtyInput').addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    document.getElementById('priceInput').focus();
+                    document.getElementById('priceInput').select();
+                }
+            });
+
+            document.getElementById('priceInput').addEventListener('keydown', e => {
                 if (e.key === 'Enter') confirmProduct();
             });
 
@@ -642,6 +660,7 @@
             document.getElementById('productModal').classList.add('active');
             document.getElementById('productSearch').value = '';
             document.getElementById('qtyInput').value = '';
+            document.getElementById('priceInput').value = '';
             document.getElementById('productList').innerHTML = '';
             document.getElementById('productSearchHint').classList.remove('hidden');
             document.getElementById('qtySection').classList.add('hidden');
@@ -703,6 +722,7 @@
                 type: product.type
             };
             document.getElementById('qtySection').classList.remove('hidden');
+            document.getElementById('priceInput').value = parseFloat(product.price).toFixed(3);
             document.getElementById('qtyInput').focus();
             document.getElementById('qtyInput').placeholder = selectedProduct.type === 'weight' ? 'الوزن بالكيلو' : 'العدد';
         }
@@ -717,6 +737,7 @@
                 type: item.dataset.type
             };
             document.getElementById('qtySection').classList.remove('hidden');
+            document.getElementById('priceInput').value = parseFloat(item.dataset.price).toFixed(3);
             document.getElementById('qtyInput').focus();
             document.getElementById('qtyInput').placeholder = selectedProduct.type === 'weight' ? 'الوزن بالكيلو' : 'العدد';
         }
@@ -725,12 +746,14 @@
             if (!selectedProduct) return toast('اختر صنف', 'error');
             const qty = parseFloat(document.getElementById('qtyInput').value);
             if (!qty || qty <= 0) return toast('أدخل الكمية', 'error');
+            const customPrice = parseFloat(document.getElementById('priceInput').value);
+            if (!customPrice || customPrice < 0) return toast('أدخل السعر', 'error');
 
-            const total = selectedProduct.price * qty;
+            const total = customPrice * qty;
             orderItems.push({
                 product_id: selectedProduct.id,
                 product_name: selectedProduct.name,
-                price: selectedProduct.price,
+                price: customPrice,
                 quantity: qty,
                 total: total,
                 is_weight: selectedProduct.type === 'weight'
@@ -749,11 +772,20 @@
                     <td><button class="remove-btn" onclick="removeItem(${index})"><i class="ti ti-x"></i></button></td>
                     <td>${item.product_name}${item.is_weight ? '<span class="weight-tag"><i class="ti ti-scale"></i></span>' : ''}</td>
                     <td style="text-align:center">${qty}</td>
-                    <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
+                    <td style="text-align:center"><input type="number" class="price-inline" value="${parseFloat(item.price).toFixed(3)}" step="0.001" onchange="updateItemPrice(${index}, this.value)"></td>
                     <td style="text-align:left">${parseFloat(item.total).toFixed(3)}</td>
                 </tr>`;
             }).join('');
             document.getElementById('itemsBody').innerHTML = html;
+        }
+
+        function updateItemPrice(index, newPrice) {
+            newPrice = parseFloat(newPrice);
+            if (isNaN(newPrice) || newPrice < 0) return;
+            orderItems[index].price = newPrice;
+            orderItems[index].total = newPrice * orderItems[index].quantity;
+            renderItems();
+            updateSummary();
         }
 
         function removeItem(index) {
