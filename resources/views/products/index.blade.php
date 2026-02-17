@@ -1477,59 +1477,138 @@ function printBarcode() {
         return;
     }
 
-    const priceText = parseFloat(price).toFixed(2) + (type === 'weight' ? ' د.ل/كجم' : ' د.ل');
+    const priceText = parseFloat(price).toFixed(3) + ' د.ل';
 
     const html = `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>ستيكر - ${escapeHtml(name)}</title>
+<title>Label</title>
 <script src="{{ asset('js/barcode/jsbarcode.min.js') }}"><\/script>
 <style>
-*{margin:0!important;padding:0!important;box-sizing:border-box}
-html,body{margin:0!important;padding:0!important;width:35mm;height:30mm}
-body{font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center}
-.sticker{width:35mm;height:30mm;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5mm;overflow:hidden}
-.product-name{font-size:8px;font-weight:bold;text-align:center;line-height:1.2;max-height:4mm;overflow:hidden;width:100%}
-.barcode{display:flex;align-items:center;justify-content:center}
-.barcode svg{width:30mm;height:13mm}
-.barcode-num{font-family:monospace;font-size:8px;font-weight:bold;margin-top:-1.5mm!important;line-height:1;text-align:center}
-.product-price{font-size:9px;font-weight:bold;text-align:center;margin-top:0.5mm!important}
-@media print{
-@page{size:35mm 30mm;margin:0!important}
-html,body{width:35mm!important;height:30mm!important}
-.no-print{display:none!important}
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{
+width:40mm;
+height:26mm;
+display:flex;
+justify-content:center;
+align-items:center;
 }
-@media screen{
-.sticker{border:1px dashed #ccc;margin:10px auto!important;background:white}
+
+body{font-family:Arial,Helvetica,sans-serif}
+
+.label{
+width:38mm;
+height:24mm;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+gap:0;
+}
+
+.top{
+font-size:6px;
+font-weight:bold;
+line-height:1;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+margin:0;
+padding:0;
+}
+
+.barcode{
+margin:0;
+padding:0;
+line-height:0;
+}
+
+.barcode svg{
+width:34mm;
+height:10mm;
+display:block;
+margin:0;
+padding:0;
+}
+
+.barcode-text{
+font-size:6px;
+font-family:monospace;
+font-weight:bold;
+line-height:1;
+margin:0;
+padding:0;
+}
+
+@media print{
+@page{size:40mm 26mm;margin:0}
+
+html,body{
+width:40mm;
+height:26mm;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.no-print{display:none}
 }
 </style>
 </head>
 <body>
-<div class="no-print" style="text-align:center;padding:10px!important">
-<button onclick="window.print()" style="padding:10px 30px!important;font-size:16px;cursor:pointer">طباعة</button>
-<p style="margin-top:10px!important;color:#666">35mm x 30mm</p>
+
+<div class="no-print" style="position:absolute;top:5px;text-align:center">
+<button onclick="window.print()" style="padding:4px 15px;font-size:12px">طباعة</button>
 </div>
-<div class="sticker">
-<div class="product-name">${escapeHtml(name)}</div>
-<div class="barcode"><svg id="barcode"></svg></div>
-<div class="barcode-num">${escapeHtml(barcode)}</div>
-<div class="product-price">${priceText}</div>
+
+<div class="label">
+
+<div class="top">تاج السلطان</div>
+<div class="top">الصنف:${escapeHtml(name)} / ${priceText}</div>
+
+<div class="barcode">
+<svg id="barcode"></svg>
 </div>
+
+<div class="barcode-text">${escapeHtml(barcode)}</div>
+
+</div>
+
 <script>
-JsBarcode("#barcode","${barcode}",{format:"CODE128",width:0.7,height:18,displayValue:false,margin:0});
-window.onload=function(){setTimeout(function(){window.print()},300)};
-window.onafterprint=function(){window.close()};
+JsBarcode("#barcode","${barcode}",{
+format:"CODE128",
+width:0.65,
+height:10,
+displayValue:false,
+margin:0
+});
+
+window.onload=function(){
+setTimeout(function(){
+window.print();
+},200);
+};
+
+window.onafterprint=function(){
+window.close();
+};
 <\/script>
+
 </body>
 </html>`;
 
-    const win = window.open('', '_blank', 'width=400,height=400');
+    const win = window.open('', '_blank', 'width=420,height=320');
     if (win) {
         win.document.write(html);
         win.document.close();
     }
 }
+
+
+
 
 function openStockModal(id, name, currentStock, type) {
     document.getElementById('stockProductId').value = id;
