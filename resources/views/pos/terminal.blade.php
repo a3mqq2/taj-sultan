@@ -259,6 +259,7 @@
             flex-direction: column;
             background: #fff;
             border-right: 1px solid #e2e8f0;
+            overflow: hidden;
         }
 
         .cart-header {
@@ -374,6 +375,7 @@
             padding: 24px;
             background: #f8fafc;
             border-top: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .cart-total {
