@@ -1497,7 +1497,7 @@ height:30mm;
 display:flex;
 justify-content:center;
 align-items:center;
-font-family:"Arial Black",Tahoma,Arial;
+font-family:"Times New Roman",Times,serif;
 -webkit-print-color-adjust:exact;
 print-color-adjust:exact;
 }

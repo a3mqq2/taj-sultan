@@ -867,6 +867,9 @@
         <div class="header">
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan"></div>
             <div class="header-left">
+                <button type="button" class="logout-btn" onclick="location.reload()" style="background:#eff6ff;color:#3b82f6;" title="إعادة تحميل الصفحة">
+                    <i class="ti ti-reload"></i>
+                </button>
                 <button type="button" class="special-order-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="showCancelInvoiceModal()">
                     <i class="ti ti-file-x"></i>
                     إلغاء فاتورة
