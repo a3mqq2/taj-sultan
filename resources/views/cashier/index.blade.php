@@ -1225,7 +1225,69 @@
             if (val.length === 13 && val.startsWith(WEIGHT_PREFIX)) {
                 await handleWeightBarcode(val);
             } else {
-                await fetchOrder(val);
+                const found = await handleProductBarcode(val);
+                if (!found) {
+                    await fetchOrder(val);
+                }
+            }
+        }
+
+        async function handleProductBarcode(barcode) {
+            try {
+                const res = await fetch(BASE_URL + '/cashier/find-by-barcode', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ barcode })
+                });
+                if (!res.ok) return false;
+                const data = await res.json();
+                if (!data.success) return false;
+
+                const item = data.data;
+
+                if (currentOrder) {
+                    const addRes = await fetch(BASE_URL + '/cashier/add-item-to-order', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            order_id: currentOrder.id,
+                            product_id: item.product_id,
+                            quantity: item.quantity
+                        })
+                    });
+                    const addData = await addRes.json();
+                    if (addData.success) {
+                        currentOrder = addData.data.order;
+                        renderOrder();
+                        toast('تم إضافة الصنف', 'success');
+                    } else {
+                        toast(addData.message, 'error');
+                    }
+                } else {
+                    if (!isDirectMode) {
+                        isDirectMode = true;
+                        directItems = [];
+                    }
+                    const existing = directItems.find(i => i.product_id === item.product_id && !item.is_weight);
+                    if (existing) {
+                        existing.quantity = parseFloat(existing.quantity) + 1;
+                        existing.total = existing.price * existing.quantity;
+                    } else {
+                        directItems.push(item);
+                    }
+                    renderItems();
+                    updateSummary();
+                    toast('تم إضافة الصنف', 'success');
+                }
+                return true;
+            } catch (err) {
+                return false;
             }
         }
 

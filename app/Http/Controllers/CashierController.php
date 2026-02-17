@@ -151,6 +151,103 @@ class CashierController extends Controller
         }
     }
 
+    public function findByBarcode(Request $request)
+    {
+        $validated = $request->validate([
+            'barcode' => 'required|string',
+        ]);
+
+        $product = Product::where('barcode', $validated['barcode'])->first();
+
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'message' => 'لم يتم العثور على صنف بهذا الباركود',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'product_id' => $product->id,
+                'product_name' => $product->name,
+                'price' => $product->price,
+                'quantity' => 1,
+                'total' => $product->price,
+                'is_weight' => $product->type === 'weight',
+            ],
+        ]);
+    }
+
+    public function addItemToOrder(Request $request)
+    {
+        $validated = $request->validate([
+            'order_id' => 'required|exists:orders,id',
+            'product_id' => 'required|exists:products,id',
+            'quantity' => 'required|numeric|min:0.001',
+        ]);
+
+        $order = Order::find($validated['order_id']);
+
+        if ($order->status !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'لا يمكن التعديل على هذا الطلب',
+            ], 400);
+        }
+
+        $product = Product::find($validated['product_id']);
+
+        try {
+            DB::transaction(function () use ($order, $product, $validated) {
+                $itemTotal = $product->price * $validated['quantity'];
+
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $product->id,
+                    'product_name' => $product->name,
+                    'price' => $product->price,
+                    'quantity' => $validated['quantity'],
+                    'is_weight' => $product->type === 'weight',
+                    'total' => $itemTotal,
+                ]);
+
+                $order->update([
+                    'total' => $order->items()->sum('total'),
+                ]);
+            });
+
+            $order->refresh();
+            $order->load('items');
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'order' => [
+                        'id' => $order->id,
+                        'order_number' => $order->order_number,
+                        'total' => $order->total,
+                        'items' => $order->items->map(function ($item) {
+                            return [
+                                'id' => $item->id,
+                                'product_name' => $item->product_name,
+                                'quantity' => $item->quantity,
+                                'price' => $item->price,
+                                'total' => $item->total,
+                                'is_weight' => $item->is_weight,
+                            ];
+                        }),
+                    ],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'حدث خطأ أثناء إضافة الصنف',
+            ], 500);
+        }
+    }
+
     public function addWeightBarcode(Request $request)
     {
         $validated = $request->validate([

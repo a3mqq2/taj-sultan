@@ -132,6 +132,8 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::get('/', [CashierController::class, 'index'])->name('index');
     Route::post('/fetch-order', [CashierController::class, 'fetchOrder'])->name('fetch-order');
     Route::post('/new-invoice', [CashierController::class, 'newInvoice'])->name('new-invoice');
+    Route::post('/find-by-barcode', [CashierController::class, 'findByBarcode'])->name('find-by-barcode');
+    Route::post('/add-item-to-order', [CashierController::class, 'addItemToOrder'])->name('add-item-to-order');
     Route::post('/add-weight-barcode', [CashierController::class, 'addWeightBarcode'])->name('add-weight-barcode');
     Route::post('/add-weight-manual', [CashierController::class, 'addWeightManual'])->name('add-weight-manual');
     Route::post('/add-weight-item', [CashierController::class, 'addWeightItem'])->name('add-weight-item');
