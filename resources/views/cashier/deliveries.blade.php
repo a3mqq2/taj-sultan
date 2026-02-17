@@ -356,7 +356,26 @@
                 });
                 const data = await res.json();
                 if (data.success) {
+                    const orderToPrint = { ...selectedOrder };
                     toast(data.message, 'success');
+
+                    const printConfirm = await Swal.fire({
+                        title: 'طباعة إيصال التوصيل؟',
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="ti ti-printer"></i> طباعة',
+                        cancelButtonText: 'لا',
+                        confirmButtonColor: '#3b82f6',
+                        cancelButtonColor: '#64748b',
+                        customClass: {
+                            popup: 'swal-rtl',
+                            title: 'swal-title-rtl'
+                        }
+                    });
+
+                    if (printConfirm.isConfirmed) {
+                        printDeliveryReceipt(orderToPrint);
+                    }
+
                     clearSelection();
                     loadOrders();
                 } else {
@@ -366,6 +385,30 @@
                 console.error('markAsDelivered error:', err);
                 toast('خطأ في الاتصال', 'error');
             }
+        }
+
+        function printDeliveryReceipt(order) {
+            let itemsRows = order.items.map(item => {
+                const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) : parseInt(item.quantity);
+                return `<tr><td>${item.product_name}</td><td class="qty">${qty}</td><td class="price">${parseFloat(item.price).toFixed(2)}</td><td class="price">${parseFloat(item.total).toFixed(2)}</td></tr>`;
+            }).join('');
+
+            let paymentsHtml = order.payments.map(p => `<div class="pay-row"><span>${p.method}</span><span>${parseFloat(p.amount).toFixed(3)}</span></div>`).join('');
+
+            const discountVal = parseFloat(order.discount) || 0;
+            let discountHtml = '';
+            if (discountVal > 0) {
+                discountHtml = `<div class="total-line"><span>الخصم:</span><span>-${discountVal.toFixed(3)} د.ل</span></div>`;
+            }
+
+            const html = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>توصيل #${order.order_number}</title><link href="${BASE_URL}/assets/fonts/cairo/cairo.css" rel="stylesheet"><style>@page{margin:0;size:72mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:10px;line-height:1.2;padding:3mm;width:72mm;color:#000;direction:rtl}.header{text-align:center;font-size:13px;font-weight:800;padding:3px 0;border-bottom:1px dashed #000;margin-bottom:3px}.info{border-bottom:1px dashed #000;padding-bottom:3px;margin-bottom:3px}.info-row{display:flex;justify-content:space-between;padding:1px 0;font-size:10px}.info-row .label{font-weight:700}.status{text-align:center;padding:3px;border:1px solid #000;font-weight:700;font-size:11px;margin:3px 0}table{width:100%;border-collapse:collapse;margin:3px 0}th,td{padding:2px;text-align:right;font-size:9px;border-bottom:1px dotted #ccc}th{border-bottom:1px solid #000}.qty{text-align:center;width:40px}.price{text-align:left;width:45px}.totals{border-top:1px dashed #000;padding-top:3px;margin-top:3px}.total-line{display:flex;justify-content:space-between;font-size:10px;padding:1px 0}.total-grand{display:flex;justify-content:space-between;font-size:12px;font-weight:700;border:1px solid #000;padding:4px;margin:3px 0}.pays{font-size:9px;border-top:1px dashed #000;padding-top:3px;margin-top:3px}.pay-row{display:flex;justify-content:space-between;padding:1px 0}.footer{text-align:center;font-size:10px;border-top:1px dashed #000;padding:3px 0;margin-top:3px}.brand{text-align:center;display:flex;align-items:center;justify-content:center;gap:4px;font-size:8px;color:#333;padding-top:2px}.brand img{height:18px;width:auto;filter:grayscale(100%)}@media print{body{padding:3mm;width:72mm}}</style></head><body><div class="header">تاج السلطان</div><div class="info"><div class="info-row"><span class="label">فاتورة:</span><span>#${order.order_number}</span></div>${order.delivery_phone ? `<div class="info-row"><span class="label">هاتف:</span><span style="direction:ltr">${order.delivery_phone}</span></div>` : ''}${order.customer_name ? `<div class="info-row"><span class="label">الزبون:</span><span>${order.customer_name}</span></div>` : ''}<div class="info-row"><span class="label">التاريخ:</span><span>${order.paid_at || '-'}</span></div></div><div class="status">تم التوصيل</div><table><thead><tr><th>الصنف</th><th class="qty">الكمية</th><th class="price">السعر</th><th class="price">المجموع</th></tr></thead><tbody>${itemsRows}</tbody></table><div class="totals">${discountHtml}<div class="total-grand"><span>الإجمالي:</span><span>${parseFloat(order.total).toFixed(3)} د.ل</span></div></div>${paymentsHtml ? `<div class="pays">${paymentsHtml}</div>` : ''}<div class="footer">شكراً لتعاملكم معنا</div><div class="brand"><img src="${BASE_URL}/hulul.jpg"><span>حلول لتقنية المعلومات</span></div></body></html>`;
+
+            const w = window.open('', '_blank', 'width=300,height=600');
+            w.document.write(html);
+            w.document.close();
+            w.onload = function() {
+                w.printer && w.printer.print ? w.printer.print() : w.print();
+            };
         }
 
         function toast(msg, type = 'info') {
