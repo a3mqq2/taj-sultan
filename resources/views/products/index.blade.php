@@ -1497,7 +1497,9 @@ height:30mm;
 display:flex;
 justify-content:center;
 align-items:center;
-font-family:Tahoma,Arial;
+font-family:"Arial Black",Tahoma,Arial;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact;
 }
 
 .label{
@@ -1511,20 +1513,24 @@ text-align:center;
 }
 
 .shop{
-font-size:7.5px;
-font-weight:bold;
-line-height:1.1;
+font-size:8px;
+font-weight:900;
+line-height:1.15;
+color:#000;
+text-rendering:geometricPrecision;
 }
 
 .info{
-font-size:6.5px;
-font-weight:600;
-line-height:1.1;
+font-size:7px;
+font-weight:800;
+line-height:1.15;
+color:#000;
+text-rendering:geometricPrecision;
 }
 
 .barcode{
 line-height:0;
-margin:1px 0;
+margin:2px 0;
 }
 
 .barcode svg{
@@ -1534,10 +1540,12 @@ display:block;
 }
 
 .code{
-font-size:6.5px;
-font-family:monospace;
-font-weight:bold;
+font-size:7px;
+font-family:"Courier New",monospace;
+font-weight:900;
 line-height:1.1;
+color:#000;
+letter-spacing:0.3px;
 }
 
 @media print{
@@ -1578,7 +1586,7 @@ display:none;
 <script>
 JsBarcode("#barcode","${barcode}",{
 format:"CODE128",
-width:0.6,
+width:0.65,
 height:9,
 displayValue:false,
 margin:0
