@@ -1465,6 +1465,8 @@ function updatePriceUnit() {
     const priceUnit = document.getElementById('priceUnit');
     priceUnit.textContent = type === 'weight' ? 'د.ل / كجم' : 'د.ل';
 }
+
+
 function printBarcode() {
     const name = document.getElementById('productName').value;
     const barcode = document.getElementById('productBarcode').value;
@@ -1493,74 +1495,81 @@ box-sizing:border-box;
 
 html,body{
 width:35mm;
-height:30mm;
+height:25mm;
+font-family:Arial,Helvetica,sans-serif;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact;
+overflow:hidden;
+}
+
+body{
 display:flex;
 justify-content:center;
 align-items:center;
-font-family:"Times New Roman",Times,serif;
--webkit-print-color-adjust:exact;
-print-color-adjust:exact;
 }
 
 .label{
-width:34mm;
-height:29mm;
+width:35mm;
+height:25mm;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
 text-align:center;
-gap:1px;
+padding-top:4mm;
+padding-left:1mm;
+padding-right:1mm;
+gap:0.5px;
 }
 
 .shop{
-font-size:11px;
+font-size:12px;
 font-weight:900;
-line-height:1.2;
+line-height:1.05;
 color:#000;
 }
 
 .name{
 font-size:9px;
 font-weight:700;
-line-height:1.2;
+line-height:1.05;
 color:#000;
 max-width:33mm;
-overflow:hidden;
 white-space:nowrap;
+overflow:hidden;
 text-overflow:ellipsis;
 }
 
 .price{
-font-size:12px;
+font-size:13px;
 font-weight:900;
-line-height:1.2;
+line-height:1.05;
 color:#000;
 }
 
 .barcode{
 line-height:0;
-margin:1px 0;
+margin-top:0.5px;
 }
 
 .barcode svg{
-width:32mm;
-height:10mm;
+width:33mm;
+height:9mm;
 display:block;
 }
 
 .code{
 font-size:9px;
-font-family:"Courier New",monospace;
+font-family:monospace;
 font-weight:900;
-line-height:1.1;
+line-height:1;
 color:#000;
-letter-spacing:0.5px;
+margin-top:0.5px;
 }
 
 @media print{
 @page{
-size:35mm 30mm;
+size:35mm 25mm;
 margin:0;
 }
 
@@ -1573,7 +1582,7 @@ display:none;
 
 <body>
 
-<div class="no-print" style="position:absolute;top:4px">
+<div class="no-print" style="position:absolute;top:2px">
 <button onclick="window.print()">طباعة</button>
 </div>
 
@@ -1596,8 +1605,8 @@ display:none;
 <script>
 JsBarcode("#barcode","${barcode}",{
 format:"CODE128",
-width:1.2,
-height:14,
+width:1.25,
+height:11,
 displayValue:false,
 margin:0
 });
@@ -1605,7 +1614,7 @@ margin:0
 window.onload=function(){
 setTimeout(function(){
 window.print();
-},150);
+},120);
 };
 
 window.onafterprint=function(){
@@ -1616,15 +1625,13 @@ window.close();
 </body>
 </html>`;
 
-    const win = window.open('', '_blank', 'width=400,height=350');
+    const win = window.open('', '_blank', 'width=400,height=300');
 
     if (win) {
         win.document.write(html);
         win.document.close();
     }
 }
-
-
 
 
 function openStockModal(id, name, currentStock, type) {
