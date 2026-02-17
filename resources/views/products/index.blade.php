@@ -1520,16 +1520,17 @@ line-height:1.2;
 }
 
 .name{
-font-size:9px;
+font-size:13px;
 line-height:1.2;
 max-width:30mm;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
+font-weight:bold!important;
 }
 
 .price{
-font-size:12px;
+font-size:10px;
 line-height:1.2;
 }
 
@@ -1548,6 +1549,7 @@ font-size:8px;
 font-family:monospace;
 line-height:1;
 margin-top:2px;
+font-weight:bold !important;
 }
 
 @media print{
@@ -1579,7 +1581,7 @@ margin:0;
 <script>
 JsBarcode("#barcode","${barcode}",{
 format:"CODE128",
-width:1.2,
+width:1.5,
 height:15,
 displayValue:false,
 margin:0
