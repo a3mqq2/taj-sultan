@@ -1465,8 +1465,6 @@ function updatePriceUnit() {
     const priceUnit = document.getElementById('priceUnit');
     priceUnit.textContent = type === 'weight' ? 'د.ل / كجم' : 'د.ل';
 }
-
-
 function printBarcode() {
     const name = document.getElementById('productName').value;
     const barcode = document.getElementById('productBarcode').value;
@@ -1497,9 +1495,10 @@ html,body{
 width:35mm;
 height:25mm;
 font-family:Arial,Helvetica,sans-serif;
+overflow:hidden;
 -webkit-print-color-adjust:exact;
 print-color-adjust:exact;
-overflow:hidden;
+background:#fff;
 }
 
 body{
@@ -1508,63 +1507,47 @@ justify-content:center;
 align-items:center;
 }
 
-.label{
-width:35mm;
-height:25mm;
+.container{
 display:flex;
 flex-direction:column;
 align-items:center;
-justify-content:center;
 text-align:center;
-padding-top:4mm;
-padding-left:1mm;
-padding-right:1mm;
-gap:0.5px;
 }
 
 .shop{
-font-size:12px;
-font-weight:900;
-line-height:1.05;
-color:#000;
+font-size:11px;
+line-height:1.2;
 }
 
 .name{
 font-size:9px;
-font-weight:700;
-line-height:1.05;
-color:#000;
-max-width:33mm;
+line-height:1.2;
+max-width:30mm;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
 }
 
 .price{
-font-size:13px;
-font-weight:900;
-line-height:1.05;
-color:#000;
+font-size:12px;
+line-height:1.2;
 }
 
 .barcode{
 line-height:0;
-margin-top:0.5px;
 }
 
 .barcode svg{
-width:33mm;
-height:9mm;
+width:28mm;
+height:mm;
 display:block;
 }
 
 .code{
-font-size:9px;
+font-size:8px;
 font-family:monospace;
-font-weight:900;
 line-height:1;
-color:#000;
-margin-top:0.5px;
+margin-top:2px;
 }
 
 @media print{
@@ -1572,26 +1555,17 @@ margin-top:0.5px;
 size:35mm 25mm;
 margin:0;
 }
-
-.no-print{
-display:none;
-}
+.no-print{display:none;}
 }
 </style>
 </head>
 
 <body>
 
-<div class="no-print" style="position:absolute;top:2px">
-<button onclick="window.print()">طباعة</button>
-</div>
-
-<div class="label">
+<div class="container">
 
 <div class="shop">تاج السلطان</div>
-
 <div class="name">${escapeHtml(name)}</div>
-
 <div class="price">${priceText}</div>
 
 <div class="barcode">
@@ -1605,8 +1579,8 @@ display:none;
 <script>
 JsBarcode("#barcode","${barcode}",{
 format:"CODE128",
-width:1.25,
-height:11,
+width:1.2,
+height:15,
 displayValue:false,
 margin:0
 });
@@ -1614,7 +1588,7 @@ margin:0
 window.onload=function(){
 setTimeout(function(){
 window.print();
-},120);
+},100);
 };
 
 window.onafterprint=function(){
@@ -1625,14 +1599,13 @@ window.close();
 </body>
 </html>`;
 
-    const win = window.open('', '_blank', 'width=400,height=300');
+    const win = window.open('', '_blank', 'width=380,height=260');
 
     if (win) {
         win.document.write(html);
         win.document.close();
     }
 }
-
 
 function openStockModal(id, name, currentStock, type) {
     document.getElementById('stockProductId').value = id;
