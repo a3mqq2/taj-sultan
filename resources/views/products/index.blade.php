@@ -1503,49 +1503,59 @@ print-color-adjust:exact;
 }
 
 .label{
-width:33mm;
-height:28mm;
+width:34mm;
+height:29mm;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
 text-align:center;
+gap:1px;
 }
 
 .shop{
-font-size:8px;
+font-size:11px;
 font-weight:900;
-line-height:1.15;
+line-height:1.2;
 color:#000;
-text-rendering:geometricPrecision;
 }
 
-.info{
-font-size:7px;
-font-weight:800;
-line-height:1.15;
+.name{
+font-size:9px;
+font-weight:700;
+line-height:1.2;
 color:#000;
-text-rendering:geometricPrecision;
+max-width:33mm;
+overflow:hidden;
+white-space:nowrap;
+text-overflow:ellipsis;
+}
+
+.price{
+font-size:12px;
+font-weight:900;
+line-height:1.2;
+color:#000;
 }
 
 .barcode{
 line-height:0;
-margin:2px 0;
+margin:1px 0;
 }
 
 .barcode svg{
-width:31mm;
-height:9mm;
+width:32mm;
+height:10mm;
 display:block;
 }
 
 .code{
-font-size:7px;
+font-size:9px;
 font-family:"Courier New",monospace;
 font-weight:900;
 line-height:1.1;
 color:#000;
-letter-spacing:0.3px;
+letter-spacing:0.5px;
 }
 
 @media print{
@@ -1571,9 +1581,9 @@ display:none;
 
 <div class="shop">تاج السلطان</div>
 
-<div class="info">الصنف: ${escapeHtml(name)}</div>
+<div class="name">${escapeHtml(name)}</div>
 
-<div class="info">السعر: ${priceText}</div>
+<div class="price">${priceText}</div>
 
 <div class="barcode">
 <svg id="barcode"></svg>
@@ -1586,8 +1596,8 @@ display:none;
 <script>
 JsBarcode("#barcode","${barcode}",{
 format:"CODE128",
-width:0.65,
-height:9,
+width:1.2,
+height:14,
 displayValue:false,
 margin:0
 });
