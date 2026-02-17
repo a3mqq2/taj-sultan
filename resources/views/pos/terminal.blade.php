@@ -32,6 +32,8 @@
             flex-direction: column;
             background: #f0f4f8;
             position: relative;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .products-section::before {
@@ -60,6 +62,7 @@
             border-bottom: 1px solid #e2e8f0;
             position: relative;
             z-index: 1;
+            flex-shrink: 0;
         }
 
         .header-right {
@@ -149,6 +152,7 @@
             padding: 20px 28px;
             position: relative;
             z-index: 1;
+            flex-shrink: 0;
         }
 
         .search-input-wrapper {
@@ -188,6 +192,7 @@
 
         .products-grid {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
             padding: 0 28px 28px;
             display: grid;
@@ -259,12 +264,14 @@
             flex-direction: column;
             background: #fff;
             border-right: 1px solid #e2e8f0;
+            height: 100vh;
             overflow: hidden;
         }
 
         .cart-header {
             padding: 24px;
             border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .cart-title {
@@ -697,6 +704,7 @@
             border-top: 1px solid #e2e8f0;
             position: relative;
             z-index: 1;
+            flex-shrink: 0;
         }
 
         .footer-credit {

@@ -1465,12 +1465,10 @@ function updatePriceUnit() {
     const priceUnit = document.getElementById('priceUnit');
     priceUnit.textContent = type === 'weight' ? 'د.ل / كجم' : 'د.ل';
 }
-
 function printBarcode() {
     const name = document.getElementById('productName').value;
     const barcode = document.getElementById('productBarcode').value;
     const price = document.getElementById('productPrice').value;
-    const type = document.getElementById('productType').value;
 
     if (!barcode) {
         showToast('لا يوجد باركود لهذا الصنف', 'error');
@@ -1485,103 +1483,103 @@ function printBarcode() {
 <meta charset="UTF-8">
 <title>Label</title>
 <script src="{{ asset('js/barcode/jsbarcode.min.js') }}"><\/script>
+
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
 
 html,body{
-width:40mm;
-height:26mm;
+width:35mm;
+height:30mm;
 display:flex;
 justify-content:center;
 align-items:center;
+font-family:Tahoma,Arial;
 }
 
-body{font-family:Arial,Helvetica,sans-serif}
-
 .label{
-width:38mm;
-height:24mm;
+width:33mm;
+height:28mm;
 display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
 text-align:center;
-gap:0;
 }
 
-.top{
-font-size:6px;
+.shop{
+font-size:7.5px;
 font-weight:bold;
-line-height:1;
-white-space:nowrap;
-overflow:hidden;
-text-overflow:ellipsis;
-margin:0;
-padding:0;
+line-height:1.1;
+}
+
+.info{
+font-size:6.5px;
+font-weight:600;
+line-height:1.1;
 }
 
 .barcode{
-margin:0;
-padding:0;
 line-height:0;
+margin:1px 0;
 }
 
 .barcode svg{
-width:34mm;
-height:10mm;
+width:31mm;
+height:9mm;
 display:block;
-margin:0;
-padding:0;
 }
 
-.barcode-text{
-font-size:6px;
+.code{
+font-size:6.5px;
 font-family:monospace;
 font-weight:bold;
-line-height:1;
-margin:0;
-padding:0;
+line-height:1.1;
 }
 
 @media print{
-@page{size:40mm 26mm;margin:0}
-
-html,body{
-width:40mm;
-height:26mm;
-display:flex;
-justify-content:center;
-align-items:center;
+@page{
+size:35mm 30mm;
+margin:0;
 }
 
-.no-print{display:none}
+.no-print{
+display:none;
+}
 }
 </style>
 </head>
+
 <body>
 
-<div class="no-print" style="position:absolute;top:5px;text-align:center">
-<button onclick="window.print()" style="padding:4px 15px;font-size:12px">طباعة</button>
+<div class="no-print" style="position:absolute;top:4px">
+<button onclick="window.print()">طباعة</button>
 </div>
 
 <div class="label">
 
-<div class="top">تاج السلطان</div>
-<div class="top">الصنف:${escapeHtml(name)} / ${priceText}</div>
+<div class="shop">تاج السلطان</div>
+
+<div class="info">الصنف: ${escapeHtml(name)}</div>
+
+<div class="info">السعر: ${priceText}</div>
 
 <div class="barcode">
 <svg id="barcode"></svg>
 </div>
 
-<div class="barcode-text">${escapeHtml(barcode)}</div>
+<div class="code">${escapeHtml(barcode)}</div>
 
 </div>
 
 <script>
 JsBarcode("#barcode","${barcode}",{
 format:"CODE128",
-width:0.65,
-height:10,
+width:0.6,
+height:9,
 displayValue:false,
 margin:0
 });
@@ -1589,7 +1587,7 @@ margin:0
 window.onload=function(){
 setTimeout(function(){
 window.print();
-},200);
+},150);
 };
 
 window.onafterprint=function(){
@@ -1600,7 +1598,8 @@ window.close();
 </body>
 </html>`;
 
-    const win = window.open('', '_blank', 'width=420,height=320');
+    const win = window.open('', '_blank', 'width=400,height=350');
+
     if (win) {
         win.document.write(html);
         win.document.close();
