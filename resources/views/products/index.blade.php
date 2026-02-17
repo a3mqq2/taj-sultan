@@ -855,7 +855,7 @@
     <div class="modal-dialog modal-dialog-centered modal-sm">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">إضافة مخزون</h5>
+                <h5 class="modal-title" id="stockModalTitle">إضافة مخزون</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form id="stockForm" onsubmit="submitStock(event)">
@@ -863,8 +863,9 @@
                     <p class="fw-bold mb-2" id="stockProductName"></p>
                     <p class="text-muted mb-3">المخزون الحالي: <span id="stockCurrentQty" class="fw-bold"></span></p>
                     <input type="hidden" id="stockProductId">
+                    <input type="hidden" id="stockAction" value="add">
                     <div class="mb-3">
-                        <label class="form-label">الكمية المضافة</label>
+                        <label class="form-label" id="stockQuantityLabel">الكمية المضافة</label>
                         <input type="number" class="form-control" id="stockQuantity" min="1" required style="font-size:18px;text-align:center;font-weight:700;">
                     </div>
                     <div class="mb-3">
@@ -905,11 +906,35 @@
                             <th>بعد</th>
                             <th>المستخدم</th>
                             <th>ملاحظة</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="stockLogBody"></tbody>
                 </table>
                 <div id="stockLogEmpty" class="text-center text-muted py-4 d-none">لا توجد حركات مخزون</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteStockMovementModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <i class="ti ti-alert-triangle text-danger" style="font-size: 48px;"></i>
+                </div>
+                <h5 class="mb-2">حذف حركة المخزون؟</h5>
+                <p class="text-muted mb-0">سيتم تعديل المخزون الحالي بعد الحذف</p>
+            </div>
+            <div class="modal-footer justify-content-center border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteMovementBtn" onclick="confirmDeleteStockMovement()">
+                    <span class="btn-text">حذف</span>
+                    <span class="btn-loading d-none">
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                    </span>
+                </button>
             </div>
         </div>
     </div>
@@ -934,6 +959,7 @@ const productModal = new bootstrap.Modal(document.getElementById('productModal')
 const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
 const stockModal = new bootstrap.Modal(document.getElementById('stockModal'));
 const stockLogModal = new bootstrap.Modal(document.getElementById('stockLogModal'));
+const stockDeleteModal = new bootstrap.Modal(document.getElementById('deleteStockMovementModal'));
 
 // عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', function() {
@@ -1068,8 +1094,11 @@ function renderProducts(products) {
             </td>
             <td onclick="event.stopPropagation()">
                 <span class="fw-bold ${parseFloat(product.stock) < 0 ? 'text-danger' : parseFloat(product.stock) == 0 ? 'text-warning' : 'text-success'}">${product.type === 'weight' ? parseFloat(product.stock).toFixed(3) + ' كجم' : parseFloat(product.stock).toFixed(0)}</span>
-                <button class="btn btn-sm btn-outline-primary ms-1" onclick="openStockModal(${product.id}, '${escapeHtml(product.name)}', ${product.stock}, '${product.type}')" title="إضافة مخزون" style="padding:2px 6px;font-size:12px;">
+                <button class="btn btn-sm btn-outline-primary ms-1" onclick="openStockModal(${product.id}, '${escapeHtml(product.name)}', ${product.stock}, '${product.type}', 'add')" title="إضافة مخزون" style="padding:2px 6px;font-size:12px;">
                     <i class="ti ti-plus"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-danger ms-1" onclick="openStockModal(${product.id}, '${escapeHtml(product.name)}', ${product.stock}, '${product.type}', 'deduct')" title="خصم مخزون" style="padding:2px 6px;font-size:12px;">
+                    <i class="ti ti-minus"></i>
                 </button>
             </td>
             <td>
@@ -1609,8 +1638,9 @@ window.close();
     }
 }
 
-function openStockModal(id, name, currentStock, type) {
+function openStockModal(id, name, currentStock, type, action = 'add') {
     document.getElementById('stockProductId').value = id;
+    document.getElementById('stockAction').value = action;
     document.getElementById('stockProductName').textContent = name;
     const isWeight = type === 'weight';
     document.getElementById('stockCurrentQty').textContent = isWeight ? parseFloat(currentStock).toFixed(3) + ' كجم' : parseFloat(currentStock).toFixed(0);
@@ -1620,6 +1650,13 @@ function openStockModal(id, name, currentStock, type) {
     qtyInput.min = isWeight ? '0.001' : '1';
     qtyInput.placeholder = isWeight ? '0.000 كجم' : '0';
     document.getElementById('stockNotes').value = '';
+    const isDeduct = action === 'deduct';
+    document.getElementById('stockModalTitle').textContent = isDeduct ? 'خصم مخزون' : 'إضافة مخزون';
+    document.getElementById('stockQuantityLabel').textContent = isDeduct ? 'الكمية المخصومة' : 'الكمية المضافة';
+    document.getElementById('stockNotes').placeholder = isDeduct ? 'مثال: تالف / مرتجع' : 'مثال: توريد جديد';
+    const submitBtn = document.getElementById('stockSubmitBtn');
+    submitBtn.querySelector('.btn-text').textContent = isDeduct ? 'خصم' : 'إضافة';
+    submitBtn.className = isDeduct ? 'btn btn-danger' : 'btn btn-primary';
     stockModal.show();
     setTimeout(() => qtyInput.focus(), 300);
 }
@@ -1629,14 +1666,19 @@ async function submitStock(e) {
     const id = document.getElementById('stockProductId').value;
     const quantity = document.getElementById('stockQuantity').value;
     const notes = document.getElementById('stockNotes').value;
+    const action = document.getElementById('stockAction').value;
 
     const btn = document.getElementById('stockSubmitBtn');
     btn.querySelector('.btn-text').classList.add('d-none');
     btn.querySelector('.btn-loading').classList.remove('d-none');
     btn.disabled = true;
 
+    const url = action === 'deduct'
+        ? `{{ url('products') }}/${id}/deduct-stock`
+        : `{{ url('products') }}/${id}/add-stock`;
+
     try {
-        const response = await fetch(`{{ url('products') }}/${id}/add-stock`, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1656,8 +1698,8 @@ async function submitStock(e) {
             showToast(result.message || 'حدث خطأ', 'error');
         }
     } catch (error) {
-        console.error('Error adding stock:', error);
-        showToast('حدث خطأ في إضافة المخزون', 'error');
+        console.error('Error stock operation:', error);
+        showToast('حدث خطأ', 'error');
     } finally {
         btn.querySelector('.btn-text').classList.remove('d-none');
         btn.querySelector('.btn-loading').classList.add('d-none');
@@ -1673,13 +1715,19 @@ function openStockLogFromModal() {
     openStockLog(id, name);
 }
 
+let stockLogProductId = null;
+
 async function openStockLog(id, name) {
+    stockLogProductId = id;
     document.getElementById('stockLogProductName').textContent = name;
     document.getElementById('stockLogBody').innerHTML = '';
     document.getElementById('stockLogEmpty').classList.add('d-none');
     document.getElementById('stockLogTable').classList.remove('d-none');
     stockLogModal.show();
+    await loadStockLog(id);
+}
 
+async function loadStockLog(id) {
     try {
         const response = await fetch(`{{ url('products') }}/${id}/stock-movements`, {
             headers: {
@@ -1696,6 +1744,9 @@ async function openStockLog(id, name) {
                 return;
             }
 
+            document.getElementById('stockLogTable').classList.remove('d-none');
+            document.getElementById('stockLogEmpty').classList.add('d-none');
+
             const typeColors = { addition: 'text-success', sale: 'text-danger', adjustment: 'text-warning' };
 
             document.getElementById('stockLogBody').innerHTML = result.data.map(m => `
@@ -1707,12 +1758,58 @@ async function openStockLog(id, name) {
                     <td class="fw-bold">${parseFloat(m.stock_after).toFixed(3)}</td>
                     <td>${m.user_name || '-'}</td>
                     <td style="font-size:12px;">${m.notes || (m.reference_id ? 'فاتورة #' + m.reference_id : '-')}</td>
+                    <td><button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" onclick="deleteStockMovement(${m.id})" title="حذف"><i class="ti ti-trash" style="font-size:14px;"></i></button></td>
                 </tr>
             `).join('');
         }
     } catch (error) {
         console.error('Error loading stock movements:', error);
         showToast('حدث خطأ في تحميل سجل المخزون', 'error');
+    }
+}
+
+let pendingDeleteMovementId = null;
+
+function deleteStockMovement(movementId) {
+    pendingDeleteMovementId = movementId;
+    stockDeleteModal.show();
+}
+
+async function confirmDeleteStockMovement() {
+    if (!pendingDeleteMovementId) return;
+
+    const btn = document.getElementById('confirmDeleteMovementBtn');
+    btn.disabled = true;
+    btn.querySelector('.btn-text').classList.add('d-none');
+    btn.querySelector('.btn-loading').classList.remove('d-none');
+
+    try {
+        const response = await fetch(`{{ url('products') }}/${stockLogProductId}/stock-movements/${pendingDeleteMovementId}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            stockDeleteModal.hide();
+            showToast(data.message, 'success');
+            await loadStockLog(stockLogProductId);
+            loadProducts();
+        } else {
+            showToast(data.message || 'حدث خطأ', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting stock movement:', error);
+        showToast('حدث خطأ في حذف الحركة', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.querySelector('.btn-text').classList.remove('d-none');
+        btn.querySelector('.btn-loading').classList.add('d-none');
+        pendingDeleteMovementId = null;
     }
 }
 </script>

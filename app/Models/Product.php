@@ -98,6 +98,23 @@ class Product extends Model
         ]);
     }
 
+    public function manualDeductStock($quantity, $userId, $notes = null)
+    {
+        $stockBefore = $this->stock;
+        $stockAfter = $stockBefore - $quantity;
+
+        $this->update(['stock' => $stockAfter]);
+
+        return $this->stockMovements()->create([
+            'type' => StockMovement::TYPE_ADJUSTMENT,
+            'quantity' => $quantity,
+            'stock_before' => $stockBefore,
+            'stock_after' => $stockAfter,
+            'user_id' => $userId,
+            'notes' => $notes,
+        ]);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

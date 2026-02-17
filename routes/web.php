@@ -40,7 +40,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])->middleware('permission:product.delete')->name('bulk-delete');
         Route::post('/bulk-toggle', [ProductController::class, 'bulkToggle'])->middleware('permission:product.edit')->name('bulk-toggle');
         Route::post('/{product}/add-stock', [ProductController::class, 'addStock'])->middleware('permission:product.edit')->name('add-stock');
+        Route::post('/{product}/deduct-stock', [ProductController::class, 'deductStock'])->middleware('permission:product.edit')->name('deduct-stock');
         Route::get('/{product}/stock-movements', [ProductController::class, 'stockMovements'])->name('stock-movements');
+        Route::delete('/{product}/stock-movements/{movement}', [ProductController::class, 'deleteStockMovement'])->middleware('permission:product.edit')->name('delete-stock-movement');
     });
 
     Route::prefix('payment-methods')->name('payment-methods.')->group(function () {

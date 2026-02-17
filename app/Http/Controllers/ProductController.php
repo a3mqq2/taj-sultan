@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\PosPoint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -268,6 +269,52 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'data' => $movements,
+        ]);
+    }
+
+    public function deductStock(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'quantity' => 'required|numeric|min:0.001',
+            'notes' => 'nullable|string|max:500',
+        ], [
+            'quantity.required' => 'الكمية مطلوبة',
+            'quantity.numeric' => 'الكمية يجب أن تكون رقم',
+            'quantity.min' => 'الكمية يجب أن تكون أكبر من صفر',
+        ]);
+
+        $product->manualDeductStock(
+            $validated['quantity'],
+            auth()->id(),
+            $validated['notes'] ?? null
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم خصم ' . $validated['quantity'] . ' من مخزون ' . $product->name,
+            'data' => [
+                'stock' => $product->fresh()->stock,
+            ]
+        ]);
+    }
+
+    public function deleteStockMovement(Product $product, StockMovement $movement)
+    {
+        if ($movement->product_id !== $product->id) {
+            return response()->json(['success' => false, 'message' => 'حركة غير صالحة'], 400);
+        }
+
+        $diff = $movement->stock_after - $movement->stock_before;
+        $product->update(['stock' => $product->stock - $diff]);
+
+        $movement->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حذف الحركة',
+            'data' => [
+                'stock' => $product->fresh()->stock,
+            ]
         ]);
     }
 
