@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class Product extends Model
@@ -27,7 +28,7 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'is_active' => 'boolean',
-        'stock' => 'integer',
+        'stock' => 'decimal:3',
     ];
 
     protected static function boot()
@@ -55,6 +56,46 @@ class Product extends Model
     public function posPoint(): BelongsTo
     {
         return $this->belongsTo(PosPoint::class);
+    }
+
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class)->orderBy('created_at', 'desc');
+    }
+
+    public function addStock($quantity, $userId, $notes = null)
+    {
+        $stockBefore = $this->stock;
+        $stockAfter = $stockBefore + $quantity;
+
+        $this->update(['stock' => $stockAfter]);
+
+        return $this->stockMovements()->create([
+            'type' => StockMovement::TYPE_ADDITION,
+            'quantity' => $quantity,
+            'stock_before' => $stockBefore,
+            'stock_after' => $stockAfter,
+            'user_id' => $userId,
+            'notes' => $notes,
+        ]);
+    }
+
+    public function deductStock($quantity, $orderId, $userId = null)
+    {
+        $stockBefore = $this->stock;
+        $stockAfter = $stockBefore - $quantity;
+
+        $this->update(['stock' => $stockAfter]);
+
+        return $this->stockMovements()->create([
+            'type' => StockMovement::TYPE_SALE,
+            'quantity' => $quantity,
+            'stock_before' => $stockBefore,
+            'stock_after' => $stockAfter,
+            'reference_type' => Order::class,
+            'reference_id' => $orderId,
+            'user_id' => $userId,
+        ]);
     }
 
     public function scopeActive($query)

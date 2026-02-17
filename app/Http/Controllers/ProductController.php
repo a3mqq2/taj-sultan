@@ -40,7 +40,7 @@ class ProductController extends Controller
         $sortField = $request->get('sort', 'created_at');
         $sortDirection = $request->get('direction', 'desc');
 
-        $allowedSorts = ['name', 'price', 'created_at'];
+        $allowedSorts = ['name', 'price', 'created_at', 'stock'];
         if (in_array($sortField, $allowedSorts)) {
             $query->orderBy($sortField, $sortDirection);
         }
@@ -59,6 +59,7 @@ class ProductController extends Controller
                 'type' => $product->type,
                 'barcode' => $product->barcode,
                 'is_active' => $product->is_active,
+                'stock' => $product->stock,
             ];
         });
 
@@ -116,6 +117,7 @@ class ProductController extends Controller
                 'type' => $product->type,
                 'barcode' => $product->barcode,
                 'is_active' => $product->is_active,
+                'stock' => $product->stock,
             ]
         ], 201);
     }
@@ -134,6 +136,7 @@ class ProductController extends Controller
                 'type' => $product->type,
                 'barcode' => $product->barcode,
                 'is_active' => $product->is_active,
+                'stock' => $product->stock,
             ]
         ]);
     }
@@ -182,6 +185,7 @@ class ProductController extends Controller
                 'type' => $product->type,
                 'barcode' => $product->barcode,
                 'is_active' => $product->is_active,
+                'stock' => $product->stock,
             ]
         ]);
     }
@@ -210,6 +214,60 @@ class ProductController extends Controller
             'data' => [
                 'is_active' => $product->is_active
             ]
+        ]);
+    }
+
+    public function addStock(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'quantity' => 'required|numeric|min:0.001',
+            'notes' => 'nullable|string|max:500',
+        ], [
+            'quantity.required' => 'الكمية مطلوبة',
+            'quantity.numeric' => 'الكمية يجب أن تكون رقم',
+            'quantity.min' => 'الكمية يجب أن تكون أكبر من صفر',
+        ]);
+
+        $product->addStock(
+            $validated['quantity'],
+            auth()->id(),
+            $validated['notes'] ?? null
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إضافة ' . $validated['quantity'] . ' إلى مخزون ' . $product->name,
+            'data' => [
+                'stock' => $product->fresh()->stock,
+            ]
+        ]);
+    }
+
+    public function stockMovements(Product $product)
+    {
+        $movements = $product->stockMovements()
+            ->with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get()
+            ->map(function ($movement) {
+                return [
+                    'id' => $movement->id,
+                    'type' => $movement->type,
+                    'type_name' => $movement->type_name,
+                    'quantity' => $movement->quantity,
+                    'stock_before' => $movement->stock_before,
+                    'stock_after' => $movement->stock_after,
+                    'reference_id' => $movement->reference_id,
+                    'user_name' => $movement->user ? $movement->user->name : null,
+                    'notes' => $movement->notes,
+                    'created_at' => $movement->created_at->format('Y-m-d H:i'),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $movements,
         ]);
     }
 

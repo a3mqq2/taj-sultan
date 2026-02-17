@@ -406,6 +406,15 @@ class CashierController extends Controller
                     $customer = Customer::find($customerId);
                     $customer->addCreditOrderTransaction($creditAmount, $order->id, auth()->id());
                 }
+
+                foreach ($order->items as $item) {
+                    if ($item->product_id) {
+                        $product = Product::find($item->product_id);
+                        if ($product) {
+                            $product->deductStock($item->quantity, $order->id, auth()->id());
+                        }
+                    }
+                }
             });
 
             $order->refresh();

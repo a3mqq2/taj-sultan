@@ -39,6 +39,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::patch('/{product}/toggle-status', [ProductController::class, 'toggleStatus'])->middleware('permission:product.edit')->name('toggle-status');
         Route::post('/bulk-delete', [ProductController::class, 'bulkDelete'])->middleware('permission:product.delete')->name('bulk-delete');
         Route::post('/bulk-toggle', [ProductController::class, 'bulkToggle'])->middleware('permission:product.edit')->name('bulk-toggle');
+        Route::post('/{product}/add-stock', [ProductController::class, 'addStock'])->middleware('permission:product.edit')->name('add-stock');
+        Route::get('/{product}/stock-movements', [ProductController::class, 'stockMovements'])->name('stock-movements');
     });
 
     Route::prefix('payment-methods')->name('payment-methods.')->group(function () {
