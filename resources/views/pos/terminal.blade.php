@@ -802,6 +802,9 @@
                     <div class="pos-name">{{ $posPoint->name }}</div>
                 </div>
                 <div class="session-info">
+                    <button type="button" class="refresh-products-btn" onclick="location.reload()" title="إعادة تحميل الصفحة">
+                        <i class="ti ti-reload"></i>
+                    </button>
                     <button type="button" class="refresh-products-btn" id="refreshProductsBtn" onclick="refreshProducts()" title="تحديث المنتجات (F5)">
                         <i class="ti ti-refresh"></i>
                         <span>تحديث</span>
