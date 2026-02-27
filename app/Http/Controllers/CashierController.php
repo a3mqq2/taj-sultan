@@ -105,6 +105,10 @@ class CashierController extends Controller
                 foreach ($validated['items'] as $item) {
                     $product = Product::find($item['product_id']);
                     $price = $item['price'];
+                    $itemTotal = $price * $item['quantity'];
+                    if ($product->type === 'weight') {
+                        $itemTotal = round($itemTotal);
+                    }
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $product->id,
@@ -112,7 +116,7 @@ class CashierController extends Controller
                         'price' => $price,
                         'quantity' => $item['quantity'],
                         'is_weight' => $product->type === 'weight',
-                        'total' => $price * $item['quantity'],
+                        'total' => $itemTotal,
                     ]);
                 }
 
@@ -201,6 +205,9 @@ class CashierController extends Controller
         try {
             DB::transaction(function () use ($order, $product, $validated) {
                 $itemTotal = $product->price * $validated['quantity'];
+                if ($product->type === 'weight') {
+                    $itemTotal = round($itemTotal);
+                }
 
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -283,7 +290,7 @@ class CashierController extends Controller
             ], 404);
         }
 
-        $itemTotal = $product->price * $weight;
+        $itemTotal = round($product->price * $weight);
 
         return response()->json([
             'success' => true,
@@ -314,7 +321,7 @@ class CashierController extends Controller
             ], 400);
         }
 
-        $itemTotal = $product->price * $validated['quantity'];
+        $itemTotal = round($product->price * $validated['quantity']);
 
         return response()->json([
             'success' => true,
@@ -357,7 +364,7 @@ class CashierController extends Controller
 
         try {
             DB::transaction(function () use ($order, $product, $validated) {
-                $itemTotal = $product->price * $validated['quantity'];
+                $itemTotal = round($product->price * $validated['quantity']);
 
                 OrderItem::create([
                     'order_id' => $order->id,

@@ -1547,12 +1547,13 @@
             tbody.innerHTML = '';
             currentOrder.items.forEach(item => {
                 const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity;
+                const itemTotal = item.is_weight ? Math.round(parseFloat(item.total)) : parseFloat(item.total).toFixed(3);
                 tbody.innerHTML += `<tr>
                     <td><button class="item-remove-btn" onclick="removeOrderItem(${item.id})"><i class="ti ti-x"></i></button></td>
                     <td>${item.product_name}${item.is_weight ? '<span class="weight-tag"><i class="ti ti-scale"></i></span>' : ''}</td>
                     <td style="text-align:center">${qty}</td>
                     <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
-                    <td style="text-align:left">${parseFloat(item.total).toFixed(3)}</td>
+                    <td style="text-align:left">${itemTotal}</td>
                 </tr>`;
             });
 
@@ -1622,12 +1623,13 @@
                 directItems.forEach((item, index) => {
                     total += parseFloat(item.total);
                     const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity;
+                    const itemTotal = item.is_weight ? Math.round(parseFloat(item.total)) : parseFloat(item.total).toFixed(3);
                     tbody.innerHTML += `<tr>
                         <td><button class="item-remove-btn" onclick="removeDirectItem(${index})"><i class="ti ti-x"></i></button></td>
                         <td>${item.product_name}<span class="weight-tag"><i class="ti ti-scale"></i></span></td>
                         <td style="text-align:center">${qty}</td>
                         <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
-                        <td style="text-align:left">${parseFloat(item.total).toFixed(3)}</td>
+                        <td style="text-align:left">${itemTotal}</td>
                     </tr>`;
                 });
                 document.getElementById('invoiceTotal').textContent = total.toFixed(3);
@@ -1908,7 +1910,8 @@
             let itemsHtml = '';
             items.forEach(i => {
                 const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
-                itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${parseFloat(i.total).toFixed(3)}</td></tr>`;
+                const iTotal = i.is_weight ? Math.round(parseFloat(i.total)) : parseFloat(i.total).toFixed(3);
+                itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${iTotal}</td></tr>`;
             });
 
             let paymentsHtml = '';
@@ -2262,7 +2265,8 @@
             let itemsHtml = '';
             items.forEach(i => {
                 const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
-                itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${parseFloat(i.total).toFixed(3)}</td></tr>`;
+                const iTotal = i.is_weight ? Math.round(parseFloat(i.total)) : parseFloat(i.total).toFixed(3);
+                itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${iTotal}</td></tr>`;
             });
 
             const discountVal = parseFloat(data.discount) || 0;
