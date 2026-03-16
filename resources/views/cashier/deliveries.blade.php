@@ -14,13 +14,20 @@
         html, body { height: 100%; overflow: hidden; }
         body { font-family: 'Cairo', sans-serif; background: #f1f5f9; color: #1e293b; }
         .app-container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
-        .header { background: #1e293b; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .header .logo { height: 80px; }
-        .header .logo img { height: 100%; width: auto; }
+        .header { background: #fff; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; flex-shrink: 0; }
+        .header .logo { display: flex; align-items: center; }
+        .header .logo img { height: 80px; }
         .header-left { display: flex; align-items: center; gap: 12px; }
-        .back-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: #3b82f6; border: none; border-radius: 8px; color: #fff; font-weight: 600; cursor: pointer; font-family: inherit; font-size: 14px; text-decoration: none; transition: all 0.2s; }
-        .back-btn:hover { background: #2563eb; color: #fff; }
-        .user-info { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(255,255,255,0.1); border-radius: 6px; font-weight: 600; font-size: 14px; color: #fff; }
+        .back-btn { display: flex; align-items: center; gap: 6px; padding: 10px 20px; background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; border-radius: 10px; color: #fff; font-weight: 700; cursor: pointer; font-family: inherit; font-size: 15px; text-decoration: none; transition: all 0.2s; position: relative; }
+        .back-btn:hover { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; }
+        .back-btn i { font-size: 22px; }
+        .shortcut-badge { position: absolute; top: -6px; left: -6px; background: #1e293b; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 6px; line-height: 1.3; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .user-info { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: #f8fafc; border-radius: 6px; font-weight: 600; font-size: 14px; }
+
+        .shortcuts-bar { display: flex; align-items: center; gap: 16px; padding: 8px 24px; background: #1e293b; flex-shrink: 0; }
+        .shortcut-hint { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #94a3b8; }
+        .shortcut-hint kbd { background: #334155; color: #e2e8f0; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: inherit; }
+
         .main-content { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px; overflow: hidden; min-height: 0; }
         .left-panel { display: flex; flex-direction: column; gap: 16px; overflow: hidden; min-height: 0; }
         .search-section { background: #fff; border-radius: 12px; padding: 16px; flex-shrink: 0; }
@@ -39,6 +46,8 @@
         .order-card { padding: 14px; border: 2px solid #e2e8f0; border-radius: 10px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s; }
         .order-card:hover { border-color: #10b981; background: #f0fdf4; }
         .order-card.active { border-color: #10b981; background: #f0fdf4; }
+        .order-card.highlighted { border-color: #3b82f6; background: #eff6ff; }
+        .order-card.highlighted.active { border-color: #10b981; background: #f0fdf4; box-shadow: 0 0 0 3px rgba(59,130,246,0.3); }
         .order-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .order-number { font-weight: 800; font-size: 16px; color: #1e293b; }
         .order-total { font-weight: 800; font-size: 15px; color: #10b981; }
@@ -83,7 +92,8 @@
         <div class="header">
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Logo"></div>
             <div class="header-left">
-                <a href="{{ route('cashier.index') }}" class="back-btn">
+                <a href="{{ route('cashier.index') }}" class="back-btn" id="backBtn">
+                    <span class="shortcut-badge">Esc</span>
                     <i class="ti ti-arrow-right"></i>
                     العودة للكاشير
                 </a>
@@ -94,11 +104,19 @@
             </div>
         </div>
 
+        <div class="shortcuts-bar">
+            <div class="shortcut-hint"><kbd>↑↓</kbd> تنقل بين الطلبات</div>
+            <div class="shortcut-hint"><kbd>Enter</kbd> تم التوصيل</div>
+            <div class="shortcut-hint"><kbd>Space</kbd> بحث</div>
+            <div class="shortcut-hint"><kbd>F5</kbd> تحديث</div>
+            <div class="shortcut-hint"><kbd>Esc</kbd> رجوع</div>
+        </div>
+
         <div class="main-content">
             <div class="left-panel">
                 <div class="search-section">
                     <div class="search-row">
-                        <input type="text" class="search-input" id="searchInput" placeholder="بحث برقم الفاتورة أو رقم الهاتف..." autofocus>
+                        <input type="text" class="search-input" id="searchInput" placeholder="اضغط مسطرة للبحث برقم الفاتورة أو رقم الهاتف...">
                         <button class="search-btn" id="searchBtn"><i class="ti ti-search"></i> بحث</button>
                         <button class="refresh-btn" id="refreshBtn" title="تحديث"><i class="ti ti-refresh"></i></button>
                     </div>
@@ -201,6 +219,7 @@
         const BASE_URL = "{{ url('/') }}";
         let orders = [];
         let selectedOrder = null;
+        let highlightIndex = -1;
 
         document.addEventListener('DOMContentLoaded', function() {
             loadOrders();
@@ -211,16 +230,93 @@
                 loadOrders();
             });
             document.getElementById('searchInput').addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') loadOrders();
+                if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.blur();
+                    handleGlobalKeys(e);
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.value.trim()) {
+                        loadOrders();
+                    } else {
+                        this.blur();
+                        if (selectedOrder) markAsDelivered();
+                    }
+                }
             });
             document.getElementById('deliverBtn').addEventListener('click', markAsDelivered);
 
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    clearSelection();
-                }
-            });
+            document.addEventListener('keydown', handleGlobalKeys);
         });
+
+        function handleGlobalKeys(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (document.activeElement === document.getElementById('searchInput')) {
+                    document.getElementById('searchInput').blur();
+                    return;
+                }
+                window.location.href = document.getElementById('backBtn').href;
+                return;
+            }
+
+            if (e.key === ' ' && document.activeElement !== document.getElementById('searchInput')) {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+                document.getElementById('searchInput').value = '';
+                return;
+            }
+
+            if (e.key === 'F5') {
+                e.preventDefault();
+                document.getElementById('searchInput').value = '';
+                loadOrders();
+                return;
+            }
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (orders.length === 0) return;
+                highlightIndex = Math.min(highlightIndex + 1, orders.length - 1);
+                updateHighlightAndSelect();
+                return;
+            }
+
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (orders.length === 0) return;
+                highlightIndex = Math.max(highlightIndex - 1, 0);
+                updateHighlightAndSelect();
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (selectedOrder) {
+                    markAsDelivered();
+                }
+                return;
+            }
+        }
+
+        function updateHighlightAndSelect() {
+            if (highlightIndex >= 0 && highlightIndex < orders.length) {
+                selectOrder(orders[highlightIndex].id);
+            }
+            updateHighlight();
+        }
+
+        function updateHighlight() {
+            const cards = document.querySelectorAll('.order-card');
+            cards.forEach((card, i) => {
+                card.classList.toggle('highlighted', i === highlightIndex);
+            });
+            if (highlightIndex >= 0 && cards[highlightIndex]) {
+                cards[highlightIndex].scrollIntoView({ block: 'nearest' });
+            }
+        }
 
         async function loadOrders() {
             const search = document.getElementById('searchInput').value.trim();
@@ -232,10 +328,16 @@
                 const data = await res.json();
                 if (data.success) {
                     orders = data.data;
+                    highlightIndex = orders.length > 0 ? 0 : -1;
+                    selectedOrder = null;
                     renderOrders();
+                    if (orders.length > 0) {
+                        selectOrder(orders[0].id);
+                    } else {
+                        clearSelection();
+                    }
                 }
             } catch (err) {
-                console.error('loadOrders error:', err);
                 toast('خطأ في تحميل البيانات', 'error');
             }
         }
@@ -250,8 +352,8 @@
                 return;
             }
 
-            container.innerHTML = orders.map(order => `
-                <div class="order-card ${selectedOrder && selectedOrder.id === order.id ? 'active' : ''}" onclick="selectOrder(${order.id})">
+            container.innerHTML = orders.map((order, i) => `
+                <div class="order-card ${selectedOrder && selectedOrder.id === order.id ? 'active' : ''} ${i === highlightIndex ? 'highlighted' : ''}" onclick="selectOrder(${order.id})">
                     <div class="order-card-header">
                         <span class="order-number">#${order.order_number}</span>
                         <span class="order-total">${parseFloat(order.total).toFixed(3)} د.ل</span>
@@ -274,6 +376,9 @@
         function selectOrder(id) {
             selectedOrder = orders.find(o => o.id === id);
             if (!selectedOrder) return;
+
+            const idx = orders.findIndex(o => o.id === id);
+            if (idx >= 0) highlightIndex = idx;
 
             renderOrders();
 
@@ -382,7 +487,6 @@
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                console.error('markAsDelivered error:', err);
                 toast('خطأ في الاتصال', 'error');
             }
         }

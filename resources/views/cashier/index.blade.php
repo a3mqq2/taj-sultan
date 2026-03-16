@@ -55,68 +55,112 @@
 
         .header-left {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            align-items: stretch;
+            gap: 10px;
         }
 
         .user-info {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 6px;
-            padding: 6px 12px;
+            gap: 4px;
+            padding: 10px 14px;
             background: #f8fafc;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .user-info i {
+            font-size: 24px;
+            color: #64748b;
         }
 
         .logout-btn {
             display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 4px;
-            padding: 6px 12px;
+            padding: 10px 14px;
             background: #fee2e2;
             border: none;
-            border-radius: 6px;
+            border-radius: 12px;
             color: #dc2626;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             font-family: inherit;
             font-size: 13px;
+            min-width: 70px;
+            position: relative;
         }
 
-        .special-order-btn {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            border: none;
-            border-radius: 8px;
+        .logout-btn i {
+            font-size: 24px;
+        }
+
+        .logout-btn .shortcut-badge {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            background: #1e293b;
             color: #fff;
-            font-weight: 600;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            line-height: 1.3;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .header-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 12px;
+            color: #fff;
+            font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 13px;
             text-decoration: none;
             transition: all 0.2s;
+            position: relative;
+            min-width: 90px;
         }
 
-        .special-order-btn:hover {
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        .header-btn:hover {
             color: #fff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        .special-order-btn i {
-            font-size: 18px;
+        .header-btn i {
+            font-size: 28px;
+        }
+
+        .header-btn .shortcut-badge {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            background: #1e293b;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            line-height: 1.3;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
 
         .main-content {
             flex: 1;
             display: grid;
-            grid-template-columns: 1fr 380px;
+            grid-template-columns: 1fr 320px;
             gap: 16px;
             padding: 16px;
             overflow: hidden;
@@ -265,6 +309,83 @@
             margin-bottom: 12px;
         }
 
+        .item-remove-btn {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 16px;
+            opacity: 0.6;
+            transition: opacity 0.15s;
+        }
+
+        .item-remove-btn:hover {
+            opacity: 1;
+        }
+
+        .weight-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            color: #8b5cf6;
+            font-size: 11px;
+            margin-left: 4px;
+        }
+
+        .footer-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            background: #fff;
+            border-radius: 12px;
+            flex-shrink: 0;
+            gap: 16px;
+        }
+
+        .footer-hints {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .hint kbd {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            font-family: inherit;
+            color: #475569;
+        }
+
+        .footer-credit {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-credit img {
+            height: 24px;
+            filter: grayscale(100%);
+        }
+
+        .footer-credit span {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
         .right-panel {
             display: flex;
             flex-direction: column;
@@ -273,240 +394,279 @@
             min-height: 0;
         }
 
-        .order-box {
+        .total-card {
             background: #fff;
-            border-radius: 12px;
-            padding: 16px;
-            flex-shrink: 0;
-        }
-
-        .order-num {
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .order-num span {
-            font-size: 20px;
-            font-weight: 800;
-            color: #1e293b;
-        }
-
-        .payment-box {
-            background: #fff;
-            border-radius: 12px;
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
             flex: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
-            min-height: 0;
-        }
-
-        .payment-header {
-            padding: 10px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .payment-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #64748b;
-        }
-
-        .payment-methods-scroll {
-            overflow-y: auto;
-            padding: 10px;
-            max-height: 140px;
-        }
-
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-        }
-
-        .pm-btn {
-            padding: 8px;
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            text-align: center;
-            transition: all 0.15s;
-        }
-
-        .pm-btn:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
-        .pm-btn.selected {
-            border-color: #3b82f6;
-            background: #3b82f6;
-            color: #fff;
-        }
-
-        .pm-btn.credit-btn {
-            background: linear-gradient(135deg, #f97316, #ea580c);
-            border-color: #ea580c;
-            color: #fff;
-            display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 8px;
         }
 
-        .pm-btn.credit-btn i {
-            font-size: 14px;
-        }
-
-        .pm-btn.credit-btn:hover {
-            background: linear-gradient(135deg, #ea580c, #c2410c);
-            border-color: #c2410c;
-        }
-
-        .pm-btn.credit-btn.selected {
-            background: linear-gradient(135deg, #c2410c, #9a3412);
-            border-color: #9a3412;
-        }
-
-        .added-payments {
-            padding: 8px 10px;
-            border-top: 1px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .added-title {
-            font-size: 11px;
+        .total-label {
+            font-size: 16px;
             font-weight: 600;
             color: #64748b;
-            margin-bottom: 4px;
         }
 
-        .payment-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 6px 8px;
-            background: #f0fdf4;
-            border-radius: 4px;
-            margin-bottom: 4px;
+        .total-amount {
+            font-size: 56px;
+            font-weight: 900;
+            color: #1e293b;
+            line-height: 1;
         }
 
-        .payment-row .method {
-            font-weight: 600;
-            font-size: 11px;
-        }
-
-        .payment-row .amount {
+        .total-currency {
+            font-size: 18px;
             font-weight: 700;
-            font-size: 12px;
-            color: #059669;
+            color: #64748b;
         }
 
-        .payment-row .remove-btn {
+        .items-count {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-top: 8px;
+        }
+
+        .discount-badge {
+            display: none;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 6px 14px;
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .discount-badge.visible {
+            display: flex;
+        }
+
+        .discount-badge .remove-btn {
             background: none;
             border: none;
             color: #ef4444;
             cursor: pointer;
-            padding: 2px;
-            font-size: 14px;
-        }
-
-        .amount-input-section {
-            padding: 10px;
-            border-top: 1px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .amount-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #64748b;
-            margin-bottom: 4px;
-        }
-
-        .amount-row {
-            display: flex;
-            gap: 6px;
-        }
-
-        .amount-input {
-            flex: 1;
-            padding: 8px 10px;
             font-size: 16px;
+            padding: 0 2px;
+        }
+
+        .net-badge {
+            display: none;
+            font-size: 22px;
+            font-weight: 800;
+            color: #059669;
+            margin-top: 4px;
+        }
+
+        .net-badge.visible {
+            display: block;
+        }
+
+        .pay-hint {
+            display: none;
+            margin-top: 16px;
+            padding: 10px 20px;
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #15803d;
+        }
+
+        .pay-hint.visible {
+            display: block;
+        }
+
+        .pay-hint kbd {
+            background: #dcfce7;
+            border: 1px solid #86efac;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 12px;
             font-weight: 700;
-            text-align: center;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
             font-family: inherit;
         }
 
-        .amount-input:focus {
+        .wizard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .wizard-overlay.active {
+            display: flex;
+        }
+
+        .wizard-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 36px;
+            width: 520px;
+            max-width: 90vw;
+            text-align: center;
+            animation: wizardIn 0.2s ease-out;
+        }
+
+        @keyframes wizardIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .wizard-step-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 8px;
+        }
+
+        .wizard-total {
+            font-size: 42px;
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 24px;
+        }
+
+        .wizard-total span {
+            font-size: 18px;
+            font-weight: 700;
+            color: #64748b;
+        }
+
+        .wizard-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .wizard-option {
+            padding: 16px 12px;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .wizard-option.selected {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: #fff;
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .wizard-option.credit-option {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .wizard-option.credit-option.selected {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            border-color: #ea580c;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        .wizard-delivery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .wizard-delivery-option {
+            padding: 28px 16px;
+            border: 3px solid #e2e8f0;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #f8fafc;
+        }
+
+        .wizard-delivery-option i {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        .wizard-delivery-option .delivery-label {
+            font-size: 18px;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .wizard-delivery-option.selected {
+            border-color: #10b981;
+            background: #f0fdf4;
+            transform: scale(1.03);
+        }
+
+        .wizard-delivery-option.selected i {
+            color: #10b981;
+        }
+
+        .wizard-delivery-option.selected .delivery-label {
+            color: #059669;
+        }
+
+        .wizard-phone-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            margin-bottom: 24px;
+        }
+
+        .wizard-phone-input:focus {
             outline: none;
             border-color: #3b82f6;
         }
 
-        .add-payment-btn {
-            padding: 8px 12px;
-            background: #3b82f6;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            font-family: inherit;
-        }
-
-        .add-payment-btn:hover {
-            background: #2563eb;
-        }
-
-        .add-payment-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-
-        .discount-row {
-            color: #f59e0b;
-            font-weight: 600;
-            font-size: 11px;
-        }
-
-        .remove-discount-btn {
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            padding: 0 2px;
-            font-size: 10px;
-            vertical-align: middle;
-        }
-
-        .discount-btn {
-            background: none;
-            border: none;
-            color: #f59e0b;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            font-family: inherit;
-            display: inline-flex;
+        .wizard-hint {
+            font-size: 13px;
+            color: #94a3b8;
+            display: flex;
             align-items: center;
-            gap: 2px;
-            padding: 0;
+            justify-content: center;
+            gap: 16px;
         }
 
-        .discount-btn i {
-            font-size: 12px;
-        }
-
-        .discount-btn:hover {
-            color: #d97706;
+        .wizard-hint kbd {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+            color: #475569;
         }
 
         .modal {
@@ -516,7 +676,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -614,125 +774,6 @@
             color: #fff;
         }
 
-        .summary-section {
-            padding: 10px;
-            border-top: 1px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 3px 0;
-            font-size: 12px;
-        }
-
-        .summary-row.total {
-            font-size: 14px;
-            font-weight: 800;
-            padding-top: 6px;
-            border-top: 1px dashed #e2e8f0;
-            margin-top: 3px;
-        }
-
-        .summary-row.diff {
-            color: #dc2626;
-            font-weight: 700;
-        }
-
-        .summary-row.diff.ok {
-            color: #059669;
-        }
-
-        .delivery-section {
-            padding: 8px 10px;
-            border-top: 1px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .delivery-toggle {
-            display: flex;
-            gap: 6px;
-        }
-
-        .delivery-btn {
-            flex: 1;
-            padding: 7px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            background: #f8fafc;
-            font-family: inherit;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: all 0.15s;
-        }
-
-        .delivery-btn.active {
-            border-color: #3b82f6;
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .delivery-btn:hover {
-            border-color: #93c5fd;
-        }
-
-        .delivery-phone-row {
-            margin-top: 6px;
-        }
-
-        .delivery-phone-input {
-            width: 100%;
-            padding: 8px 10px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            font-family: inherit;
-            font-size: 13px;
-            text-align: center;
-        }
-
-        .delivery-phone-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-
-        .pay-section {
-            padding: 10px;
-            border-top: 1px solid #e2e8f0;
-            flex-shrink: 0;
-        }
-
-        .pay-btn {
-            width: 100%;
-            padding: 14px;
-            background: #10b981;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .pay-btn:hover {
-            background: #059669;
-        }
-
-        .pay-btn:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-
         .hidden {
             display: none !important;
         }
@@ -783,83 +824,6 @@
         .swal2-backdrop-show {
             background: transparent !important;
         }
-
-        .weight-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 2px;
-            color: #8b5cf6;
-            font-size: 11px;
-            margin-left: 4px;
-        }
-
-        .item-remove-btn {
-            background: none;
-            border: none;
-            color: #ef4444;
-            cursor: pointer;
-            padding: 4px;
-            font-size: 16px;
-            opacity: 0.6;
-            transition: opacity 0.15s;
-        }
-
-        .item-remove-btn:hover {
-            opacity: 1;
-        }
-
-        .footer-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 16px;
-            background: #fff;
-            border-radius: 12px;
-            flex-shrink: 0;
-            gap: 16px;
-        }
-
-        .footer-hints {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .hint {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 11px;
-            color: #64748b;
-        }
-
-        .hint kbd {
-            background: #f1f5f9;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            font-family: inherit;
-            color: #475569;
-        }
-
-        .footer-credit {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .footer-credit img {
-            height: 24px;
-            filter: grayscale(100%);
-        }
-
-        .footer-credit span {
-            font-size: 11px;
-            color: #64748b;
-            font-weight: 600;
-        }
     </style>
 </head>
 <body>
@@ -868,21 +832,27 @@
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan"></div>
             <div class="header-left">
                 <button type="button" class="logout-btn" onclick="location.reload()" style="background:#eff6ff;color:#3b82f6;" title="إعادة تحميل الصفحة">
+                    <span class="shortcut-badge">F1</span>
                     <i class="ti ti-reload"></i>
+                    تحديث
                 </button>
-                <button type="button" class="special-order-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="showCancelInvoiceModal()">
+                <button type="button" class="header-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="showCancelInvoiceModal()">
+                    <span class="shortcut-badge">F3</span>
                     <i class="ti ti-file-x"></i>
                     إلغاء فاتورة
                 </button>
-                <a href="{{ route('cashier.customers') }}" class="special-order-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);">
+                <a href="{{ route('cashier.customers') }}" class="header-btn" style="background:linear-gradient(135deg,#f97316,#ea580c);" id="btnCustomers">
+                    <span class="shortcut-badge">F5</span>
                     <i class="ti ti-users"></i>
                     الزبائن والديون
                 </a>
-                <a href="{{ route('cashier.deliveries') }}" class="special-order-btn" style="background:linear-gradient(135deg,#10b981,#059669);">
+                <a href="{{ route('cashier.deliveries') }}" class="header-btn" style="background:linear-gradient(135deg,#10b981,#059669);" id="btnDeliveries">
+                    <span class="shortcut-badge">F6</span>
                     <i class="ti ti-truck-delivery"></i>
                     التوصيل
                 </a>
-                <a href="{{ route('cashier.special-orders') }}" class="special-order-btn">
+                <a href="{{ route('cashier.special-orders') }}" class="header-btn" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);" id="btnSpecialOrders">
+                    <span class="shortcut-badge">F7</span>
                     <i class="ti ti-cake"></i>
                     طلبيات خاصة
                 </a>
@@ -937,7 +907,7 @@
                     <div class="footer-hints">
                         <div class="hint"><kbd>F2</kbd> الباركود</div>
                         <div class="hint"><kbd>F4</kbd> خصم</div>
-                        <div class="hint"><kbd>F8</kbd> دفع</div>
+                        <div class="hint"><kbd>Enter</kbd> دفع</div>
                         <div class="hint"><kbd>Esc</kbd> إلغاء</div>
                     </div>
                     <div class="footer-credit">
@@ -948,82 +918,28 @@
             </div>
 
             <div class="right-panel">
-                <div class="payment-box">
-                    <div class="payment-header">
-                        <div class="payment-title">طرق الدفع</div>
+                <div class="total-card">
+                    <div class="total-label">الإجمالي</div>
+                    <div class="total-amount" id="totalDisplay">0.000</div>
+                    <div class="total-currency">د.ل</div>
+                    <div class="items-count" id="itemsCount">0 أصناف</div>
+                    <div class="discount-badge" id="discountBadge">
+                        <i class="ti ti-discount-2"></i>
+                        <span>خصم: <span id="discountDisplay">0.000</span></span>
+                        <button class="remove-btn" onclick="removeDiscount()"><i class="ti ti-x"></i></button>
                     </div>
-                    <div class="payment-methods-scroll">
-                        <div class="payment-methods" id="paymentMethods">
-                            @foreach($paymentMethods as $method)
-                            <button class="pm-btn" data-id="{{ $method->id }}" data-name="{{ $method->name }}">
-                                {{ $method->name }}
-                            </button>
-                            @endforeach
-                            <button class="pm-btn credit-btn" id="creditBtn">
-                                <i class="ti ti-clock-dollar"></i>
-                                آجل
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="amount-input-section hidden" id="amountSection">
-                        <div class="amount-label">المبلغ (<span id="selectedMethodName">-</span>)</div>
-                        <div class="amount-row">
-                            <input type="number" class="amount-input" id="amountInput" step="0.001" placeholder="0.000">
-                            <button class="add-payment-btn" id="addPaymentBtn">إضافة</button>
-                        </div>
-                    </div>
-
-                    <div class="added-payments hidden" id="addedPayments">
-                        <div class="added-title">المدفوعات</div>
-                        <div id="paymentsList"></div>
-                    </div>
-
-                    <div class="summary-section">
-                        <div class="summary-row">
-                            <span>إجمالي الفاتورة <button class="discount-btn" id="discountBtn"><i class="ti ti-discount-2"></i> خصم</button></span>
-                            <span id="invoiceTotal">0.000</span>
-                        </div>
-                        <div class="summary-row discount-row hidden" id="discountRow">
-                            <span>الخصم <button class="remove-discount-btn" id="removeDiscountBtn"><i class="ti ti-x"></i></button></span>
-                            <span id="discountAmount">0.000</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>الصافي</span>
-                            <span id="netTotal">0.000</span>
-                        </div>
-                        <div class="summary-row">
-                            <span>المدفوع</span>
-                            <span id="paidTotal">0.000</span>
-                        </div>
-                        <div class="summary-row diff" id="diffRow">
-                            <span>المتبقي</span>
-                            <span id="diffAmount">0.000</span>
-                        </div>
-                    </div>
-
-                    <div class="delivery-section">
-                        <div class="delivery-toggle">
-                            <button type="button" class="delivery-btn active" id="pickupBtn" onclick="setDeliveryType('pickup')">
-                                <i class="ti ti-building-store"></i> استلام
-                            </button>
-                            <button type="button" class="delivery-btn" id="deliveryBtn" onclick="setDeliveryType('delivery')">
-                                <i class="ti ti-truck-delivery"></i> توصيل
-                            </button>
-                        </div>
-                        <div class="delivery-phone-row hidden" id="deliveryPhoneRow">
-                            <input type="text" class="delivery-phone-input" id="deliveryPhoneInput" placeholder="رقم الهاتف للتوصيل">
-                        </div>
-                    </div>
-
-                    <div class="pay-section">
-                        <button class="pay-btn" id="payBtn" disabled>
-                            <i class="ti ti-check"></i>
-                            تأكيد الدفع
-                        </button>
+                    <div class="net-badge" id="netBadge">الصافي: <span id="netDisplay">0.000</span> د.ل</div>
+                    <div class="pay-hint" id="payHint">
+                        اضغط <kbd>Enter</kbd> للدفع
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="wizard-overlay" id="wizardOverlay">
+        <div class="wizard-card">
+            <div id="wizardContent"></div>
         </div>
     </div>
 
@@ -1044,120 +960,52 @@
         </div>
     </div>
 
-    <div class="modal" id="creditModal">
-        <div class="modal-content" style="max-width:450px;">
-            <div class="modal-header">
-                <div class="modal-title"><i class="ti ti-clock-dollar" style="color:#f97316;"></i> البيع بالآجل</div>
-                <button class="modal-close" id="closeCreditModal"><i class="ti ti-x"></i></button>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">البحث عن زبون</label>
-                <input type="text" class="form-input" id="customerSearch" placeholder="اسم أو رقم هاتف..." style="font-size:14px;text-align:right;">
-            </div>
 
-            <div id="customerResults" style="max-height:150px;overflow-y:auto;margin-bottom:12px;"></div>
-
-            <div id="selectedCustomerBox" class="hidden" style="background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;padding:12px;margin-bottom:12px;">
-                <div style="display:flex;justify-content:space-between;align-items:center;">
-                    <div>
-                        <div style="font-weight:700;color:#15803d;" id="selectedCustomerName">-</div>
-                        <div style="font-size:12px;color:#64748b;" id="selectedCustomerPhone">-</div>
-                        <div style="font-size:12px;color:#dc2626;" id="selectedCustomerBalance">-</div>
-                    </div>
-                    <button type="button" class="modal-close" id="clearCustomer" style="width:28px;height:28px;"><i class="ti ti-x"></i></button>
-                </div>
-            </div>
-
-            <div id="newCustomerForm" class="hidden" style="background:#fef3c7;border:2px solid #f59e0b;border-radius:8px;padding:12px;margin-bottom:12px;">
-                <div style="font-weight:700;color:#92400e;margin-bottom:8px;"><i class="ti ti-user-plus"></i> إضافة زبون جديد</div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <label class="form-label">الاسم *</label>
-                    <input type="text" class="form-input" id="newCustomerName" placeholder="اسم الزبون" style="font-size:14px;text-align:right;">
-                </div>
-                <div class="form-group" style="margin-bottom:8px;">
-                    <label class="form-label">الهاتف</label>
-                    <input type="text" class="form-input" id="newCustomerPhone" placeholder="رقم الهاتف" style="font-size:14px;text-align:right;">
-                </div>
-                <div style="display:flex;gap:8px;">
-                    <button type="button" class="modal-btn" id="saveNewCustomer" style="flex:1;background:#22c55e;color:#fff;">حفظ الزبون</button>
-                    <button type="button" class="modal-btn modal-btn-cancel" id="cancelNewCustomer" style="flex:0;">إلغاء</button>
-                </div>
-            </div>
-
-            <button type="button" class="modal-btn" id="showNewCustomerForm" style="width:100%;background:#fef3c7;color:#92400e;border:2px dashed #f59e0b;margin-bottom:12px;">
-                <i class="ti ti-user-plus"></i> إضافة زبون جديد
-            </button>
-
-            <div style="border-top:1px solid #e2e8f0;padding-top:12px;">
-                <div class="form-group">
-                    <label class="form-label">المبلغ المدفوع</label>
-                    <input type="number" class="form-input" id="creditPaidAmount" step="0.001" min="0" placeholder="0.000">
-                </div>
-                <div style="display:flex;justify-content:space-between;padding:8px;background:#fef2f2;border-radius:6px;margin-bottom:12px;">
-                    <span style="color:#991b1b;font-weight:600;">المبلغ الآجل:</span>
-                    <span style="color:#dc2626;font-weight:800;" id="creditRemainingAmount">0.000</span>
-                </div>
-            </div>
-
-            <div class="modal-actions">
-                <button class="modal-btn modal-btn-cancel" id="cancelCreditModal">إلغاء</button>
-                <button class="modal-btn" id="confirmCredit" style="background:#f97316;color:#fff;" disabled>
-                    <i class="ti ti-check"></i> حفظ البيع بالآجل
-                </button>
-            </div>
-        </div>
-    </div>
 
     <script>
         const BASE_URL = "{{ url('/') }}";
         const WEIGHT_PREFIX = '99';
         const MAX_DISCOUNT = 5;
+        const PAYMENT_METHODS = [
+            @foreach($paymentMethods as $method)
+            { id: {{ $method->id }}, name: "{{ $method->name }}", isCredit: false },
+            @endforeach
+            { id: 'credit', name: 'آجل', isCredit: true }
+        ];
+
         let currentOrder = null;
         let directItems = [];
         let isDirectMode = false;
-        let payments = [];
-        let selectedMethod = null;
         let discount = 0;
-        let selectedCustomer = null;
-        let isCredit = false;
         let mergedOrderIds = [];
-        let currentDeliveryType = 'pickup';
+        let selectedCustomer = null;
+
+        let wizardActive = false;
+        let wizardStep = 0;
+        let wizardMethodIndex = 0;
+        let wizardDeliveryIndex = 0;
+        let wizardSelectedMethod = null;
+        let wizardPayments = [];
+        let creditMode = false;
+        let creditSearchResults = [];
+        let creditResultIndex = -1;
+        let creditShowNewForm = false;
+        let creditPaidAmount = 0;
+        let creditSearchQuery = '';
 
         document.addEventListener('DOMContentLoaded', init);
 
         function init() {
-            document.querySelectorAll('.pm-btn').forEach(btn => {
-                btn.addEventListener('click', () => selectPaymentMethod(btn));
-            });
-
             document.getElementById('invoiceInput').addEventListener('keydown', handleInvoiceInput);
-            document.getElementById('addPaymentBtn').addEventListener('click', addPayment);
-            document.getElementById('discountBtn').addEventListener('click', openDiscountModal);
             document.getElementById('closeDiscountModal').addEventListener('click', closeDiscountModal);
             document.getElementById('cancelDiscountModal').addEventListener('click', closeDiscountModal);
             document.getElementById('confirmDiscount').addEventListener('click', applyDiscount);
-            document.getElementById('removeDiscountBtn').addEventListener('click', removeDiscount);
             document.getElementById('discountInput').addEventListener('keydown', e => {
                 if (e.key === 'Enter') applyDiscount();
             });
-            document.getElementById('payBtn').addEventListener('click', processPayment);
-            document.getElementById('amountInput').addEventListener('keydown', e => {
-                if (e.key === 'Enter') addPayment();
-            });
 
             document.addEventListener('keydown', handleGlobalKeys);
-
-            document.getElementById('creditBtn').addEventListener('click', openCreditModal);
-            document.getElementById('closeCreditModal').addEventListener('click', closeCreditModal);
-            document.getElementById('cancelCreditModal').addEventListener('click', closeCreditModal);
-            document.getElementById('customerSearch').addEventListener('input', debounce(searchCustomers, 300));
-            document.getElementById('clearCustomer').addEventListener('click', clearSelectedCustomer);
-            document.getElementById('showNewCustomerForm').addEventListener('click', showNewCustomerForm);
-            document.getElementById('cancelNewCustomer').addEventListener('click', hideNewCustomerForm);
-            document.getElementById('saveNewCustomer').addEventListener('click', saveNewCustomer);
-            document.getElementById('creditPaidAmount').addEventListener('input', updateCreditRemaining);
-            document.getElementById('confirmCredit').addEventListener('click', processCreditPayment);
         }
 
         function debounce(func, wait) {
@@ -1169,31 +1017,59 @@
         }
 
         function handleGlobalKeys(e) {
+            if (wizardActive) {
+                handleWizardKeys(e);
+                return;
+            }
+
+            if (e.key === 'F1') {
+                e.preventDefault();
+                location.reload();
+            }
             if (e.key === 'F2') {
                 e.preventDefault();
                 document.getElementById('invoiceInput').focus();
                 document.getElementById('invoiceInput').select();
             }
+            if (e.key === 'F3') {
+                e.preventDefault();
+                showCancelInvoiceModal();
+            }
             if (e.key === 'F4') {
                 e.preventDefault();
                 openDiscountModal();
             }
+            if (e.key === 'F5') {
+                e.preventDefault();
+                window.location.href = document.getElementById('btnCustomers').href;
+            }
+            if (e.key === 'F6') {
+                e.preventDefault();
+                window.location.href = document.getElementById('btnDeliveries').href;
+            }
+            if (e.key === 'F7') {
+                e.preventDefault();
+                window.location.href = document.getElementById('btnSpecialOrders').href;
+            }
             if (e.key === 'F8') {
                 e.preventDefault();
-                if (!document.getElementById('payBtn').disabled) processPayment();
+                if (hasItems()) openWizard();
             }
             if (e.key === 'Escape') {
                 if (document.getElementById('discountModal').classList.contains('active')) {
                     closeDiscountModal();
-                } else if (isDirectMode || currentOrder) {
+                } else if (hasItems()) {
                     cancelAllItems();
                 }
             }
         }
 
+        function hasItems() {
+            return isDirectMode ? directItems.length > 0 : (currentOrder && currentOrder.items && currentOrder.items.length > 0);
+        }
+
         async function cancelAllItems() {
-            const hasItems = isDirectMode ? directItems.length > 0 : (currentOrder && currentOrder.items.length > 0);
-            if (!hasItems) return;
+            if (!hasItems()) return;
 
             const confirm = await Swal.fire({
                 title: '<i class="ti ti-trash" style="color:#ef4444;font-size:28px;"></i><br>إلغاء الأصناف',
@@ -1203,22 +1079,28 @@
                 cancelButtonText: 'لا',
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#64748b',
-                customClass: {
-                    popup: 'swal-rtl',
-                    title: 'swal-title-rtl'
-                }
+                customClass: { popup: 'swal-rtl', title: 'swal-title-rtl' }
             });
 
             if (!confirm.isConfirmed) return;
-
             resetAll();
             toast('تم إلغاء الأصناف', 'success');
         }
 
         async function handleInvoiceInput(e) {
             if (e.key !== 'Enter') return;
+            if (wizardActive) return;
             const val = e.target.value.trim();
-            if (!val) return;
+
+            if (!val) {
+                if (hasItems()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    document.getElementById('invoiceInput').blur();
+                    openWizard();
+                }
+                return;
+            }
 
             document.getElementById('invoiceInput').value = '';
 
@@ -1326,17 +1208,18 @@
                         }
                     } else {
                         if (!isDirectMode) {
-                            startDirectMode();
+                            isDirectMode = true;
+                            directItems = [];
                         }
                         directItems.push(data.data);
                         renderItems();
+                        updateSummary();
                         toast('تم إضافة الصنف', 'success');
                     }
                 } else {
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                console.error('handleWeightBarcode error:', err);
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
@@ -1390,47 +1273,716 @@
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                console.error('fetchOrder error:', err);
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
-        async function cancelSpecialOrder(orderId) {
-            const confirm = await Swal.fire({
-                title: 'تأكيد الإلغاء',
-                text: 'هل أنت متأكد من إلغاء هذه الطلبية؟',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: '<i class="ti ti-trash"></i> نعم، إلغاء',
-                cancelButtonText: 'لا',
-                confirmButtonColor: '#ef4444',
-                cancelButtonColor: '#64748b',
-                customClass: {
-                    popup: 'swal-rtl',
-                    title: 'swal-title-rtl'
-                }
+        function renderOrder() {
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('itemsTable').classList.remove('hidden');
+
+            const tbody = document.getElementById('itemsBody');
+            tbody.innerHTML = '';
+            currentOrder.items.forEach(item => {
+                const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity;
+                const itemTotal = item.is_weight ? Math.floor(parseFloat(item.total)) : parseFloat(item.total).toFixed(3);
+                tbody.innerHTML += `<tr>
+                    <td><button class="item-remove-btn" onclick="removeOrderItem(${item.id})"><i class="ti ti-x"></i></button></td>
+                    <td>${item.product_name}${item.is_weight ? '<span class="weight-tag"><i class="ti ti-scale"></i></span>' : ''}</td>
+                    <td style="text-align:center">${qty}</td>
+                    <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
+                    <td style="text-align:left">${itemTotal}</td>
+                </tr>`;
             });
 
-            if (!confirm.isConfirmed) return;
+            updateSummary();
+        }
 
+        async function removeOrderItem(itemId) {
             try {
-                const res = await fetch(BASE_URL + '/cashier/special-orders/' + orderId + '/cancel', {
+                const res = await fetch(BASE_URL + '/cashier/remove-item', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
+                    },
+                    body: JSON.stringify({
+                        order_id: currentOrder.id,
+                        item_id: itemId
+                    })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    toast(data.message, 'success');
+                    currentOrder = data.data.order;
+                    if (currentOrder.items.length === 0) {
+                        resetAll();
+                    } else {
+                        renderOrder();
+                    }
+                    toast('تم حذف الصنف', 'success');
                 } else {
                     toast(data.message, 'error');
                 }
             } catch (err) {
-                console.error('cancelSpecialOrder error:', err);
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
+        }
+
+        function renderItems() {
+            if (directItems.length === 0) {
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('itemsTable').classList.add('hidden');
+                isDirectMode = false;
+            } else {
+                document.getElementById('emptyState').classList.add('hidden');
+                document.getElementById('itemsTable').classList.remove('hidden');
+
+                const tbody = document.getElementById('itemsBody');
+                tbody.innerHTML = '';
+                directItems.forEach((item, index) => {
+                    const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity;
+                    const itemTotal = item.is_weight ? Math.floor(parseFloat(item.total)) : parseFloat(item.total).toFixed(3);
+                    tbody.innerHTML += `<tr>
+                        <td><button class="item-remove-btn" onclick="removeDirectItem(${index})"><i class="ti ti-x"></i></button></td>
+                        <td>${item.product_name}${item.is_weight ? '<span class="weight-tag"><i class="ti ti-scale"></i></span>' : ''}</td>
+                        <td style="text-align:center">${qty}</td>
+                        <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
+                        <td style="text-align:left">${itemTotal}</td>
+                    </tr>`;
+                });
+            }
+            updateSummary();
+        }
+
+        function removeDirectItem(index) {
+            directItems.splice(index, 1);
+            renderItems();
+            toast('تم حذف الصنف', 'success');
+        }
+
+        function round3(n) {
+            return Math.round(n * 1000) / 1000;
+        }
+
+        function getGrossTotal() {
+            if (isDirectMode) {
+                return round3(directItems.reduce((s, i) => s + parseFloat(i.total), 0));
+            }
+            return currentOrder ? parseFloat(currentOrder.total) : 0;
+        }
+
+        function getTotal() {
+            return round3(Math.max(0, getGrossTotal() - discount));
+        }
+
+        function getItemsCount() {
+            if (isDirectMode) return directItems.length;
+            if (currentOrder && currentOrder.items) return currentOrder.items.length;
+            return 0;
+        }
+
+        function updateSummary() {
+            const grossTotal = getGrossTotal();
+            const netTotal = getTotal();
+            const count = getItemsCount();
+
+            document.getElementById('totalDisplay').textContent = grossTotal.toFixed(3);
+            document.getElementById('itemsCount').textContent = count + ' أصناف';
+
+            const discountBadge = document.getElementById('discountBadge');
+            const netBadge = document.getElementById('netBadge');
+            if (discount > 0) {
+                discountBadge.classList.add('visible');
+                document.getElementById('discountDisplay').textContent = discount.toFixed(3);
+                netBadge.classList.add('visible');
+                document.getElementById('netDisplay').textContent = netTotal.toFixed(3);
+            } else {
+                discountBadge.classList.remove('visible');
+                netBadge.classList.remove('visible');
+            }
+
+            const payHint = document.getElementById('payHint');
+            if (count > 0) {
+                payHint.classList.add('visible');
+            } else {
+                payHint.classList.remove('visible');
+            }
+        }
+
+        function openWizard() {
+            wizardActive = true;
+            wizardStep = 1;
+            wizardMethodIndex = 0;
+            wizardDeliveryIndex = 0;
+            wizardSelectedMethod = null;
+            wizardPayments = [];
+            document.getElementById('wizardOverlay').classList.add('active');
+            renderWizardStep();
+        }
+
+        function closeWizard() {
+            wizardActive = false;
+            wizardStep = 0;
+            creditMode = false;
+            creditSearchResults = [];
+            creditResultIndex = -1;
+            creditShowNewForm = false;
+            creditPaidAmount = 0;
+            creditSearchQuery = '';
+            selectedCustomer = null;
+            document.getElementById('wizardOverlay').classList.remove('active');
+            document.getElementById('invoiceInput').focus();
+        }
+
+        function getWizardPaid() {
+            return round3(wizardPayments.reduce((s, p) => s + p.amount, 0));
+        }
+
+        function getWizardRemaining() {
+            return round3(Math.max(0, getTotal() - getWizardPaid()));
+        }
+
+        function renderWizardStep() {
+            const content = document.getElementById('wizardContent');
+            const total = getTotal();
+            const remaining = getWizardRemaining();
+
+            if (wizardStep === 1) {
+                let methodsHtml = '';
+                PAYMENT_METHODS.forEach((m, i) => {
+                    const selectedClass = i === wizardMethodIndex ? 'selected' : '';
+                    const creditClass = m.isCredit ? 'credit-option' : '';
+                    const icon = m.isCredit ? '<i class="ti ti-clock-dollar" style="margin-left:4px;"></i>' : '';
+                    methodsHtml += `<div class="wizard-option ${selectedClass} ${creditClass}" data-index="${i}" onclick="wizardSelectMethod(${i})">${icon}${m.name}</div>`;
+                });
+
+                let paidHtml = '';
+                if (wizardPayments.length > 0) {
+                    let paidRows = wizardPayments.map((p, i) => `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#f0fdf4;border-radius:6px;margin-bottom:4px;"><span style="font-weight:600;font-size:13px;">${p.method_name}</span><span style="font-weight:700;color:#059669;">${p.amount.toFixed(3)} د.ل</span></div>`).join('');
+                    paidHtml = `<div style="margin-bottom:16px;padding:12px;background:#f8fafc;border-radius:10px;border:2px solid #e2e8f0;">
+                        <div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;">المدفوعات السابقة</div>
+                        ${paidRows}
+                        <div style="display:flex;justify-content:space-between;padding:8px 10px;background:#fef2f2;border-radius:6px;margin-top:6px;font-weight:700;"><span style="color:#991b1b;">المتبقي</span><span style="color:#dc2626;">${remaining.toFixed(3)} د.ل</span></div>
+                    </div>`;
+                }
+
+                const grossTotal = getGrossTotal();
+                let discountHtml = '';
+                if (wizardPayments.length === 0) {
+                    const discountActive = discount > 0;
+                    discountHtml = `<div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px;padding:10px 16px;background:${discountActive ? '#fef3c7' : '#f8fafc'};border:2px solid ${discountActive ? '#f59e0b' : '#e2e8f0'};border-radius:10px;">
+                        <span style="font-size:13px;font-weight:600;color:${discountActive ? '#92400e' : '#64748b'};"><i class="ti ti-discount-2"></i> خصم</span>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:11px;color:#94a3b8;">↓</span>
+                            <span style="font-size:22px;font-weight:800;color:${discountActive ? '#f59e0b' : '#94a3b8'};min-width:60px;text-align:center;">${discount.toFixed(3)}</span>
+                            <span style="font-size:11px;color:#94a3b8;">↑</span>
+                        </div>
+                        <span style="font-size:11px;color:#94a3b8;">حد أقصى ${MAX_DISCOUNT}</span>
+                    </div>`;
+                }
+
+                content.innerHTML = `
+                    <div class="wizard-step-title">طريقة الدفع</div>
+                    <div class="wizard-total">${(wizardPayments.length > 0 ? remaining : total).toFixed(3)} <span>د.ل</span></div>
+                    ${discountHtml}
+                    ${paidHtml}
+                    <div class="wizard-grid">${methodsHtml}</div>
+                    <div class="wizard-hint">
+                        <span><kbd>→</kbd> <kbd>←</kbd> طرق الدفع</span>
+                        <span><kbd>↑</kbd> <kbd>↓</kbd> خصم</span>
+                        <span><kbd>Enter</kbd> تأكيد</span>
+                        <span><kbd>Esc</kbd> إلغاء</span>
+                    </div>
+                `;
+            } else if (wizardStep === 2) {
+                content.innerHTML = `
+                    <div class="wizard-step-title">المبلغ - ${wizardSelectedMethod.name}</div>
+                    <div class="wizard-total">${remaining.toFixed(3)} <span>د.ل</span></div>
+                    <input type="number" class="wizard-phone-input" id="wizardAmountInput" step="0.001" value="${remaining.toFixed(3)}" placeholder="0.000" style="font-size:28px;">
+                    <div style="font-size:12px;color:#94a3b8;margin-top:8px;margin-bottom:16px;">اضغط Enter للمبلغ الكامل أو عدّل المبلغ لتقسيم الدفع</div>
+                    <div class="wizard-hint">
+                        <span><kbd>Enter</kbd> تأكيد</span>
+                        <span><kbd>Esc</kbd> رجوع</span>
+                    </div>
+                `;
+                setTimeout(() => {
+                    const input = document.getElementById('wizardAmountInput');
+                    if (input) { input.focus(); input.select(); }
+                }, 50);
+            } else if (wizardStep === 3) {
+                content.innerHTML = `
+                    <div class="wizard-step-title">نوع الاستلام</div>
+                    <div class="wizard-delivery-grid">
+                        <div class="wizard-delivery-option ${wizardDeliveryIndex === 0 ? 'selected' : ''}" onclick="wizardSelectDelivery(0)">
+                            <i class="ti ti-building-store"></i>
+                            <div class="delivery-label">استلام</div>
+                        </div>
+                        <div class="wizard-delivery-option ${wizardDeliveryIndex === 1 ? 'selected' : ''}" onclick="wizardSelectDelivery(1)">
+                            <i class="ti ti-truck-delivery"></i>
+                            <div class="delivery-label">توصيل</div>
+                        </div>
+                    </div>
+                    <div class="wizard-hint">
+                        <span><kbd>→</kbd> <kbd>←</kbd> للتنقل</span>
+                        <span><kbd>Enter</kbd> تأكيد</span>
+                        <span><kbd>Esc</kbd> رجوع</span>
+                    </div>
+                `;
+            } else if (wizardStep === 4) {
+                content.innerHTML = `
+                    <div class="wizard-step-title">رقم هاتف التوصيل</div>
+                    <input type="text" class="wizard-phone-input" id="wizardPhoneInput" placeholder="رقم الهاتف">
+                    <div class="wizard-hint">
+                        <span><kbd>Enter</kbd> تأكيد وطباعة</span>
+                        <span><kbd>Esc</kbd> رجوع</span>
+                    </div>
+                `;
+                setTimeout(() => {
+                    const phoneInput = document.getElementById('wizardPhoneInput');
+                    if (phoneInput) phoneInput.focus();
+                }, 50);
+            } else if (wizardStep === 5) {
+                if (creditShowNewForm) {
+                    content.innerHTML = `
+                        <div class="wizard-step-title"><i class="ti ti-user-plus" style="color:#f59e0b;"></i> إضافة زبون جديد</div>
+                        <div style="margin:20px 0;text-align:right;">
+                            <div style="margin-bottom:12px;">
+                                <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:4px;">الاسم *</label>
+                                <input type="text" class="wizard-phone-input" id="wizardNewName" placeholder="اسم الزبون" style="font-size:16px;text-align:right;">
+                            </div>
+                            <div>
+                                <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:4px;">الهاتف</label>
+                                <input type="text" class="wizard-phone-input" id="wizardNewPhone" placeholder="رقم الهاتف (اختياري)" style="font-size:16px;text-align:right;">
+                            </div>
+                        </div>
+                        <div class="wizard-hint">
+                            <span><kbd>Tab</kbd> التالي</span>
+                            <span><kbd>Enter</kbd> حفظ</span>
+                            <span><kbd>Esc</kbd> رجوع</span>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        const nameInput = document.getElementById('wizardNewName');
+                        if (nameInput) nameInput.focus();
+                    }, 50);
+                } else {
+                    let resultsHtml = '';
+                    if (creditSearchResults.length > 0) {
+                        resultsHtml = creditSearchResults.map((c, i) => {
+                            const hl = i === creditResultIndex;
+                            return `<div style="padding:10px;border:2px solid ${hl ? '#3b82f6' : '#e2e8f0'};background:${hl ? '#eff6ff' : '#fff'};border-radius:8px;margin-bottom:6px;cursor:pointer;text-align:right;" onclick="wizardSelectCustomer(${i})">
+                                <div style="font-weight:600;">${c.name}</div>
+                                <div style="font-size:12px;color:#64748b;">${c.phone || '-'}</div>
+                                <div style="font-size:12px;color:${c.balance < 0 ? '#dc2626' : '#22c55e'};">الرصيد: ${parseFloat(c.balance).toFixed(3)}</div>
+                            </div>`;
+                        }).join('');
+                    } else if (creditSearchQuery) {
+                        resultsHtml = '<div style="text-align:center;color:#64748b;padding:12px;">لا توجد نتائج</div>';
+                    }
+
+                    content.innerHTML = `
+                        <div class="wizard-step-title"><i class="ti ti-clock-dollar" style="color:#f97316;"></i> البيع بالآجل - اختر زبون</div>
+                        <div class="wizard-total">${getTotal().toFixed(3)} <span>د.ل</span></div>
+                        <input type="text" class="wizard-phone-input" id="wizardCustomerSearch" placeholder="ابحث بالاسم أو رقم الهاتف..." style="font-size:16px;text-align:right;margin-bottom:16px;" value="${creditSearchQuery}">
+                        <div id="wizardCustomerResults" style="max-height:200px;overflow-y:auto;margin-bottom:16px;">${resultsHtml}</div>
+                        <div class="wizard-hint">
+                            <span><kbd>↑</kbd> <kbd>↓</kbd> تنقل</span>
+                            <span><kbd>Enter</kbd> اختيار</span>
+                            <span><kbd>Tab</kbd> زبون جديد</span>
+                            <span><kbd>Esc</kbd> رجوع</span>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        const searchInput = document.getElementById('wizardCustomerSearch');
+                        if (searchInput) {
+                            searchInput.focus();
+                            searchInput.setSelectionRange(searchInput.value.length, searchInput.value.length);
+                            searchInput.addEventListener('input', debounce(wizardSearchCustomers, 300));
+                        }
+                    }, 50);
+                }
+            } else if (wizardStep === 6) {
+                const total = getTotal();
+                content.innerHTML = `
+                    <div class="wizard-step-title">المبلغ المدفوع</div>
+                    <div style="background:#f0fdf4;border:2px solid #22c55e;border-radius:10px;padding:12px;margin-bottom:16px;text-align:right;">
+                        <div style="font-weight:700;color:#15803d;font-size:16px;">${selectedCustomer.name}</div>
+                        <div style="font-size:12px;color:#64748b;">${selectedCustomer.phone || '-'}</div>
+                    </div>
+                    <div style="font-size:14px;color:#64748b;margin-bottom:8px;">الإجمالي: ${total.toFixed(3)} د.ل</div>
+                    <input type="number" class="wizard-phone-input" id="wizardCreditPaid" step="0.001" min="0" value="0" placeholder="0.000" style="font-size:28px;margin-bottom:12px;">
+                    <div style="display:flex;justify-content:space-between;padding:12px;background:#fef2f2;border:2px solid #fecaca;border-radius:8px;margin-bottom:16px;">
+                        <span style="color:#991b1b;font-weight:700;">المبلغ الآجل:</span>
+                        <span style="color:#dc2626;font-weight:800;font-size:18px;" id="wizardCreditRemaining">${total.toFixed(3)} د.ل</span>
+                    </div>
+                    <div class="wizard-hint">
+                        <span><kbd>Enter</kbd> تأكيد</span>
+                        <span><kbd>Esc</kbd> رجوع</span>
+                    </div>
+                `;
+                setTimeout(() => {
+                    const input = document.getElementById('wizardCreditPaid');
+                    if (input) {
+                        input.focus();
+                        input.select();
+                        input.addEventListener('input', () => {
+                            const paid = parseFloat(input.value) || 0;
+                            const rem = Math.max(0, getTotal() - paid);
+                            document.getElementById('wizardCreditRemaining').textContent = rem.toFixed(3) + ' د.ل';
+                        });
+                    }
+                }, 50);
+            }
+        }
+
+        function wizardSelectMethod(index) {
+            wizardMethodIndex = index;
+            renderWizardStep();
+            confirmWizardPayment();
+        }
+
+        function wizardSelectDelivery(index) {
+            wizardDeliveryIndex = index;
+            renderWizardStep();
+            confirmWizardDelivery();
+        }
+
+        function handleWizardKeys(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (wizardStep === 6) {
+                    wizardStep = 5;
+                    renderWizardStep();
+                } else if (wizardStep === 5) {
+                    if (creditShowNewForm) {
+                        creditShowNewForm = false;
+                        renderWizardStep();
+                    } else {
+                        creditMode = false;
+                        creditSearchResults = [];
+                        creditResultIndex = -1;
+                        creditSearchQuery = '';
+                        wizardStep = 1;
+                        renderWizardStep();
+                    }
+                } else if (wizardStep === 4) {
+                    wizardStep = 3;
+                    wizardDeliveryIndex = 1;
+                    renderWizardStep();
+                } else if (wizardStep === 3) {
+                    if (creditMode) {
+                        wizardStep = 6;
+                    } else {
+                        wizardStep = 2;
+                    }
+                    renderWizardStep();
+                } else if (wizardStep === 2) {
+                    wizardStep = 1;
+                    renderWizardStep();
+                } else {
+                    closeWizard();
+                }
+                return;
+            }
+
+            if (wizardStep === 1) {
+                const count = PAYMENT_METHODS.length;
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    wizardMethodIndex = (wizardMethodIndex + 1) % count;
+                    renderWizardStep();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    wizardMethodIndex = (wizardMethodIndex - 1 + count) % count;
+                    renderWizardStep();
+                } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (wizardPayments.length === 0) {
+                        const grossTotal = getGrossTotal();
+                        discount = Math.min(discount + 0.25, MAX_DISCOUNT, grossTotal);
+                        updateSummary();
+                        renderWizardStep();
+                    }
+                } else if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (wizardPayments.length === 0) {
+                        discount = Math.max(discount - 0.25, 0);
+                        updateSummary();
+                        renderWizardStep();
+                    }
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    confirmWizardPayment();
+                }
+            } else if (wizardStep === 2) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    confirmWizardAmount();
+                }
+            } else if (wizardStep === 3) {
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    wizardDeliveryIndex = wizardDeliveryIndex === 0 ? 1 : 0;
+                    renderWizardStep();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    confirmWizardDelivery();
+                }
+            } else if (wizardStep === 4) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const phone = document.getElementById('wizardPhoneInput').value.trim();
+                    if (!phone) {
+                        toast('أدخل رقم الهاتف', 'error');
+                        return;
+                    }
+                    processWizardPayment('delivery', phone);
+                }
+            } else if (wizardStep === 5) {
+                if (creditShowNewForm) {
+                    if (e.key === 'Enter') {
+                        const focused = document.activeElement;
+                        const nameInput = document.getElementById('wizardNewName');
+                        const phoneInput = document.getElementById('wizardNewPhone');
+                        if (focused === nameInput && nameInput.value.trim()) {
+                            e.preventDefault();
+                            phoneInput.focus();
+                        } else if (focused === phoneInput || (focused === nameInput && nameInput.value.trim())) {
+                            e.preventDefault();
+                            wizardSaveNewCustomer();
+                        }
+                    }
+                } else {
+                    if (e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        if (creditSearchResults.length > 0) {
+                            creditResultIndex = Math.min(creditResultIndex + 1, creditSearchResults.length - 1);
+                            updateCreditResultHighlight();
+                        }
+                    } else if (e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        if (creditSearchResults.length > 0) {
+                            creditResultIndex = Math.max(creditResultIndex - 1, 0);
+                            updateCreditResultHighlight();
+                        }
+                    } else if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (creditResultIndex >= 0 && creditResultIndex < creditSearchResults.length) {
+                            wizardSelectCustomer(creditResultIndex);
+                        }
+                    } else if (e.key === 'Tab') {
+                        e.preventDefault();
+                        creditShowNewForm = true;
+                        renderWizardStep();
+                    }
+                }
+            } else if (wizardStep === 6) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    creditPaidAmount = parseFloat(document.getElementById('wizardCreditPaid').value) || 0;
+                    const total = getTotal();
+                    if (creditPaidAmount > total) {
+                        toast('المبلغ المدفوع أكبر من الإجمالي', 'error');
+                        return;
+                    }
+                    wizardStep = 3;
+                    wizardDeliveryIndex = 0;
+                    renderWizardStep();
+                }
+            }
+        }
+
+        function confirmWizardPayment() {
+            wizardSelectedMethod = PAYMENT_METHODS[wizardMethodIndex];
+
+            if (wizardSelectedMethod.isCredit) {
+                creditMode = true;
+                creditSearchResults = [];
+                creditResultIndex = -1;
+                creditShowNewForm = false;
+                creditSearchQuery = '';
+                selectedCustomer = null;
+                wizardStep = 5;
+                renderWizardStep();
+                return;
+            }
+
+            wizardStep = 2;
+            renderWizardStep();
+        }
+
+        function confirmWizardAmount() {
+            const input = document.getElementById('wizardAmountInput');
+            const amount = parseFloat(input.value) || 0;
+            const remaining = getWizardRemaining();
+
+            if (amount <= 0) {
+                toast('أدخل مبلغ صحيح', 'error');
+                return;
+            }
+            if (amount > remaining + 0.001) {
+                toast('المبلغ أكبر من المتبقي', 'error');
+                return;
+            }
+
+            wizardPayments.push({
+                payment_method_id: wizardSelectedMethod.id,
+                method_name: wizardSelectedMethod.name,
+                amount: round3(Math.min(amount, remaining))
+            });
+
+            const newRemaining = getWizardRemaining();
+            if (newRemaining > 0.001) {
+                wizardStep = 1;
+                wizardMethodIndex = 0;
+                renderWizardStep();
+            } else {
+                wizardStep = 3;
+                wizardDeliveryIndex = 0;
+                renderWizardStep();
+            }
+        }
+
+        function confirmWizardDelivery() {
+            if (wizardDeliveryIndex === 1) {
+                wizardStep = 4;
+                renderWizardStep();
+            } else {
+                processWizardPayment('pickup', '');
+            }
+        }
+
+        async function processWizardPayment(deliveryType, deliveryPhone) {
+            const total = getTotal();
+            if (total <= 0) return toast('لا يوجد مبلغ', 'error');
+
+            const grossTotal = getGrossTotal();
+
+            try {
+                let orderId;
+
+                if (isDirectMode) {
+                    const createRes = await fetch(BASE_URL + '/cashier/new-invoice', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price })),
+                            gross_total: grossTotal,
+                            discount: discount,
+                            total: total,
+                            merged_order_ids: mergedOrderIds
+                        })
+                    });
+                    const createData = await createRes.json();
+                    if (!createData.success) return toast(createData.message, 'error');
+                    orderId = createData.data.id;
+                } else {
+                    orderId = currentOrder.id;
+                }
+
+                if (creditMode) {
+                    const firstPaymentMethod = PAYMENT_METHODS.find(m => !m.isCredit);
+                    const defaultPaymentMethodId = firstPaymentMethod ? firstPaymentMethod.id : 1;
+                    const creditPayments = creditPaidAmount > 0 ? [{ payment_method_id: defaultPaymentMethodId, amount: creditPaidAmount }] : [];
+
+                    const payRes = await fetch(BASE_URL + '/cashier/pay', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            order_id: orderId,
+                            discount: discount,
+                            payments: creditPayments,
+                            is_credit: true,
+                            customer_id: selectedCustomer.id,
+                            paid_amount: creditPaidAmount,
+                            delivery_type: deliveryType,
+                            delivery_phone: deliveryPhone
+                        })
+                    });
+
+                    const payData = await payRes.json();
+                    if (payData.success) {
+                        closeWizard();
+                        printCreditReceipt(payData.data);
+                        toast('تم حفظ البيع بالآجل', 'success');
+                        resetAll();
+                    } else {
+                        toast(payData.message, 'error');
+                    }
+                } else {
+                    const payRes = await fetch(BASE_URL + '/cashier/pay', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        },
+                        body: JSON.stringify({
+                            order_id: orderId,
+                            discount: discount,
+                            payments: wizardPayments.map(p => ({
+                                payment_method_id: p.payment_method_id,
+                                amount: p.amount
+                            })),
+                            delivery_type: deliveryType,
+                            delivery_phone: deliveryPhone
+                        })
+                    });
+
+                    const payData = await payRes.json();
+                    if (payData.success) {
+                        closeWizard();
+                        printReceipt(payData.data);
+                        toast('تم الدفع بنجاح', 'success');
+                        resetAll();
+                    } else {
+                        toast(payData.message, 'error');
+                    }
+                }
+            } catch (err) {
+                toast('خطأ في الاتصال: ' + err.message, 'error');
+            }
+        }
+
+        function openDiscountModal() {
+            document.getElementById('discountModal').classList.add('active');
+            document.getElementById('discountInput').value = discount > 0 ? discount : '';
+            document.getElementById('discountInput').focus();
+        }
+
+        function closeDiscountModal() {
+            document.getElementById('discountModal').classList.remove('active');
+            document.getElementById('invoiceInput').focus();
+        }
+
+        function applyDiscount() {
+            let val = parseFloat(document.getElementById('discountInput').value) || 0;
+            if (val < 0) val = 0;
+            if (val > MAX_DISCOUNT) {
+                toast('الحد الأقصى للخصم 5 د.ل', 'error');
+                return;
+            }
+            const grossTotal = getGrossTotal();
+            if (val > grossTotal) {
+                toast('الخصم لا يمكن أن يتجاوز الإجمالي', 'error');
+                return;
+            }
+            discount = val;
+            closeDiscountModal();
+            updateSummary();
+            if (val > 0) {
+                toast('تم تطبيق الخصم', 'success');
+            }
+        }
+
+        function removeDiscount() {
+            discount = 0;
+            updateSummary();
         }
 
         async function showCancelInvoiceModal() {
@@ -1444,21 +1996,13 @@
                 cancelButtonText: 'إغلاق',
                 confirmButtonColor: '#3b82f6',
                 cancelButtonColor: '#64748b',
-                customClass: {
-                    popup: 'swal-rtl',
-                    title: 'swal-title-rtl',
-                    input: 'swal-input-rtl'
-                },
+                customClass: { popup: 'swal-rtl', title: 'swal-title-rtl' },
                 inputValidator: (value) => {
-                    if (!value) {
-                        return 'يرجى إدخال رقم الفاتورة';
-                    }
+                    if (!value) return 'يرجى إدخال رقم الفاتورة';
                 }
             });
 
-            if (orderNumber) {
-                await searchAndDeleteInvoice(orderNumber);
-            }
+            if (orderNumber) await searchAndDeleteInvoice(orderNumber);
         }
 
         async function searchAndDeleteInvoice(orderNumber) {
@@ -1490,15 +2034,9 @@
                     cancelButtonText: 'رجوع',
                     confirmButtonColor: '#ef4444',
                     cancelButtonColor: '#64748b',
-                    customClass: {
-                        popup: 'swal-rtl',
-                        title: 'swal-title-rtl',
-                        input: 'swal-input-rtl'
-                    },
+                    customClass: { popup: 'swal-rtl', title: 'swal-title-rtl' },
                     inputValidator: (value) => {
-                        if (!value) {
-                            return 'يرجى إدخال كود الإلغاء';
-                        }
+                        if (!value) return 'يرجى إدخال كود الإلغاء';
                     }
                 });
 
@@ -1534,373 +2072,98 @@
                     toast(deleteData.message, 'error');
                 }
             } catch (err) {
-                console.error('searchAndDeleteInvoice error:', err);
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
 
-        function renderOrder() {
-            document.getElementById('emptyState').classList.add('hidden');
-            document.getElementById('itemsTable').classList.remove('hidden');
-
-            const tbody = document.getElementById('itemsBody');
-            tbody.innerHTML = '';
-            currentOrder.items.forEach(item => {
-                const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity;
-                const itemTotal = item.is_weight ? Math.round(parseFloat(item.total)) : parseFloat(item.total).toFixed(3);
-                tbody.innerHTML += `<tr>
-                    <td><button class="item-remove-btn" onclick="removeOrderItem(${item.id})"><i class="ti ti-x"></i></button></td>
-                    <td>${item.product_name}${item.is_weight ? '<span class="weight-tag"><i class="ti ti-scale"></i></span>' : ''}</td>
-                    <td style="text-align:center">${qty}</td>
-                    <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
-                    <td style="text-align:left">${itemTotal}</td>
-                </tr>`;
-            });
-
-            document.getElementById('invoiceTotal').textContent = parseFloat(currentOrder.total).toFixed(3);
-            updateSummary();
+        async function wizardSearchCustomers() {
+            const input = document.getElementById('wizardCustomerSearch');
+            if (!input) return;
+            const q = input.value.trim();
+            creditSearchQuery = q;
+            if (!q) {
+                creditSearchResults = [];
+                creditResultIndex = -1;
+                renderCreditResults();
+                return;
+            }
+            try {
+                const res = await fetch(BASE_URL + `/cashier/search-customers?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                if (data.success) {
+                    creditSearchResults = data.data;
+                    creditResultIndex = creditSearchResults.length > 0 ? 0 : -1;
+                    renderCreditResults();
+                }
+            } catch (err) {
+            }
         }
 
-        async function removeOrderItem(itemId) {
+        function renderCreditResults() {
+            const container = document.getElementById('wizardCustomerResults');
+            if (!container) return;
+            if (creditSearchResults.length === 0) {
+                container.innerHTML = creditSearchQuery ? '<div style="text-align:center;color:#64748b;padding:12px;">لا توجد نتائج</div>' : '';
+                return;
+            }
+            container.innerHTML = creditSearchResults.map((c, i) => {
+                const hl = i === creditResultIndex;
+                return `<div style="padding:10px;border:2px solid ${hl ? '#3b82f6' : '#e2e8f0'};background:${hl ? '#eff6ff' : '#fff'};border-radius:8px;margin-bottom:6px;cursor:pointer;text-align:right;" onclick="wizardSelectCustomer(${i})">
+                    <div style="font-weight:600;">${c.name}</div>
+                    <div style="font-size:12px;color:#64748b;">${c.phone || '-'}</div>
+                    <div style="font-size:12px;color:${c.balance < 0 ? '#dc2626' : '#22c55e'};">الرصيد: ${parseFloat(c.balance).toFixed(3)}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function updateCreditResultHighlight() {
+            const container = document.getElementById('wizardCustomerResults');
+            if (!container) return;
+            const items = container.children;
+            for (let i = 0; i < items.length; i++) {
+                if (i === creditResultIndex) {
+                    items[i].style.borderColor = '#3b82f6';
+                    items[i].style.background = '#eff6ff';
+                } else {
+                    items[i].style.borderColor = '#e2e8f0';
+                    items[i].style.background = '#fff';
+                }
+            }
+        }
+
+        function wizardSelectCustomer(index) {
+            const c = creditSearchResults[index];
+            if (!c) return;
+            selectedCustomer = { id: c.id, name: c.name, phone: c.phone, balance: c.balance };
+            wizardStep = 6;
+            renderWizardStep();
+        }
+
+        async function wizardSaveNewCustomer() {
+            const name = document.getElementById('wizardNewName').value.trim();
+            const phone = document.getElementById('wizardNewPhone').value.trim();
+
+            if (!name) return toast('أدخل اسم الزبون', 'error');
+
             try {
-                const res = await fetch(BASE_URL + '/cashier/remove-item', {
+                const res = await fetch(BASE_URL + '/cashier/quick-customer', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
-                    body: JSON.stringify({
-                        order_id: currentOrder.id,
-                        item_id: itemId
-                    })
+                    body: JSON.stringify({ name, phone })
                 });
                 const data = await res.json();
                 if (data.success) {
-                    currentOrder = data.data.order;
-                    if (currentOrder.items.length === 0) {
-                        resetAll();
-                    } else {
-                        renderOrder();
-                    }
-                    toast('تم حذف الصنف', 'success');
+                    selectedCustomer = { id: data.data.id, name: data.data.name, phone: data.data.phone, balance: data.data.balance };
+                    toast('تم إضافة الزبون', 'success');
+                    wizardStep = 6;
+                    renderWizardStep();
                 } else {
-                    toast(data.message, 'error');
+                    toast(data.message || 'خطأ في الحفظ', 'error');
                 }
             } catch (err) {
-                console.error('removeOrderItem error:', err);
-                toast('خطأ في الاتصال: ' + err.message, 'error');
-            }
-        }
-
-        function startDirectMode() {
-            isDirectMode = true;
-            directItems = [];
-            currentOrder = null;
-            payments = [];
-
-            document.getElementById('invoiceInput').value = '';
-            document.getElementById('emptyState').classList.remove('hidden');
-            document.getElementById('itemsTable').classList.add('hidden');
-            document.getElementById('itemsBody').innerHTML = '';
-            document.getElementById('invoiceTotal').textContent = '0.000';
-            clearPayments();
-            updateSummary();
-        }
-
-        function renderItems() {
-            if (directItems.length === 0) {
-                document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('itemsTable').classList.add('hidden');
-                document.getElementById('invoiceTotal').textContent = '0.000';
-                isDirectMode = false;
-            } else {
-                document.getElementById('emptyState').classList.add('hidden');
-                document.getElementById('itemsTable').classList.remove('hidden');
-
-                let total = 0;
-                const tbody = document.getElementById('itemsBody');
-                tbody.innerHTML = '';
-                directItems.forEach((item, index) => {
-                    total += parseFloat(item.total);
-                    const qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : item.quantity;
-                    const itemTotal = item.is_weight ? Math.round(parseFloat(item.total)) : parseFloat(item.total).toFixed(3);
-                    tbody.innerHTML += `<tr>
-                        <td><button class="item-remove-btn" onclick="removeDirectItem(${index})"><i class="ti ti-x"></i></button></td>
-                        <td>${item.product_name}<span class="weight-tag"><i class="ti ti-scale"></i></span></td>
-                        <td style="text-align:center">${qty}</td>
-                        <td style="text-align:center">${parseFloat(item.price).toFixed(3)}</td>
-                        <td style="text-align:left">${itemTotal}</td>
-                    </tr>`;
-                });
-                document.getElementById('invoiceTotal').textContent = total.toFixed(3);
-            }
-            updateSummary();
-        }
-
-        function removeDirectItem(index) {
-            directItems.splice(index, 1);
-            renderItems();
-            toast('تم حذف الصنف', 'success');
-        }
-
-        function selectPaymentMethod(btn) {
-            document.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedMethod = { id: btn.dataset.id, name: btn.dataset.name };
-            document.getElementById('selectedMethodName').textContent = btn.dataset.name;
-            document.getElementById('amountSection').classList.remove('hidden');
-            document.getElementById('amountInput').value = '';
-            document.getElementById('amountInput').focus();
-
-            const remaining = getRemaining();
-            if (remaining > 0) {
-                document.getElementById('amountInput').value = remaining.toFixed(3);
-            }
-        }
-
-        function addPayment() {
-            if (!selectedMethod) return toast('اختر طريقة دفع', 'error');
-            const amount = parseFloat(document.getElementById('amountInput').value);
-            if (!amount || amount <= 0) return toast('أدخل المبلغ', 'error');
-
-            const remaining = getRemaining();
-            if (amount > remaining + 0.001) {
-                return toast('المبلغ أكبر من المتبقي', 'error');
-            }
-
-            payments.push({
-                payment_method_id: selectedMethod.id,
-                method_name: selectedMethod.name,
-                amount: amount
-            });
-
-            renderPayments();
-            document.getElementById('amountSection').classList.add('hidden');
-            document.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('selected'));
-            selectedMethod = null;
-            updateSummary();
-        }
-
-        function renderPayments() {
-            const container = document.getElementById('paymentsList');
-            if (payments.length === 0) {
-                document.getElementById('addedPayments').classList.add('hidden');
-                container.innerHTML = '';
-                return;
-            }
-
-            document.getElementById('addedPayments').classList.remove('hidden');
-            container.innerHTML = '';
-            payments.forEach((p, i) => {
-                container.innerHTML += `
-                    <div class="payment-row">
-                        <span class="method">${p.method_name}</span>
-                        <span class="amount">${parseFloat(p.amount).toFixed(3)}</span>
-                        <button class="remove-btn" onclick="removePayment(${i})"><i class="ti ti-x"></i></button>
-                    </div>
-                `;
-            });
-        }
-
-        function removePayment(index) {
-            payments.splice(index, 1);
-            renderPayments();
-            updateSummary();
-        }
-
-        function clearPayments() {
-            payments = [];
-            renderPayments();
-            document.getElementById('amountSection').classList.add('hidden');
-            document.querySelectorAll('.pm-btn').forEach(b => b.classList.remove('selected'));
-            selectedMethod = null;
-        }
-
-        function openDiscountModal() {
-            document.getElementById('discountModal').classList.add('active');
-            document.getElementById('discountInput').value = discount > 0 ? discount : '';
-            document.getElementById('discountInput').focus();
-        }
-
-        function closeDiscountModal() {
-            document.getElementById('discountModal').classList.remove('active');
-        }
-
-        function applyDiscount() {
-            let val = parseFloat(document.getElementById('discountInput').value) || 0;
-            if (val < 0) val = 0;
-            if (val > MAX_DISCOUNT) {
-                toast('الحد الأقصى للخصم 5 د.ل', 'error');
-                return;
-            }
-            const grossTotal = getGrossTotal();
-            if (val > grossTotal) {
-                toast('الخصم لا يمكن أن يتجاوز الإجمالي', 'error');
-                return;
-            }
-            discount = val;
-            const newNet = getGrossTotal() - val;
-            if (getPaid() > newNet + 0.001) {
-                clearPayments();
-                updateSummary();
-                closeDiscountModal();
-                toast('تم تطبيق الخصم وحذف المدفوعات لأن المبلغ المدفوع أكبر من الصافي الجديد', 'info');
-                return;
-            }
-            closeDiscountModal();
-            updateSummary();
-            if (val > 0) {
-                toast('تم تطبيق الخصم', 'success');
-            }
-        }
-
-        function removeDiscount() {
-            discount = 0;
-            updateSummary();
-        }
-
-        function setDeliveryType(type) {
-            currentDeliveryType = type;
-            document.getElementById('pickupBtn').classList.toggle('active', type === 'pickup');
-            document.getElementById('deliveryBtn').classList.toggle('active', type === 'delivery');
-            const phoneRow = document.getElementById('deliveryPhoneRow');
-            if (type === 'delivery') {
-                phoneRow.classList.remove('hidden');
-                document.getElementById('deliveryPhoneInput').focus();
-            } else {
-                phoneRow.classList.add('hidden');
-                document.getElementById('deliveryPhoneInput').value = '';
-            }
-        }
-
-        function round3(n) {
-            return Math.round(n * 1000) / 1000;
-        }
-
-        function getGrossTotal() {
-            if (isDirectMode) {
-                return round3(directItems.reduce((s, i) => s + parseFloat(i.total), 0));
-            }
-            return currentOrder ? parseFloat(currentOrder.total) : 0;
-        }
-
-        function getTotal() {
-            return round3(Math.max(0, getGrossTotal() - discount));
-        }
-
-        function getPaid() {
-            return round3(payments.reduce((s, p) => s + parseFloat(p.amount), 0));
-        }
-
-        function getRemaining() {
-            return Math.max(0, getTotal() - getPaid());
-        }
-
-        function updateSummary() {
-            const grossTotal = getGrossTotal();
-            const netTotal = getTotal();
-            const paid = getPaid();
-            const diff = netTotal - paid;
-
-            document.getElementById('invoiceTotal').textContent = grossTotal.toFixed(3);
-            document.getElementById('netTotal').textContent = netTotal.toFixed(3);
-            document.getElementById('paidTotal').textContent = paid.toFixed(3);
-
-            const discountRow = document.getElementById('discountRow');
-            if (discount > 0) {
-                discountRow.classList.remove('hidden');
-                document.getElementById('discountAmount').textContent = '-' + discount.toFixed(3);
-            } else {
-                discountRow.classList.add('hidden');
-            }
-
-            const diffRow = document.getElementById('diffRow');
-            const diffAmount = document.getElementById('diffAmount');
-
-            if (Math.abs(diff) < 0.001) {
-                diffRow.classList.add('ok');
-                diffRow.classList.remove('diff');
-                diffAmount.textContent = '0.000';
-                document.getElementById('payBtn').disabled = netTotal <= 0;
-            } else {
-                diffRow.classList.remove('ok');
-                diffRow.classList.add('diff');
-                diffAmount.textContent = diff.toFixed(3);
-                document.getElementById('payBtn').disabled = true;
-            }
-        }
-
-        async function processPayment() {
-            const total = getTotal();
-            if (total <= 0) return toast('لا يوجد مبلغ', 'error');
-            if (payments.length === 0) return toast('أضف طريقة دفع', 'error');
-
-            const paid = getPaid();
-            if (Math.abs(paid - total) > 0.001) {
-                return toast('المدفوعات لا تساوي الإجمالي', 'error');
-            }
-
-            const grossTotal = getGrossTotal();
-            const deliveryType = currentDeliveryType;
-            const deliveryPhone = document.getElementById('deliveryPhoneInput').value.trim();
-
-            if (deliveryType === 'delivery' && !deliveryPhone) {
-                return toast('أدخل رقم الهاتف للتوصيل', 'error');
-            }
-
-            try {
-                let orderId;
-
-                if (isDirectMode) {
-                    const createRes = await fetch(BASE_URL + '/cashier/new-invoice', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price })),
-                            gross_total: grossTotal,
-                            discount: discount,
-                            total: total,
-                            merged_order_ids: mergedOrderIds
-                        })
-                    });
-                    const createData = await createRes.json();
-                    if (!createData.success) return toast(createData.message, 'error');
-                    orderId = createData.data.id;
-                } else {
-                    orderId = currentOrder.id;
-                }
-
-                const payRes = await fetch(BASE_URL + '/cashier/pay', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        order_id: orderId,
-                        discount: discount,
-                        payments: payments.map(p => ({
-                            payment_method_id: p.payment_method_id,
-                            amount: p.amount
-                        })),
-                        delivery_type: deliveryType,
-                        delivery_phone: deliveryPhone
-                    })
-                });
-
-                const payData = await payRes.json();
-                if (payData.success) {
-                    printReceipt(payData.data);
-                    toast('تم الدفع بنجاح', 'success');
-                    resetAll();
-                } else {
-                    toast(payData.message, 'error');
-                }
-            } catch (err) {
-                console.error('processPayment error:', err);
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
@@ -1910,7 +2173,7 @@
             let itemsHtml = '';
             items.forEach(i => {
                 const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
-                const iTotal = i.is_weight ? Math.round(parseFloat(i.total)) : parseFloat(i.total).toFixed(3);
+                const iTotal = i.is_weight ? Math.floor(parseFloat(i.total)) : parseFloat(i.total).toFixed(3);
                 itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${iTotal}</td></tr>`;
             });
 
@@ -1968,304 +2231,12 @@
             }
         }
 
-        function openCreditModal() {
-            const total = getTotal();
-            if (total <= 0) return toast('لا يوجد مبلغ للبيع', 'error');
-
-            document.getElementById('creditModal').classList.add('active');
-            document.getElementById('customerSearch').value = '';
-            document.getElementById('customerResults').innerHTML = '';
-            document.getElementById('selectedCustomerBox').classList.add('hidden');
-            document.getElementById('newCustomerForm').classList.add('hidden');
-            document.getElementById('showNewCustomerForm').classList.remove('hidden');
-            document.getElementById('creditPaidAmount').value = '0';
-            selectedCustomer = null;
-            updateCreditRemaining();
-            document.getElementById('customerSearch').focus();
-        }
-
-        function closeCreditModal() {
-            document.getElementById('creditModal').classList.remove('active');
-            selectedCustomer = null;
-        }
-
-        async function searchCustomers() {
-            const q = document.getElementById('customerSearch').value.trim();
-            if (!q) {
-                document.getElementById('customerResults').innerHTML = '';
-                return;
-            }
-
-            try {
-                const res = await fetch(BASE_URL + `/cashier/search-customers?q=${encodeURIComponent(q)}`);
-                const data = await res.json();
-                if (data.success) {
-                    renderCustomerResults(data.data);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-
-        function renderCustomerResults(customers) {
-            const container = document.getElementById('customerResults');
-            if (customers.length === 0) {
-                container.innerHTML = '<div style="text-align:center;color:#64748b;padding:12px;">لا توجد نتائج</div>';
-                return;
-            }
-
-            container.innerHTML = customers.map(c => `
-                <div class="customer-result-item" onclick="selectCustomer(${c.id}, '${c.name}', '${c.phone || ''}', ${c.balance})" style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;margin-bottom:6px;cursor:pointer;transition:background 0.15s;">
-                    <div style="font-weight:600;">${c.name}</div>
-                    <div style="font-size:12px;color:#64748b;">${c.phone || '-'}</div>
-                    <div style="font-size:12px;color:${c.balance < 0 ? '#dc2626' : '#22c55e'};">الرصيد: ${parseFloat(c.balance).toFixed(3)}</div>
-                </div>
-            `).join('');
-        }
-
-        function selectCustomer(id, name, phone, balance) {
-            selectedCustomer = { id, name, phone, balance };
-            document.getElementById('selectedCustomerName').textContent = name;
-            document.getElementById('selectedCustomerPhone').textContent = phone || '-';
-            document.getElementById('selectedCustomerBalance').textContent = 'الرصيد: ' + parseFloat(balance).toFixed(3);
-            document.getElementById('selectedCustomerBox').classList.remove('hidden');
-            document.getElementById('customerResults').innerHTML = '';
-            document.getElementById('customerSearch').value = '';
-            document.getElementById('newCustomerForm').classList.add('hidden');
-            document.getElementById('showNewCustomerForm').classList.add('hidden');
-            updateCreditConfirmBtn();
-        }
-
-        function clearSelectedCustomer() {
-            selectedCustomer = null;
-            document.getElementById('selectedCustomerBox').classList.add('hidden');
-            document.getElementById('showNewCustomerForm').classList.remove('hidden');
-            updateCreditConfirmBtn();
-        }
-
-        function showNewCustomerForm() {
-            document.getElementById('newCustomerForm').classList.remove('hidden');
-            document.getElementById('showNewCustomerForm').classList.add('hidden');
-            document.getElementById('newCustomerName').value = '';
-            document.getElementById('newCustomerPhone').value = '';
-            document.getElementById('newCustomerName').focus();
-        }
-
-        function hideNewCustomerForm() {
-            document.getElementById('newCustomerForm').classList.add('hidden');
-            document.getElementById('showNewCustomerForm').classList.remove('hidden');
-        }
-
-        async function saveNewCustomer() {
-            const name = document.getElementById('newCustomerName').value.trim();
-            const phone = document.getElementById('newCustomerPhone').value.trim();
-
-            if (!name) return toast('أدخل اسم الزبون', 'error');
-
-            try {
-                const res = await fetch(BASE_URL + '/cashier/quick-customer', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ name, phone })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    selectCustomer(data.data.id, data.data.name, data.data.phone, data.data.balance);
-                    toast('تم إضافة الزبون', 'success');
-                } else {
-                    toast(data.message || 'خطأ في الحفظ', 'error');
-                }
-            } catch (err) {
-                console.error('saveNewCustomer error:', err);
-                toast('خطأ في الاتصال: ' + err.message, 'error');
-            }
-        }
-
-        function updateCreditRemaining() {
-            const total = getTotal();
-            const paid = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
-            const remaining = Math.max(0, total - paid);
-            document.getElementById('creditRemainingAmount').textContent = remaining.toFixed(3);
-            updateCreditConfirmBtn();
-        }
-
-        function updateCreditConfirmBtn() {
-            const btn = document.getElementById('confirmCredit');
-            const total = getTotal();
-            const paid = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
-            btn.disabled = !selectedCustomer || paid > total;
-        }
-
-        async function processCreditPayment() {
-            if (!selectedCustomer) return toast('اختر زبون', 'error');
-
-            const total = getTotal();
-            const paidAmount = parseFloat(document.getElementById('creditPaidAmount').value) || 0;
-            const creditAmount = total - paidAmount;
-
-
-            const confirm = await Swal.fire({
-                title: '<i class="ti ti-clock-dollar" style="color:#f97316;font-size:28px;"></i><br>تأكيد البيع بالآجل',
-                html: `
-                    <div style="text-align:right;font-size:15px;direction:rtl;font-family:'Cairo',sans-serif;">
-                        <div style="background:#f8fafc;border-radius:8px;padding:12px;margin-bottom:12px;">
-                            <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #e2e8f0;">
-                                <span style="color:#64748b;">الزبون</span>
-                                <span style="font-weight:700;">${selectedCustomer.name}</span>
-                            </div>
-                            <div style="display:flex;justify-content:space-between;padding:6px 0;">
-                                <span style="color:#64748b;">إجمالي الفاتورة</span>
-                                <span style="font-weight:700;">${total.toFixed(3)} د.ل</span>
-                            </div>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;padding:10px;background:#f0fdf4;border-radius:6px;margin-bottom:8px;">
-                            <span style="color:#15803d;font-weight:600;">المدفوع</span>
-                            <span style="color:#22c55e;font-weight:800;font-size:16px;">${paidAmount.toFixed(3)} د.ل</span>
-                        </div>
-                        <div style="display:flex;justify-content:space-between;padding:12px;background:#fef2f2;border:2px solid #fecaca;border-radius:8px;margin-bottom:12px;">
-                            <span style="color:#991b1b;font-weight:700;">المبلغ الآجل</span>
-                            <span style="color:#dc2626;font-weight:800;font-size:18px;">${creditAmount.toFixed(3)} د.ل</span>
-                        </div>
-                        <div style="background:#fff;border:2px solid #e2e8f0;border-radius:8px;padding:12px;">
-                            <div style="font-weight:700;margin-bottom:10px;color:#475569;font-size:13px;">نوع الاستلام</div>
-                            <div style="display:flex;gap:10px;margin-bottom:10px;">
-                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f0fdf4;border:2px solid #22c55e;border-radius:8px;cursor:pointer;font-weight:600;">
-                                    <input type="radio" name="creditDeliveryType" value="pickup" checked style="width:18px;height:18px;">
-                                    <i class="ti ti-building-store" style="font-size:18px;"></i> استلام
-                                </label>
-                                <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:#f8fafc;border:2px solid #e2e8f0;border-radius:8px;cursor:pointer;font-weight:600;" id="creditDeliveryLabel">
-                                    <input type="radio" name="creditDeliveryType" value="delivery" style="width:18px;height:18px;">
-                                    <i class="ti ti-truck-delivery" style="font-size:18px;"></i> توصيل
-                                </label>
-                            </div>
-                            <div id="creditDeliveryPhoneBox" style="display:none;">
-                                <input type="text" id="creditDeliveryPhoneInput" placeholder="رقم الهاتف للتوصيل" style="width:100%;padding:10px 12px;border:2px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;text-align:center;">
-                            </div>
-                        </div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: '<i class="ti ti-check"></i> تأكيد البيع',
-                cancelButtonText: 'إلغاء',
-                confirmButtonColor: '#f97316',
-                cancelButtonColor: '#64748b',
-                customClass: {
-                    popup: 'swal-rtl',
-                    title: 'swal-title-rtl'
-                },
-                didOpen: () => {
-                    const radios = document.querySelectorAll('input[name="creditDeliveryType"]');
-                    const phoneBox = document.getElementById('creditDeliveryPhoneBox');
-                    const pickupLabel = radios[0].closest('label');
-                    const deliveryLabel = radios[1].closest('label');
-                    radios.forEach(radio => {
-                        radio.addEventListener('change', () => {
-                            if (radio.value === 'delivery') {
-                                phoneBox.style.display = 'block';
-                                deliveryLabel.style.background = '#fef3c7';
-                                deliveryLabel.style.borderColor = '#f59e0b';
-                                pickupLabel.style.background = '#f8fafc';
-                                pickupLabel.style.borderColor = '#e2e8f0';
-                                document.getElementById('creditDeliveryPhoneInput').focus();
-                            } else {
-                                phoneBox.style.display = 'none';
-                                pickupLabel.style.background = '#f0fdf4';
-                                pickupLabel.style.borderColor = '#22c55e';
-                                deliveryLabel.style.background = '#f8fafc';
-                                deliveryLabel.style.borderColor = '#e2e8f0';
-                            }
-                        });
-                    });
-                },
-                preConfirm: () => {
-                    const deliveryType = document.querySelector('input[name="creditDeliveryType"]:checked').value;
-                    const deliveryPhone = document.getElementById('creditDeliveryPhoneInput').value.trim();
-                    if (deliveryType === 'delivery' && !deliveryPhone) {
-                        Swal.showValidationMessage('أدخل رقم الهاتف للتوصيل');
-                        return false;
-                    }
-                    return { deliveryType, deliveryPhone };
-                }
-            });
-
-            if (!confirm.isConfirmed) return;
-
-            const creditDeliveryType = confirm.value.deliveryType;
-            const creditDeliveryPhone = confirm.value.deliveryPhone;
-
-            try {
-                let orderId;
-                const grossTotal = getGrossTotal();
-
-                if (isDirectMode) {
-                    const createRes = await fetch(BASE_URL + '/cashier/new-invoice', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        },
-                        body: JSON.stringify({
-                            items: directItems.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price })),
-                            gross_total: grossTotal,
-                            discount: discount,
-                            total: total,
-                            merged_order_ids: mergedOrderIds
-                        })
-                    });
-                    const createData = await createRes.json();
-                    if (!createData.success) return toast(createData.message, 'error');
-                    orderId = createData.data.id;
-                } else {
-                    orderId = currentOrder.id;
-                }
-
-                const firstPaymentMethod = document.querySelector('.pm-btn:not(.credit-btn)');
-                const defaultPaymentMethodId = firstPaymentMethod ? firstPaymentMethod.dataset.id : 1;
-
-                const creditPayments = paidAmount > 0 ? [{ payment_method_id: defaultPaymentMethodId, amount: paidAmount }] : [];
-
-                const payRes = await fetch(BASE_URL + '/cashier/pay', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        order_id: orderId,
-                        discount: discount,
-                        payments: creditPayments,
-                        is_credit: true,
-                        customer_id: selectedCustomer.id,
-                        paid_amount: paidAmount,
-                        delivery_type: creditDeliveryType,
-                        delivery_phone: creditDeliveryPhone
-                    })
-                });
-
-                const payData = await payRes.json();
-                if (payData.success) {
-                    closeCreditModal();
-                    printCreditReceipt(payData.data);
-                    toast('تم حفظ البيع بالآجل', 'success');
-                    resetAll();
-                } else {
-                    toast(payData.message, 'error');
-                }
-            } catch (err) {
-                console.error('processCreditPayment error:', err);
-                toast('خطأ في الاتصال: ' + err.message, 'error');
-            }
-        }
-
         function printCreditReceipt(data) {
             const items = data.items || (isDirectMode ? directItems : currentOrder?.items) || [];
             let itemsHtml = '';
             items.forEach(i => {
                 const qty = i.is_weight ? parseFloat(i.quantity).toFixed(3) + ' كجم' : i.quantity;
-                const iTotal = i.is_weight ? Math.round(parseFloat(i.total)) : parseFloat(i.total).toFixed(3);
+                const iTotal = i.is_weight ? Math.floor(parseFloat(i.total)) : parseFloat(i.total).toFixed(3);
                 itemsHtml += `<tr><td>${i.product_name}</td><td style="text-align:center">${qty}</td><td style="text-align:center">${parseFloat(i.price).toFixed(3)}</td><td style="text-align:left">${iTotal}</td></tr>`;
             });
 
@@ -2306,255 +2277,61 @@
 
             const barcodeValue = String(data.order_number).padStart(8, '0');
 
-const html = `<!DOCTYPE html>
+            const html = `<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
 <meta charset="UTF-8">
 <link href="{{ asset('assets/fonts/cairo/cairo.css') }}" rel="stylesheet">
 <script src="{{ asset('js/barcode/jsbarcode.min.js') }}"><\/script>
-
 <style>
-
-.barcode-section{
-text-align:center;
-padding:5px 0;
-border-bottom:1px dashed #000;
-margin-bottom:8px;
-}
-
-.barcode-svg{
-display:block;
-margin:0 auto;
-}
-
-@page{
-margin:0;
-size:72mm auto;
-}
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-}
-
-body{
-font-family:'Cairo',sans-serif;
-font-size:13px;
-width:72mm;
-margin:0 auto;
-padding:6mm 4mm;
-direction:rtl;
-text-align:right;
-}
-
-.header{
-text-align:center;
-padding:8px 0;
-border-bottom:2px dashed #000;
-margin-bottom:10px;
-}
-
-.logo{
-max-width:180px;
-margin-bottom:6px;
-background:#000;
-padding:10px 15px;
-filter:invert(1) brightness(2) contrast(1.5);
-}
-
-.info{
-display:flex;
-justify-content:space-between;
-font-size:11px;
-padding:2px 0;
-}
-
-table{
-width:100%;
-border-collapse:collapse;
-margin:8px 0;
-}
-
-th{
-background:#f0f0f0;
-padding:6px;
-font-size:11px;
-border-bottom:1px solid #000;
-}
-
-td{
-padding:6px;
-font-size:11px;
-border-bottom:1px dashed #ccc;
-}
-
-.subtotal{
-padding:8px 6px;
-display:flex;
-justify-content:space-between;
-font-size:13px;
-font-weight:600;
-border-top:1px dashed #000;
-}
-
-.discount-box{
-padding:8px;
-margin:6px 0;
-display:flex;
-justify-content:space-between;
-font-size:14px;
-font-weight:800;
-border:2px dashed #000;
-background:#f5f5f5;
-}
-
-.total{
-background:#000;
-color:#fff;
-padding:8px;
-margin:8px 0;
-display:flex;
-justify-content:space-between;
-font-size:15px;
-font-weight:800;
-}
-
-.delivery-box{
-border:2px solid #000;
-padding:8px;
-margin:8px 0;
-text-align:center;
-background:#fff;
-}
-
-.delivery-icon{
-font-size:22px;
-margin-bottom:4px;
-}
-
-.delivery-title{
-font-size:15px;
-font-weight:800;
-margin-bottom:4px;
-}
-
-.delivery-phone{
-font-size:16px;
-font-weight:700;
-direction:ltr;
-}
-
-.credit-section{
-border:2px solid #000;
-padding:8px;
-margin:10px 0;
-background:#fff5f5;
-}
-
-.credit-title{
-font-size:14px;
-font-weight:800;
-text-align:center;
-margin-bottom:6px;
-}
-
-.credit-customer{
-text-align:center;
-font-weight:700;
-margin-bottom:6px;
-font-size:12px;
-}
-
-.credit-row{
-display:flex;
-justify-content:space-between;
-padding:3px 0;
-font-size:11px;
-}
-
-.credit-amount{
-font-weight:800;
-font-size:13px;
-border-top:1px dashed #000;
-padding-top:6px;
-margin-top:4px;
-}
-
-.thanks{
-text-align:center;
-font-size:14px;
-font-weight:700;
-padding:10px 0;
-border-top:2px dashed #000;
-}
-
-.hulul-footer{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:8px;
-padding:10px 0;
-border-top:2px solid #000;
-margin-top:8px;
-}
-
-.hulul-footer img{
-height:32px;
-}
-
-.hulul-footer p{
-font-size:11px;
-font-weight:700;
-color:#000;
-}
-
+.barcode-section{text-align:center;padding:5px 0;border-bottom:1px dashed #000;margin-bottom:8px}
+.barcode-svg{display:block;margin:0 auto}
+@page{margin:0;size:72mm auto}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Cairo',sans-serif;font-size:13px;width:72mm;margin:0 auto;padding:6mm 4mm;direction:rtl;text-align:right}
+.header{text-align:center;padding:8px 0;border-bottom:2px dashed #000;margin-bottom:10px}
+.logo{max-width:180px;margin-bottom:6px;background:#000;padding:10px 15px;filter:invert(1) brightness(2) contrast(1.5)}
+.info{display:flex;justify-content:space-between;font-size:11px;padding:2px 0}
+table{width:100%;border-collapse:collapse;margin:8px 0}
+th{background:#f0f0f0;padding:6px;font-size:11px;border-bottom:1px solid #000}
+td{padding:6px;font-size:11px;border-bottom:1px dashed #ccc}
+.subtotal{padding:8px 6px;display:flex;justify-content:space-between;font-size:13px;font-weight:600;border-top:1px dashed #000}
+.discount-box{padding:8px;margin:6px 0;display:flex;justify-content:space-between;font-size:14px;font-weight:800;border:2px dashed #000;background:#f5f5f5}
+.total{background:#000;color:#fff;padding:8px;margin:8px 0;display:flex;justify-content:space-between;font-size:15px;font-weight:800}
+.credit-section{border:2px solid #000;padding:8px;margin:10px 0;background:#fff5f5}
+.credit-title{font-size:14px;font-weight:800;text-align:center;margin-bottom:6px}
+.credit-customer{text-align:center;font-weight:700;margin-bottom:6px;font-size:12px}
+.credit-row{display:flex;justify-content:space-between;padding:3px 0;font-size:11px}
+.credit-amount{font-weight:800;font-size:13px;border-top:1px dashed #000;padding-top:6px;margin-top:4px}
+.thanks{text-align:center;font-size:14px;font-weight:700;padding:10px 0;border-top:2px dashed #000}
+.hulul-footer{display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 0;border-top:2px solid #000;margin-top:8px}
+.hulul-footer img{height:32px}
+.hulul-footer p{font-size:11px;font-weight:700;color:#000}
 </style>
 </head>
-
 <body>
-
 <div class="header">
 <img src="{{ asset('logo-dark.png') }}" class="logo">
 </div>
-
 <div class="barcode-section">
 <svg class="barcode-svg"></svg>
 </div>
-
 <div class="info"><span>رقم الفاتورة:</span><span>#${data.order_number}</span></div>
 <div class="info"><span>التاريخ:</span><span>${data.paid_at}</span></div>
 <div class="info"><span>الكاشير:</span><span>${data.cashier_name}</span></div>
-
 ${deliveryHtml}
-
 <table>
-<thead>
-<tr>
-<th>الصنف</th>
-<th>الكمية</th>
-<th>السعر</th>
-<th>الإجمالي</th>
-</tr>
-</thead>
-<tbody>
-${itemsHtml}
-</tbody>
+<thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead>
+<tbody>${itemsHtml}</tbody>
 </table>
-
 ${totalsHtml}
-
 ${creditHtml}
-
 <div class="thanks">شكراً لزيارتكم</div>
-
 <div class="hulul-footer">
 <img src="{{ asset('hulul.jpg') }}">
 <p>حلول لتقنية المعلومات</p>
 </div>
-
 <script>JsBarcode(".barcode-svg","${barcodeValue}",{format:"CODE128",width:1.8,height:40,displayValue:false,margin:5});<\/script>
-
 </body>
 </html>`;
 
@@ -2578,20 +2355,15 @@ ${creditHtml}
             currentOrder = null;
             directItems = [];
             isDirectMode = false;
-            payments = [];
             discount = 0;
-            selectedCustomer = null;
-            isCredit = false;
             mergedOrderIds = [];
+            selectedCustomer = null;
 
             document.getElementById('invoiceInput').value = '';
             document.getElementById('invoiceInput').disabled = false;
             document.getElementById('emptyState').classList.remove('hidden');
             document.getElementById('itemsTable').classList.add('hidden');
             document.getElementById('itemsBody').innerHTML = '';
-            document.getElementById('invoiceTotal').textContent = '0.000';
-            clearPayments();
-            setDeliveryType('pickup');
             updateSummary();
             document.getElementById('invoiceInput').focus();
         }
@@ -2605,9 +2377,7 @@ ${creditHtml}
                 showConfirmButton: false,
                 timer: 2000,
                 timerProgressBar: true,
-                customClass: {
-                    popup: 'swal-rtl'
-                }
+                customClass: { popup: 'swal-rtl' }
             });
         }
     </script>

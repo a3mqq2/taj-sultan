@@ -74,22 +74,68 @@
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 16px;
+            padding: 10px 20px;
             background: linear-gradient(135deg, #3b82f6, #2563eb);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #fff;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            font-size: 14px;
+            font-size: 15px;
             text-decoration: none;
             transition: all 0.2s;
+            position: relative;
         }
 
         .back-btn:hover {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: #fff;
+        }
+
+        .back-btn i {
+            font-size: 22px;
+        }
+
+        .shortcut-badge {
+            position: absolute;
+            top: -6px;
+            left: -6px;
+            background: #1e293b;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 6px;
+            line-height: 1.3;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .shortcuts-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 8px 24px;
+            background: #1e293b;
+            flex-shrink: 0;
+        }
+
+        .shortcut-hint {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .shortcut-hint kbd {
+            background: #334155;
+            color: #e2e8f0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
         }
 
         .main-content {
@@ -173,6 +219,17 @@
         .customer-item.active {
             border-color: #f97316;
             background: #ffedd5;
+        }
+
+        .customer-item.highlighted {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .customer-item.highlighted.active {
+            border-color: #f97316;
+            background: #ffedd5;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.3);
         }
 
         .customer-name {
@@ -546,7 +603,8 @@
         <div class="header">
             <div class="logo"><img src="{{ asset('logo-dark.png') }}" alt="Taj Alsultan"></div>
             <div class="header-left">
-                <a href="{{ route('cashier.index') }}" class="back-btn">
+                <a href="{{ route('cashier.index') }}" class="back-btn" id="backBtn">
+                    <span class="shortcut-badge">Esc</span>
                     <i class="ti ti-arrow-right"></i>
                     العودة للكاشير
                 </a>
@@ -555,6 +613,13 @@
                     {{ auth()->user()->name }}
                 </div>
             </div>
+        </div>
+
+        <div class="shortcuts-bar">
+            <div class="shortcut-hint"><kbd>↑↓</kbd> تنقل بين الزبائن</div>
+            <div class="shortcut-hint"><kbd>Enter</kbd> اختيار / تسديد</div>
+            <div class="shortcut-hint"><kbd>Ctrl+F</kbd> بحث</div>
+            <div class="shortcut-hint"><kbd>Esc</kbd> رجوع</div>
         </div>
 
         <div class="main-content">
@@ -628,7 +693,10 @@
     <script>
         const BASE_URL = "{{ url('/') }}";
         let customers = [];
+        let filteredList = [];
         let selectedCustomer = null;
+        let highlightIndex = -1;
+        let modalOpen = false;
 
         document.addEventListener('DOMContentLoaded', init);
 
@@ -641,14 +709,82 @@
             document.getElementById('cancelPayDebt').addEventListener('click', closePayDebtModal);
             document.getElementById('confirmPayDebt').addEventListener('click', processPayDebt);
             document.getElementById('payAmount').addEventListener('keydown', e => {
-                if (e.key === 'Enter') processPayDebt();
-            });
-
-            document.addEventListener('keydown', e => {
-                if (e.key === 'Escape' && document.getElementById('payDebtModal').classList.contains('active')) {
-                    closePayDebtModal();
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    document.getElementById('paymentMethodSelect').focus();
                 }
             });
+            document.getElementById('paymentMethodSelect').addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    processPayDebt();
+                }
+            });
+
+            document.addEventListener('keydown', handleGlobalKeys);
+        }
+
+        function handleGlobalKeys(e) {
+            if (modalOpen) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    closePayDebtModal();
+                }
+                return;
+            }
+
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                window.location.href = document.getElementById('backBtn').href;
+                return;
+            }
+
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+                document.getElementById('searchInput').select();
+                return;
+            }
+
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (filteredList.length === 0) return;
+                highlightIndex = Math.min(highlightIndex + 1, filteredList.length - 1);
+                updateHighlight();
+                return;
+            }
+
+            if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (filteredList.length === 0) return;
+                highlightIndex = Math.max(highlightIndex - 1, 0);
+                updateHighlight();
+                return;
+            }
+
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (highlightIndex >= 0 && highlightIndex < filteredList.length) {
+                    if (selectedCustomer && selectedCustomer.id === filteredList[highlightIndex].id && selectedCustomer.balance < 0) {
+                        openPayDebtModal();
+                    } else {
+                        const c = filteredList[highlightIndex];
+                        selectCustomer(c.id);
+                    }
+                }
+                return;
+            }
+        }
+
+        function updateHighlight() {
+            const items = document.querySelectorAll('.customer-item');
+            items.forEach((item, i) => {
+                item.classList.toggle('highlighted', i === highlightIndex);
+            });
+
+            if (highlightIndex >= 0 && items[highlightIndex]) {
+                items[highlightIndex].scrollIntoView({ block: 'nearest' });
+            }
         }
 
         function debounce(func, wait) {
@@ -665,7 +801,7 @@
                 const data = await res.json();
                 if (data.success) {
                     customers = data.data;
-                    renderCustomers(customers);
+                    filterCustomers();
                 }
             } catch (err) {
                 toast('خطأ في تحميل البيانات', 'error');
@@ -674,11 +810,12 @@
 
         function filterCustomers() {
             const q = document.getElementById('searchInput').value.trim().toLowerCase();
-            const filtered = customers.filter(c =>
+            filteredList = customers.filter(c =>
                 c.name.toLowerCase().includes(q) ||
                 (c.phone && c.phone.includes(q))
             );
-            renderCustomers(filtered);
+            highlightIndex = filteredList.length > 0 ? 0 : -1;
+            renderCustomers(filteredList);
         }
 
         function renderCustomers(list) {
@@ -690,12 +827,13 @@
                 return;
             }
 
-            container.innerHTML = list.map(c => {
+            container.innerHTML = list.map((c, i) => {
                 const balanceClass = c.balance < 0 ? 'debt' : 'credit';
                 const balanceText = c.balance < 0 ? `دين: ${Math.abs(c.balance).toFixed(3)}` : `رصيد: ${c.balance.toFixed(3)}`;
                 const activeClass = selectedCustomer && selectedCustomer.id === c.id ? 'active' : '';
+                const hlClass = i === highlightIndex ? 'highlighted' : '';
                 return `
-                    <div class="customer-item ${activeClass}" onclick="selectCustomer(${c.id}, this)">
+                    <div class="customer-item ${activeClass} ${hlClass}" onclick="selectCustomer(${c.id})">
                         <div class="customer-name">${c.name}</div>
                         <div class="customer-phone">${c.phone || '-'}</div>
                         <div class="customer-balance ${balanceClass}">${balanceText}</div>
@@ -704,16 +842,18 @@
             }).join('');
         }
 
-        async function selectCustomer(id, el) {
+        async function selectCustomer(id) {
             try {
                 const res = await fetch(BASE_URL + `/cashier/customers/${id}`);
                 const data = await res.json();
                 if (data.success) {
                     selectedCustomer = data.data;
-                    renderCustomerDetails(data.data);
 
-                    document.querySelectorAll('.customer-item').forEach(item => item.classList.remove('active'));
-                    if (el) el.classList.add('active');
+                    const idx = filteredList.findIndex(c => c.id === id);
+                    if (idx >= 0) highlightIndex = idx;
+
+                    renderCustomerDetails(data.data);
+                    renderCustomers(filteredList);
                 } else {
                     toast(data.message || 'خطأ في تحميل البيانات', 'error');
                 }
@@ -777,6 +917,7 @@
         function openPayDebtModal() {
             if (!selectedCustomer || selectedCustomer.balance >= 0) return;
 
+            modalOpen = true;
             const debtAmount = Math.abs(selectedCustomer.balance);
             document.getElementById('modalDebtAmount').textContent = debtAmount.toFixed(3);
             document.getElementById('payAmount').value = debtAmount.toFixed(3);
@@ -786,7 +927,9 @@
         }
 
         function closePayDebtModal() {
+            modalOpen = false;
             document.getElementById('payDebtModal').classList.remove('active');
+            document.getElementById('searchInput').focus();
         }
 
         async function processPayDebt() {
@@ -817,7 +960,7 @@
                     closePayDebtModal();
                     toast('تم التسديد بنجاح', 'success');
                     loadCustomers();
-                    selectCustomer(selectedCustomer.id, null);
+                    selectCustomer(selectedCustomer.id);
                 } else {
                     toast(data.message, 'error');
                 }
