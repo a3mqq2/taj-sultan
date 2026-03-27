@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Setting;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
@@ -30,6 +31,61 @@ class SettingController extends Controller
             'success' => true,
             'message' => 'تم حفظ الإعدادات بنجاح',
         ]);
+    }
+
+    public function shortcuts()
+    {
+        $shortcuts = json_decode(Setting::getValue('product_shortcuts', '{}'), true) ?: [];
+
+        $products = [];
+        foreach ($shortcuts as $slot => $productId) {
+            $product = Product::find($productId);
+            if ($product) {
+                $products[$slot] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                ];
+            }
+        }
+
+        return view('settings.shortcuts', compact('products'));
+    }
+
+    public function updateShortcuts(Request $request)
+    {
+        $request->validate([
+            'shortcuts' => 'required|array',
+            'shortcuts.*' => 'nullable|exists:products,id',
+        ]);
+
+        $shortcuts = [];
+        foreach ($request->shortcuts as $slot => $productId) {
+            if ($productId) {
+                $shortcuts[$slot] = (int) $productId;
+            }
+        }
+
+        Setting::setValue('product_shortcuts', json_encode($shortcuts));
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم حفظ الاختصارات بنجاح',
+        ]);
+    }
+
+    public function searchProducts(Request $request)
+    {
+        $query = $request->get('q', '');
+
+        $products = Product::where('is_active', true)
+            ->where(function ($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                    ->orWhere('barcode', 'like', "%{$query}%");
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'barcode', 'price']);
+
+        return response()->json($products);
     }
 
     public function verifyCancelCode(Request $request)

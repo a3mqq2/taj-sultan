@@ -824,6 +824,315 @@
         .swal2-backdrop-show {
             background: transparent !important;
         }
+
+        .shortcuts-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shortcuts-modal.active {
+            display: flex;
+        }
+
+        .shortcuts-modal-content {
+            background: #fff;
+            border-radius: 16px;
+            padding: 28px;
+            width: 100%;
+            max-width: 420px;
+            animation: wizardIn 0.2s ease-out;
+        }
+
+        .shortcuts-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .shortcuts-modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shortcuts-modal-title i {
+            color: #3b82f6;
+            font-size: 22px;
+        }
+
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .shortcut-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #f8fafc;
+        }
+
+        .shortcut-item:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            transform: scale(1.02);
+        }
+
+        .shortcut-item.empty {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .shortcut-item.empty:hover {
+            border-color: #e2e8f0;
+            background: #f8fafc;
+            transform: none;
+        }
+
+        .shortcut-item-number {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #3b82f6;
+            color: #fff;
+            font-weight: 800;
+            font-size: 16px;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        .shortcut-item.empty .shortcut-item-number {
+            background: #94a3b8;
+        }
+
+        .shortcut-item-name {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 600;
+            color: #1e293b;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .shortcut-item.empty .shortcut-item-name {
+            color: #94a3b8;
+        }
+
+        .shortcuts-hint {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .shortcuts-hint kbd {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: inherit;
+            color: #475569;
+        }
+
+        .hold-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .hold-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245,158,11,0.4);
+        }
+
+        .hold-btn i {
+            font-size: 20px;
+        }
+
+        .held-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: #f8fafc;
+        }
+
+        .held-item:hover {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+
+        .held-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .held-item-total {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .held-item-meta {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .held-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .held-item-delete {
+            width: 30px;
+            height: 30px;
+            border: none;
+            background: #fee2e2;
+            border-radius: 6px;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .held-item-delete:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .held-products-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .held-product-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .held-empty {
+            text-align: center;
+            padding: 24px;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .numpad-btn {
+            padding: 14px;
+            font-size: 20px;
+            font-weight: 700;
+            font-family: inherit;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            background: #fff;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .numpad-btn:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .numpad-btn:active {
+            background: #e2e8f0;
+            transform: scale(0.96);
+        }
+
+        .numpad-dot {
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .numpad-back {
+            color: #f97316;
+            font-size: 22px;
+        }
+
+        .numpad-clear {
+            background: #fee2e2;
+            color: #ef4444;
+            border-color: #fecaca;
+        }
+
+        .numpad-clear:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .numpad-confirm {
+            grid-column: span 2;
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+            font-size: 18px;
+            gap: 6px;
+        }
+
+        .numpad-confirm:hover {
+            background: #059669;
+            border-color: #059669;
+        }
     </style>
 </head>
 <body>
@@ -856,6 +1165,17 @@
                     <i class="ti ti-cake"></i>
                     طلبيات خاصة
                 </a>
+                <button type="button" class="header-btn" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);" onclick="openShortcutsModal()">
+                    <span class="shortcut-badge">F9</span>
+                    <i class="ti ti-keyboard"></i>
+                    الاختصارات
+                </button>
+                <button type="button" class="header-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);position:relative;" onclick="openHeldModal()" id="btnHeld">
+                    <span class="shortcut-badge">F10</span>
+                    <i class="ti ti-player-pause"></i>
+                    معلقة
+                    <span id="heldCount" style="display:none;position:absolute;top:-8px;right:-8px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;">0</span>
+                </button>
                 <div class="user-info">
                     <i class="ti ti-user"></i>
                     {{ auth()->user()->name }}
@@ -907,6 +1227,8 @@
                     <div class="footer-hints">
                         <div class="hint"><kbd>F2</kbd> الباركود</div>
                         <div class="hint"><kbd>F4</kbd> خصم</div>
+                        <div class="hint"><kbd>F9</kbd> اختصارات</div>
+                        <div class="hint"><kbd>F10</kbd> تعليق</div>
                         <div class="hint"><kbd>Enter</kbd> دفع</div>
                         <div class="hint"><kbd>Esc</kbd> إلغاء</div>
                     </div>
@@ -933,6 +1255,11 @@
                         اضغط <kbd>Enter</kbd> للدفع
                     </div>
                 </div>
+                <button type="button" class="hold-btn" onclick="holdCurrentInvoice()" id="holdBtn">
+                    <i class="ti ti-player-pause"></i>
+                    تعليق الفاتورة
+                    <span style="font-size:11px;opacity:0.8;">F10</span>
+                </button>
             </div>
         </div>
     </div>
@@ -960,8 +1287,68 @@
         </div>
     </div>
 
+    <div class="shortcuts-modal" id="shortcutsModal">
+        <div class="shortcuts-modal-content">
+            <div class="shortcuts-modal-header">
+                <div class="shortcuts-modal-title">
+                    <i class="ti ti-keyboard"></i>
+                    الاختصارات
+                </div>
+                <button class="modal-close" onclick="closeShortcutsModal()"><i class="ti ti-x"></i></button>
+            </div>
+            <div id="shortcutsStep1">
+                <div class="shortcuts-grid" id="shortcutsGrid"></div>
+                <div class="shortcuts-hint">
+                    اضغط رقم <kbd>1</kbd> - <kbd>8</kbd> لاختيار المنتج &bull; <kbd>Esc</kbd> للإغلاق
+                </div>
+            </div>
+            <div id="shortcutsStep2" style="display:none;">
+                <div style="text-align:center;margin-bottom:12px;">
+                    <div style="font-size:16px;font-weight:700;color:#1e293b;" id="shortcutSelectedName"></div>
+                    <div style="font-size:13px;color:#64748b;margin-top:4px;" id="shortcutSelectedPrice"></div>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <label style="display:block;font-size:13px;font-weight:600;color:#64748b;margin-bottom:6px;text-align:center;" id="shortcutQtyLabel">الكمية</label>
+                    <input type="text" id="shortcutQtyInput" readonly style="width:100%;padding:14px;font-size:26px;font-weight:800;text-align:center;border:2px solid #e2e8f0;border-radius:10px;font-family:inherit;background:#f8fafc;color:#1e293b;cursor:default;" placeholder="0">
+                </div>
+                <div class="numpad">
+                    <button type="button" class="numpad-btn" onclick="numpadPress('1')">1</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('2')">2</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('3')">3</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('4')">4</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('5')">5</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('6')">6</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('7')">7</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('8')">8</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('9')">9</button>
+                    <button type="button" class="numpad-btn numpad-dot" onclick="numpadPress('.')">.</button>
+                    <button type="button" class="numpad-btn" onclick="numpadPress('0')">0</button>
+                    <button type="button" class="numpad-btn numpad-back" onclick="numpadBack()"><i class="ti ti-backspace"></i></button>
+                    <button type="button" class="numpad-btn numpad-clear" onclick="numpadClear()">C</button>
+                    <button type="button" class="numpad-btn numpad-confirm" onclick="confirmShortcutAdd()"><i class="ti ti-check"></i> إضافة</button>
+                </div>
+                <div class="shortcuts-hint" style="margin-top:10px;">
+                    <kbd>Esc</kbd> رجوع
+                </div>
+            </div>
+        </div>
+    </div>
 
-
+    <div class="shortcuts-modal" id="heldModal">
+        <div class="shortcuts-modal-content" style="max-width:460px;">
+            <div class="shortcuts-modal-header">
+                <div class="shortcuts-modal-title">
+                    <i class="ti ti-player-pause" style="color:#f59e0b;"></i>
+                    الفواتير المعلقة
+                </div>
+                <button class="modal-close" onclick="closeHeldModal()"><i class="ti ti-x"></i></button>
+            </div>
+            <div id="heldList"></div>
+            <div class="shortcuts-hint" style="margin-top:12px;">
+                <kbd>F10</kbd> تعليق الحالية &bull; <kbd>Esc</kbd> إغلاق
+            </div>
+        </div>
+    </div>
 
     <script>
         const BASE_URL = "{{ url('/') }}";
@@ -974,6 +1361,15 @@
             { id: 'credit', name: 'آجل', isCredit: true }
         ];
 
+        const PRODUCT_SHORTCUTS = {
+            @foreach($shortcuts as $slot => $product)
+            {{ $slot }}: { id: {{ $product['id'] }}, name: "{{ $product['name'] }}", price: {{ $product['price'] }}, barcode: "{{ $product['barcode'] }}", is_weight: {{ $product['is_weight'] ? 'true' : 'false' }} },
+            @endforeach
+        };
+
+        let shortcutsModalActive = false;
+        let shortcutStep = 1;
+        let shortcutSelectedSlot = null;
         let currentOrder = null;
         let directItems = [];
         let isDirectMode = false;
@@ -1006,6 +1402,8 @@
             });
 
             document.addEventListener('keydown', handleGlobalKeys);
+            renderShortcutsGrid();
+            updateHeldCount();
         }
 
         function debounce(func, wait) {
@@ -1019,6 +1417,11 @@
         function handleGlobalKeys(e) {
             if (wizardActive) {
                 handleWizardKeys(e);
+                return;
+            }
+
+            if (shortcutsModalActive) {
+                handleShortcutsKeys(e);
                 return;
             }
 
@@ -1055,8 +1458,22 @@
                 e.preventDefault();
                 if (hasItems()) openWizard();
             }
+            if (e.key === 'F9') {
+                e.preventDefault();
+                openShortcutsModal();
+            }
+            if (e.key === 'F10') {
+                e.preventDefault();
+                if (hasItems()) {
+                    holdCurrentInvoice();
+                } else {
+                    openHeldModal();
+                }
+            }
             if (e.key === 'Escape') {
-                if (document.getElementById('discountModal').classList.contains('active')) {
+                if (document.getElementById('heldModal').classList.contains('active')) {
+                    closeHeldModal();
+                } else if (document.getElementById('discountModal').classList.contains('active')) {
                     closeDiscountModal();
                 } else if (hasItems()) {
                     cancelAllItems();
@@ -1085,6 +1502,179 @@
             if (!confirm.isConfirmed) return;
             resetAll();
             toast('تم إلغاء الأصناف', 'success');
+        }
+
+        function renderShortcutsGrid() {
+            const grid = document.getElementById('shortcutsGrid');
+            let html = '';
+            for (let i = 1; i <= 8; i++) {
+                const sc = PRODUCT_SHORTCUTS[i];
+                if (sc) {
+                    const typeLabel = sc.is_weight ? '<span style="color:#8b5cf6;font-size:11px;margin-right:4px;">⚖</span>' : '';
+                    html += '<div class="shortcut-item" onclick="selectShortcut(' + i + ')">' +
+                        '<div class="shortcut-item-number">' + i + '</div>' +
+                        '<div class="shortcut-item-name">' + typeLabel + sc.name + '</div>' +
+                    '</div>';
+                } else {
+                    html += '<div class="shortcut-item empty">' +
+                        '<div class="shortcut-item-number">' + i + '</div>' +
+                        '<div class="shortcut-item-name">— فارغ —</div>' +
+                    '</div>';
+                }
+            }
+            grid.innerHTML = html;
+        }
+
+        function openShortcutsModal() {
+            shortcutsModalActive = true;
+            shortcutStep = 1;
+            shortcutSelectedSlot = null;
+            document.getElementById('shortcutsStep1').style.display = '';
+            document.getElementById('shortcutsStep2').style.display = 'none';
+            document.getElementById('shortcutsModal').classList.add('active');
+        }
+
+        function closeShortcutsModal() {
+            shortcutsModalActive = false;
+            shortcutStep = 1;
+            shortcutSelectedSlot = null;
+            document.getElementById('shortcutsModal').classList.remove('active');
+            document.getElementById('invoiceInput').focus();
+        }
+
+        function selectShortcut(num) {
+            const sc = PRODUCT_SHORTCUTS[num];
+            if (!sc) {
+                toast('لا يوجد منتج لهذا الاختصار', 'error');
+                return;
+            }
+
+            shortcutSelectedSlot = num;
+            shortcutStep = 2;
+
+            document.getElementById('shortcutSelectedName').textContent = sc.name;
+            document.getElementById('shortcutSelectedPrice').textContent = parseFloat(sc.price).toFixed(3) + ' د.ل';
+            document.getElementById('shortcutQtyLabel').textContent = sc.is_weight ? 'الوزن (كجم)' : 'الكمية';
+            document.getElementById('shortcutQtyInput').value = '';
+            document.getElementById('shortcutQtyInput').placeholder = sc.is_weight ? '0.000' : '1';
+
+            document.getElementById('shortcutsStep1').style.display = 'none';
+            document.getElementById('shortcutsStep2').style.display = '';
+        }
+
+        function numpadPress(char) {
+            const input = document.getElementById('shortcutQtyInput');
+            let val = input.value;
+            if (char === '.' && val.includes('.')) return;
+            input.value = val + char;
+        }
+
+        function numpadBack() {
+            const input = document.getElementById('shortcutQtyInput');
+            input.value = input.value.slice(0, -1);
+        }
+
+        function numpadClear() {
+            document.getElementById('shortcutQtyInput').value = '';
+        }
+
+        function handleShortcutsKeys(e) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                if (shortcutStep === 2) {
+                    shortcutStep = 1;
+                    shortcutSelectedSlot = null;
+                    document.getElementById('shortcutsStep1').style.display = '';
+                    document.getElementById('shortcutsStep2').style.display = 'none';
+                } else {
+                    closeShortcutsModal();
+                }
+                return;
+            }
+
+            if (shortcutStep === 1) {
+                const num = parseInt(e.key);
+                if (num >= 1 && num <= 8) {
+                    e.preventDefault();
+                    selectShortcut(num);
+                }
+            }
+
+            if (shortcutStep === 2) {
+                e.preventDefault();
+                if (e.key === 'Enter') {
+                    confirmShortcutAdd();
+                } else if (e.key >= '0' && e.key <= '9') {
+                    numpadPress(e.key);
+                } else if (e.key === '.' || e.key === ',') {
+                    numpadPress('.');
+                } else if (e.key === 'Backspace') {
+                    numpadBack();
+                } else if (e.key === 'Delete') {
+                    numpadClear();
+                }
+            }
+        }
+
+        async function confirmShortcutAdd() {
+            const sc = PRODUCT_SHORTCUTS[shortcutSelectedSlot];
+            if (!sc) return;
+
+            const qtyInput = document.getElementById('shortcutQtyInput');
+            const qty = parseFloat(qtyInput.value);
+
+            if (!qty || qty <= 0) {
+                toast(sc.is_weight ? 'أدخل الوزن' : 'أدخل الكمية', 'error');
+                qtyInput.focus();
+                return;
+            }
+
+            closeShortcutsModal();
+
+            if (currentOrder) {
+                const res = await fetch(BASE_URL + '/cashier/add-item-to-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        order_id: currentOrder.id,
+                        product_id: sc.id,
+                        quantity: qty
+                    })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    currentOrder = data.data.order;
+                    renderOrder();
+                    toast('تم إضافة ' + sc.name, 'success');
+                } else {
+                    toast(data.message, 'error');
+                }
+            } else {
+                if (!isDirectMode) {
+                    isDirectMode = true;
+                    directItems = [];
+                }
+                const existing = directItems.find(i => i.product_id === sc.id && !sc.is_weight);
+                if (existing) {
+                    existing.quantity = parseFloat(existing.quantity) + qty;
+                    existing.total = existing.price * existing.quantity;
+                } else {
+                    directItems.push({
+                        product_id: sc.id,
+                        product_name: sc.name,
+                        price: parseFloat(sc.price),
+                        quantity: qty,
+                        total: parseFloat(sc.price) * qty,
+                        is_weight: sc.is_weight
+                    });
+                }
+                renderItems();
+                updateSummary();
+                toast('تم إضافة ' + sc.name, 'success');
+            }
         }
 
         async function handleInvoiceInput(e) {
@@ -2349,6 +2939,132 @@ ${creditHtml}
                     win.close();
                 }, 250);
             }
+        }
+
+        function holdCurrentInvoice() {
+            if (!hasItems()) {
+                toast('لا توجد أصناف لتعليقها', 'error');
+                return;
+            }
+
+            const items = isDirectMode ? directItems : (currentOrder ? currentOrder.items : []);
+            const total = items.reduce(function(sum, i) { return sum + parseFloat(i.total); }, 0);
+
+            const held = {
+                id: Date.now(),
+                items: JSON.parse(JSON.stringify(items)),
+                discount: discount,
+                isDirectMode: isDirectMode,
+                orderId: currentOrder ? currentOrder.id : null,
+                orderNumber: currentOrder ? currentOrder.order_number : null,
+                total: total,
+                time: new Date().toLocaleTimeString('ar-LY', { hour: '2-digit', minute: '2-digit' }),
+                count: items.length
+            };
+
+            const list = getHeldInvoices();
+            list.push(held);
+            localStorage.setItem('held_invoices', JSON.stringify(list));
+
+            resetAll();
+            updateHeldCount();
+            toast('تم تعليق الفاتورة', 'success');
+        }
+
+        function getHeldInvoices() {
+            try {
+                return JSON.parse(localStorage.getItem('held_invoices') || '[]');
+            } catch(e) {
+                return [];
+            }
+        }
+
+        function updateHeldCount() {
+            const list = getHeldInvoices();
+            const badge = document.getElementById('heldCount');
+            if (list.length > 0) {
+                badge.textContent = list.length;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function openHeldModal() {
+            const list = getHeldInvoices();
+            const container = document.getElementById('heldList');
+
+            if (list.length === 0) {
+                container.innerHTML = '<div class="held-empty"><i class="ti ti-receipt-off" style="font-size:32px;display:block;margin-bottom:8px;"></i>لا توجد فواتير معلقة</div>';
+            } else {
+                container.innerHTML = list.map(function(h, idx) {
+                    var itemsHtml = h.items.map(function(item) {
+                        var qty = item.is_weight ? parseFloat(item.quantity).toFixed(3) + ' كجم' : parseInt(item.quantity) + 'x';
+                        return '<span class="held-product-tag">' + qty + ' ' + item.product_name + '</span>';
+                    }).join('');
+
+                    return '<div class="held-item" onclick="resumeHeld(' + idx + ')">' +
+                        '<div class="held-item-info" style="flex:1;min-width:0;">' +
+                            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+                                '<div class="held-item-total">' + parseFloat(h.total).toFixed(3) + ' د.ل</div>' +
+                                '<div class="held-item-meta">' + h.time + '</div>' +
+                            '</div>' +
+                            '<div class="held-products-list">' + itemsHtml + '</div>' +
+                        '</div>' +
+                        '<div class="held-item-actions">' +
+                            '<button class="held-item-delete" onclick="event.stopPropagation();deleteHeld(' + idx + ')" title="حذف"><i class="ti ti-trash"></i></button>' +
+                        '</div>' +
+                    '</div>';
+                }).join('');
+            }
+
+            document.getElementById('heldModal').classList.add('active');
+        }
+
+        function closeHeldModal() {
+            document.getElementById('heldModal').classList.remove('active');
+            document.getElementById('invoiceInput').focus();
+        }
+
+        function resumeHeld(idx) {
+            const list = getHeldInvoices();
+            const held = list[idx];
+            if (!held) return;
+
+            if (hasItems()) {
+                holdCurrentInvoice();
+            }
+
+            isDirectMode = true;
+            directItems = held.items.map(function(i) {
+                return {
+                    product_id: i.product_id,
+                    product_name: i.product_name,
+                    price: parseFloat(i.price),
+                    quantity: parseFloat(i.quantity),
+                    total: parseFloat(i.total),
+                    is_weight: i.is_weight || false
+                };
+            });
+            discount = held.discount || 0;
+
+            list.splice(idx, 1);
+            localStorage.setItem('held_invoices', JSON.stringify(list));
+
+            renderItems();
+            updateSummary();
+            updateHeldCount();
+            closeHeldModal();
+            toast('تم استرجاع الفاتورة', 'success');
+        }
+
+        function deleteHeld(idx) {
+            const list = getHeldInvoices();
+            list.splice(idx, 1);
+            localStorage.setItem('held_invoices', JSON.stringify(list));
+            updateHeldCount();
+            openHeldModal();
+            toast('تم حذف الفاتورة المعلقة', 'success');
         }
 
         function resetAll() {

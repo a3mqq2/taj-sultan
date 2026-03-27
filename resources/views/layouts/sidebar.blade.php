@@ -59,6 +59,11 @@
                         </a>
                     </li>
                     <li class="side-nav-item">
+                        <a href="{{ route('settings.shortcuts') }}" class="side-nav-link {{ request()->routeIs('settings.shortcuts') ? 'active' : '' }}">
+                            <span class="menu-text">اختصارات المنتجات</span>
+                        </a>
+                    </li>
+                    <li class="side-nav-item">
                         <a href="{{ route('payment-methods.index') }}" class="side-nav-link {{ request()->routeIs('payment-methods.*') ? 'active' : '' }}">
                             <span class="menu-text">طرق الدفع</span>
                         </a>

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
+use App\Models\Product;
 use App\Models\PosPoint;
 use App\Models\PaymentMethod;
 use App\Models\SpecialOrder;
@@ -447,6 +448,252 @@ class SalesReportController extends Controller
         ];
 
         return view('reports.sales.print', compact('orders', 'summary', 'specialOrders', 'specialSummary', 'filters'));
+    }
+
+    public function searchProducts(Request $request)
+    {
+        $q = $request->get('q', '');
+        $products = Product::where('is_active', true)
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                    ->orWhere('barcode', 'like', "%{$q}%");
+            })
+            ->limit(20)
+            ->get(['id', 'name', 'barcode']);
+
+        return response()->json($products);
+    }
+
+    public function allProductsData(Request $request)
+    {
+        $query = OrderItem::query()
+            ->whereHas('order', function ($q) use ($request) {
+                $q->whereIn('status', ['paid', 'delivering']);
+                $this->applyFilters($q, $request);
+            })
+            ->selectRaw('
+                order_items.product_id,
+                COALESCE(products.name, order_items.product_name) as name,
+                SUM(order_items.quantity) as total_quantity,
+                SUM(order_items.total) as total_sales,
+                COUNT(DISTINCT order_items.order_id) as orders_count,
+                AVG(order_items.price) as avg_price
+            ')
+            ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
+            ->groupBy('order_items.product_id', DB::raw('COALESCE(products.name, order_items.product_name)'));
+
+        $sortField = $request->get('sort', 'total_sales');
+        $sortDirection = $request->get('direction', 'desc');
+        $allowedSorts = ['total_sales', 'total_quantity', 'orders_count', 'name'];
+        if (in_array($sortField, $allowedSorts)) {
+            $query->orderBy($sortField, $sortDirection);
+        }
+
+        $products = $query->get();
+
+        $grandTotal = $products->sum('total_sales');
+
+        $data = $products->map(function ($item) use ($grandTotal) {
+            $percentage = $grandTotal > 0 ? round(($item->total_sales / $grandTotal) * 100, 1) : 0;
+            return [
+                'product_id' => $item->product_id,
+                'name' => $item->name,
+                'quantity' => number_format($item->total_quantity, 3),
+                'total' => number_format($item->total_sales, 3),
+                'total_raw' => round($item->total_sales, 3),
+                'orders_count' => $item->orders_count,
+                'avg_price' => number_format($item->avg_price, 3),
+                'percentage' => $percentage,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'grand_total' => number_format($grandTotal, 3),
+            'products_count' => $products->count(),
+        ]);
+    }
+
+    public function singleProductReport(Request $request)
+    {
+        $request->validate(['product_id' => 'required|exists:products,id']);
+
+        $product = Product::find($request->product_id);
+
+        $itemsQuery = OrderItem::query()
+            ->where('order_items.product_id', $product->id)
+            ->whereHas('order', function ($q) use ($request) {
+                $q->whereIn('status', ['paid', 'delivering']);
+                $this->applyFilters($q, $request);
+            });
+
+        $stats = $itemsQuery->clone()->selectRaw('
+            COUNT(*) as times_sold,
+            COUNT(DISTINCT order_id) as orders_count,
+            SUM(quantity) as total_quantity,
+            SUM(total) as total_sales,
+            AVG(price) as avg_price,
+            MIN(price) as min_price,
+            MAX(price) as max_price
+        ')->first();
+
+        $dailySales = $itemsQuery->clone()
+            ->join('orders', 'order_items.order_id', '=', 'orders.id')
+            ->selectRaw('DATE(orders.created_at) as date, SUM(order_items.quantity) as qty, SUM(order_items.total) as total')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $transactions = $itemsQuery->clone()
+            ->with(['order:id,order_number,created_at'])
+            ->orderByDesc('order_items.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'order_number' => $item->order->order_number,
+                    'date' => $item->order->created_at->format('Y-m-d H:i'),
+                    'quantity' => number_format($item->quantity, 3),
+                    'price' => number_format($item->price, 3),
+                    'total' => number_format($item->total, 3),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'product' => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'barcode' => $product->barcode,
+                    'price' => number_format($product->price, 3),
+                    'type' => $product->type,
+                ],
+                'stats' => [
+                    'orders_count' => $stats->orders_count ?? 0,
+                    'total_quantity' => number_format($stats->total_quantity ?? 0, 3),
+                    'total_sales' => number_format($stats->total_sales ?? 0, 3),
+                    'avg_price' => number_format($stats->avg_price ?? 0, 3),
+                    'min_price' => number_format($stats->min_price ?? 0, 3),
+                    'max_price' => number_format($stats->max_price ?? 0, 3),
+                ],
+                'daily_sales' => $dailySales->map(fn($d) => [
+                    'date' => $d->date,
+                    'qty' => round($d->qty, 3),
+                    'total' => round($d->total, 3),
+                ]),
+                'transactions' => $transactions,
+            ]
+        ]);
+    }
+
+    public function exportSingleProductExcel(Request $request)
+    {
+        $request->validate(['product_id' => 'required|exists:products,id']);
+        $product = Product::find($request->product_id);
+
+        $items = OrderItem::query()
+            ->where('order_items.product_id', $product->id)
+            ->whereHas('order', function ($q) use ($request) {
+                $q->whereIn('status', ['paid', 'delivering']);
+                $this->applyFilters($q, $request);
+            })
+            ->with(['order:id,order_number,created_at'])
+            ->orderByDesc('order_items.created_at')
+            ->get();
+
+        $filename = 'product_' . $product->id . '_report_' . now()->format('Y-m-d_H-i') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ];
+
+        $callback = function () use ($items, $product) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($file, ['تقرير مبيعات: ' . $product->name]);
+            fputcsv($file, []);
+            fputcsv($file, ['رقم الفاتورة', 'التاريخ', 'الكمية', 'السعر', 'الإجمالي']);
+
+            $totalQty = 0;
+            $totalAmount = 0;
+            foreach ($items as $item) {
+                $totalQty += $item->quantity;
+                $totalAmount += $item->total;
+                fputcsv($file, [
+                    $item->order->order_number,
+                    $item->order->created_at->format('Y-m-d H:i'),
+                    number_format($item->quantity, 3),
+                    number_format($item->price, 3),
+                    number_format($item->total, 3),
+                ]);
+            }
+
+            fputcsv($file, []);
+            fputcsv($file, ['الإجمالي', '', number_format($totalQty, 3), '', number_format($totalAmount, 3)]);
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function printProducts(Request $request)
+    {
+        $query = OrderItem::query()
+            ->whereHas('order', function ($q) use ($request) {
+                $q->whereIn('status', ['paid', 'delivering']);
+                $this->applyFilters($q, $request);
+            })
+            ->selectRaw('
+                COALESCE(products.name, order_items.product_name) as name,
+                SUM(order_items.quantity) as total_quantity,
+                SUM(order_items.total) as total_sales,
+                COUNT(DISTINCT order_items.order_id) as orders_count
+            ')
+            ->leftJoin('products', 'order_items.product_id', '=', 'products.id')
+            ->groupBy(DB::raw('COALESCE(products.name, order_items.product_name)'))
+            ->orderByDesc('total_sales')
+            ->get();
+
+        $grandTotal = $query->sum('total_sales');
+        $grandQty = $query->sum('total_quantity');
+
+        $filters = [
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+        ];
+
+        return view('reports.sales.print-products', compact('query', 'grandTotal', 'grandQty', 'filters'));
+    }
+
+    public function printSingleProduct(Request $request)
+    {
+        $request->validate(['product_id' => 'required|exists:products,id']);
+        $product = Product::find($request->product_id);
+
+        $items = OrderItem::query()
+            ->where('order_items.product_id', $product->id)
+            ->whereHas('order', function ($q) use ($request) {
+                $q->whereIn('status', ['paid', 'delivering']);
+                $this->applyFilters($q, $request);
+            })
+            ->with(['order:id,order_number,created_at'])
+            ->orderByDesc('order_items.created_at')
+            ->get();
+
+        $totalQty = $items->sum('quantity');
+        $totalAmount = $items->sum('total');
+
+        $filters = [
+            'date_from' => $request->date_from,
+            'date_to' => $request->date_to,
+        ];
+
+        return view('reports.sales.print-single-product', compact('product', 'items', 'totalQty', 'totalAmount', 'filters'));
     }
 
     protected function applyFilters($query, Request $request)

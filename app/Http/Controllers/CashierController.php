@@ -9,6 +9,7 @@ use App\Models\OrderMerge;
 use App\Models\Product;
 use App\Models\PaymentMethod;
 use App\Models\Customer;
+use App\Models\Setting;
 use App\Models\SpecialOrder;
 use App\Models\SpecialOrderItem;
 use App\Models\SpecialOrderPayment;
@@ -22,7 +23,22 @@ class CashierController extends Controller
     {
         $paymentMethods = PaymentMethod::active()->ordered()->get();
 
-        return view('cashier.index', compact('paymentMethods'));
+        $shortcutsMap = json_decode(Setting::getValue('product_shortcuts', '{}'), true) ?: [];
+        $shortcuts = [];
+        foreach ($shortcutsMap as $slot => $productId) {
+            $product = Product::where('id', $productId)->where('is_active', true)->first();
+            if ($product) {
+                $shortcuts[$slot] = [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'barcode' => $product->barcode,
+                    'is_weight' => $product->type === 'weight',
+                ];
+            }
+        }
+
+        return view('cashier.index', compact('paymentMethods', 'shortcuts'));
     }
 
     public function fetchOrder(Request $request)

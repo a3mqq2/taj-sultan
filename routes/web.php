@@ -116,9 +116,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/sales/summary', [SalesReportController::class, 'summary'])->name('sales.summary');
         Route::get('/sales/chart', [SalesReportController::class, 'chartData'])->name('sales.chart');
         Route::get('/sales/products', [SalesReportController::class, 'productsData'])->name('sales.products');
+        Route::get('/sales/products/all', [SalesReportController::class, 'allProductsData'])->name('sales.products.all');
+        Route::get('/sales/products/single', [SalesReportController::class, 'singleProductReport'])->name('sales.products.single');
+        Route::get('/sales/products/search', [SalesReportController::class, 'searchProducts'])->name('sales.products.search');
         Route::get('/sales/export/excel', [SalesReportController::class, 'exportExcel'])->name('sales.export.excel');
         Route::get('/sales/export/products', [SalesReportController::class, 'exportProductsExcel'])->name('sales.export.products');
+        Route::get('/sales/export/single-product', [SalesReportController::class, 'exportSingleProductExcel'])->name('sales.export.single-product');
         Route::get('/sales/print', [SalesReportController::class, 'print'])->name('sales.print');
+        Route::get('/sales/print/products', [SalesReportController::class, 'printProducts'])->name('sales.print.products');
+        Route::get('/sales/print/single-product', [SalesReportController::class, 'printSingleProduct'])->name('sales.print.single-product');
         Route::get('/sales/special-orders/data', [SalesReportController::class, 'specialOrdersData'])->name('sales.special-orders.data');
         Route::get('/sales/special-orders/summary', [SalesReportController::class, 'specialOrdersSummary'])->name('sales.special-orders.summary');
         Route::get('/sales/special-orders/export', [SalesReportController::class, 'exportSpecialOrdersExcel'])->name('sales.special-orders.export');
@@ -128,6 +134,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/settings/general', [SettingController::class, 'index'])->name('settings.general');
     Route::post('/settings/general', [SettingController::class, 'update'])->name('settings.general.update');
+    Route::get('/settings/shortcuts', [SettingController::class, 'shortcuts'])->name('settings.shortcuts');
+    Route::post('/settings/shortcuts', [SettingController::class, 'updateShortcuts'])->name('settings.shortcuts.update');
+    Route::get('/settings/search-products', [SettingController::class, 'searchProducts'])->name('settings.search-products');
 });
 
 Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->group(function () {

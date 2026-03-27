@@ -531,6 +531,216 @@
     [data-bs-theme="dark"] .section-divider {
         background: #374151;
     }
+
+    .report-tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 24px;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 12px;
+    }
+
+    [data-bs-theme="dark"] .report-tabs {
+        background: #1f2937;
+    }
+
+    .report-tab {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        background: transparent;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .report-tab:hover {
+        color: #334155;
+        background: rgba(255,255,255,0.5);
+    }
+
+    .report-tab.active {
+        background: #fff;
+        color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    [data-bs-theme="dark"] .report-tab.active {
+        background: #374151;
+        color: #f1f5f9;
+    }
+
+    .report-tab i {
+        font-size: 18px;
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .product-search-wrapper {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .product-search-input {
+        width: 100%;
+        padding: 12px 16px 12px 44px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 15px;
+        font-family: inherit;
+        background: #fff;
+        transition: all 0.2s;
+    }
+
+    .product-search-input:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+    }
+
+    [data-bs-theme="dark"] .product-search-input {
+        background: #111827;
+        border-color: #374151;
+        color: #f9fafb;
+    }
+
+    .product-search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 18px;
+    }
+
+    .product-search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border: 2px solid #3b82f6;
+        border-radius: 12px;
+        margin-top: 4px;
+        max-height: 240px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+
+    [data-bs-theme="dark"] .product-search-results {
+        background: #1f2937;
+    }
+
+    .product-search-results.show {
+        display: block;
+    }
+
+    .product-search-item {
+        padding: 10px 16px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background 0.1s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .product-search-item:hover {
+        background: #eff6ff;
+    }
+
+    [data-bs-theme="dark"] .product-search-item:hover {
+        background: #374151;
+    }
+
+    .product-search-item .barcode {
+        font-size: 11px;
+        color: #94a3b8;
+    }
+
+    .all-products-table th.sortable {
+        cursor: pointer;
+        user-select: none;
+    }
+
+    .all-products-table th.sortable:hover {
+        color: #3b82f6;
+    }
+
+    .percentage-bar {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 4px;
+    }
+
+    .percentage-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #10b981);
+        border-radius: 3px;
+        transition: width 0.3s;
+    }
+
+    .single-product-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    [data-bs-theme="dark"] .single-product-card {
+        background: #1f2937;
+        border-color: #374151;
+    }
+
+    .selected-product-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #eff6ff, #f0fdf4);
+        border-radius: 12px;
+        margin-bottom: 20px;
+    }
+
+    [data-bs-theme="dark"] .selected-product-header {
+        background: linear-gradient(135deg, #1e3a5f, #1a3a2a);
+    }
+
+    .selected-product-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    [data-bs-theme="dark"] .selected-product-name {
+        color: #f1f5f9;
+    }
+
+    .selected-product-meta {
+        font-size: 12px;
+        color: #64748b;
+        margin-top: 2px;
+    }
 </style>
 @endpush
 
@@ -584,100 +794,84 @@
             </div>
         </div>
     </div>
-
-    <div class="section-divider"></div>
-
-    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-        <div class="action-btns">
-            <button type="button" class="btn btn-success" onclick="exportExcel()">
-                <i class="ti ti-file-spreadsheet"></i>
-                تصدير Excel
-            </button>
-            <button type="button" class="btn btn-outline-secondary" onclick="printReport()">
-                <i class="ti ti-printer"></i>
-                طباعة
-            </button>
-        </div>
-        <button type="button" class="btn btn-primary" onclick="loadData()">
-            <i class="ti ti-refresh"></i>
-            تحديث
-        </button>
-    </div>
 </div>
 
-<div class="summary-grid">
-    <div class="summary-card">
-        <div class="icon-box green">
-            <i class="ti ti-currency-dollar"></i>
-        </div>
-        <div class="content">
-            <div class="value" id="totalSales">0.000 د.ل</div>
-            <div class="label">إجمالي المبيعات</div>
-        </div>
-    </div>
-    <div class="summary-card">
-        <div class="icon-box blue">
-            <i class="ti ti-receipt"></i>
-        </div>
-        <div class="content">
-            <div class="value" id="ordersCount">0</div>
-            <div class="label">عدد الطلبات</div>
-        </div>
-    </div>
-    <div class="summary-card">
-        <div class="icon-box purple">
-            <i class="ti ti-chart-bar"></i>
-        </div>
-        <div class="content">
-            <div class="value" id="averageOrder">0.000 د.ل</div>
-            <div class="label">متوسط الطلب</div>
-        </div>
-    </div>
-    <div class="summary-card">
-        <div class="icon-box orange">
-            <i class="ti ti-discount"></i>
-        </div>
-        <div class="content">
-            <div class="value" id="totalDiscount">0.000 د.ل</div>
-            <div class="label">إجمالي الخصومات</div>
-        </div>
-    </div>
+<div class="report-tabs">
+    <button type="button" class="report-tab active" onclick="switchTab('invoices')">
+        <i class="ti ti-receipt"></i>
+        الفواتير
+    </button>
+    <button type="button" class="report-tab" onclick="switchTab('products')">
+        <i class="ti ti-packages"></i>
+        الأصناف
+    </button>
+    <button type="button" class="report-tab" onclick="switchTab('single-product')">
+        <i class="ti ti-search"></i>
+        صنف محدد
+    </button>
+    <button type="button" class="report-tab" onclick="switchTab('special')">
+        <i class="ti ti-cake"></i>
+        طلبيات خاصة
+    </button>
 </div>
 
-<div class="charts-grid">
-    <div class="report-card">
-        <div class="report-card-header">
-            <div class="report-card-title">
-                <i class="ti ti-chart-line"></i>
-                المبيعات اليومية
+<!-- TAB 1: الفواتير -->
+<div class="tab-content active" id="tab-invoices">
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="icon-box green"><i class="ti ti-currency-dollar"></i></div>
+            <div class="content">
+                <div class="value" id="totalSales">0.000 د.ل</div>
+                <div class="label">إجمالي المبيعات</div>
             </div>
         </div>
-        <div id="salesChart" style="height: 300px;"></div>
-    </div>
-    <div class="report-card">
-        <div class="report-card-header">
-            <div class="report-card-title">
-                <i class="ti ti-chart-pie"></i>
-                طرق الدفع
+        <div class="summary-card">
+            <div class="icon-box blue"><i class="ti ti-receipt"></i></div>
+            <div class="content">
+                <div class="value" id="ordersCount">0</div>
+                <div class="label">عدد الطلبات</div>
             </div>
         </div>
-        <div id="paymentChart" style="height: 300px;"></div>
+        <div class="summary-card">
+            <div class="icon-box purple"><i class="ti ti-chart-bar"></i></div>
+            <div class="content">
+                <div class="value" id="averageOrder">0.000 د.ل</div>
+                <div class="label">متوسط الطلب</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="icon-box orange"><i class="ti ti-discount"></i></div>
+            <div class="content">
+                <div class="value" id="totalDiscount">0.000 د.ل</div>
+                <div class="label">إجمالي الخصومات</div>
+            </div>
+        </div>
     </div>
-</div>
 
-<div class="data-grid">
+    <div class="charts-grid">
+        <div class="report-card">
+            <div class="report-card-header">
+                <div class="report-card-title"><i class="ti ti-chart-line"></i> المبيعات اليومية</div>
+            </div>
+            <div id="salesChart" style="height: 300px;"></div>
+        </div>
+        <div class="report-card">
+            <div class="report-card-header">
+                <div class="report-card-title"><i class="ti ti-chart-pie"></i> طرق الدفع</div>
+            </div>
+            <div id="paymentChart" style="height: 300px;"></div>
+        </div>
+    </div>
+
     <div class="data-table position-relative">
-        <div id="tableLoading" class="loading-overlay d-none">
-            <div class="spinner"></div>
-        </div>
-
+        <div id="tableLoading" class="loading-overlay d-none"><div class="spinner"></div></div>
         <div class="report-card-header" style="padding: 20px; margin: 0; border-radius: 16px 16px 0 0;">
-            <div class="report-card-title">
-                <i class="ti ti-list-details"></i>
-                طلبات نقاط البيع
+            <div class="report-card-title"><i class="ti ti-list-details"></i> الفواتير</div>
+            <div class="action-btns">
+                <button type="button" class="btn btn-sm btn-success" onclick="exportExcel()"><i class="ti ti-file-spreadsheet me-1"></i> تصدير</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printReport()"><i class="ti ti-printer me-1"></i> طباعة</button>
             </div>
         </div>
-
         <div class="table-responsive">
             <table class="table mb-0">
                 <thead>
@@ -691,140 +885,235 @@
                         <th>طرق الدفع</th>
                     </tr>
                 </thead>
-                <tbody id="ordersTableBody">
-                </tbody>
+                <tbody id="ordersTableBody"></tbody>
             </table>
         </div>
-
         <div id="emptyState" class="empty-state d-none">
-            <div class="empty-state-icon">
-                <i class="ti ti-receipt-off"></i>
-            </div>
+            <div class="empty-state-icon"><i class="ti ti-receipt-off"></i></div>
             <h5>لا توجد طلبات</h5>
             <p class="text-muted">لم يتم العثور على طلبات في الفترة المحددة</p>
         </div>
-
         <div id="paginationWrapper" class="pagination-wrapper d-none">
-            <div class="pagination-info">
-                عرض <span id="paginationFrom">0</span> - <span id="paginationTo">0</span>
-                من <span id="paginationTotal">0</span> طلب
-            </div>
-            <nav>
-                <ul class="pagination" id="paginationNav">
-                </ul>
-            </nav>
-        </div>
-    </div>
-
-    <div class="report-card">
-        <div class="report-card-header">
-            <div class="report-card-title">
-                <i class="ti ti-trophy"></i>
-                أكثر المنتجات مبيعاً
-            </div>
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="exportProductsExcel()">
-                <i class="ti ti-file-spreadsheet me-1"></i>
-                تصدير
-            </button>
-        </div>
-        <ul class="products-list" id="topProductsList">
-        </ul>
-        <div id="productsEmpty" class="text-center py-4 text-muted d-none">
-            لا توجد بيانات
+            <div class="pagination-info">عرض <span id="paginationFrom">0</span> - <span id="paginationTo">0</span> من <span id="paginationTotal">0</span> طلب</div>
+            <nav><ul class="pagination" id="paginationNav"></ul></nav>
         </div>
     </div>
 </div>
 
-<div class="report-card mt-4">
-    <div class="report-card-header">
-        <div class="report-card-title">
-            <i class="ti ti-cake"></i>
-            الطلبيات الخاصة المسلمة
-        </div>
-        <div class="d-flex gap-2">
-            <button type="button" class="btn btn-sm btn-outline-success" onclick="exportSpecialOrdersExcel()">
-                <i class="ti ti-file-spreadsheet me-1"></i>
-                تصدير
-            </button>
-        </div>
-    </div>
-
-    <div class="summary-grid mb-4" style="padding: 0 20px;">
-        <div class="summary-card" style="padding: 16px;">
-            <div class="icon-box green" style="width: 44px; height: 44px;">
-                <i class="ti ti-currency-dollar" style="font-size: 22px;"></i>
-            </div>
+<!-- TAB 2: الأصناف -->
+<div class="tab-content" id="tab-products">
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="icon-box green"><i class="ti ti-currency-dollar"></i></div>
             <div class="content">
-                <div class="value" id="specialTotalSales" style="font-size: 20px;">0.000 د.ل</div>
-                <div class="label" style="font-size: 12px;">إجمالي المبيعات</div>
+                <div class="value" id="productsGrandTotal">0.000 د.ل</div>
+                <div class="label">إجمالي مبيعات الأصناف</div>
             </div>
         </div>
-        <div class="summary-card" style="padding: 16px;">
-            <div class="icon-box blue" style="width: 44px; height: 44px;">
-                <i class="ti ti-receipt" style="font-size: 22px;"></i>
-            </div>
+        <div class="summary-card">
+            <div class="icon-box blue"><i class="ti ti-packages"></i></div>
             <div class="content">
-                <div class="value" id="specialOrdersCount" style="font-size: 20px;">0</div>
-                <div class="label" style="font-size: 12px;">عدد الطلبات</div>
-            </div>
-        </div>
-        <div class="summary-card" style="padding: 16px;">
-            <div class="icon-box purple" style="width: 44px; height: 44px;">
-                <i class="ti ti-chart-bar" style="font-size: 22px;"></i>
-            </div>
-            <div class="content">
-                <div class="value" id="specialAverageOrder" style="font-size: 20px;">0.000 د.ل</div>
-                <div class="label" style="font-size: 12px;">متوسط الطلب</div>
-            </div>
-        </div>
-        <div class="summary-card" style="padding: 16px;">
-            <div class="icon-box orange" style="width: 44px; height: 44px;">
-                <i class="ti ti-cash" style="font-size: 22px;"></i>
-            </div>
-            <div class="content">
-                <div class="value" id="specialTotalPaid" style="font-size: 20px;">0.000 د.ل</div>
-                <div class="label" style="font-size: 12px;">إجمالي المدفوع</div>
+                <div class="value" id="productsCount">0</div>
+                <div class="label">عدد الأصناف المباعة</div>
             </div>
         </div>
     </div>
 
-    <div class="table-responsive position-relative">
-        <div id="specialTableLoading" class="loading-overlay d-none">
-            <div class="spinner"></div>
+    <div class="data-table position-relative">
+        <div id="productsTableLoading" class="loading-overlay d-none"><div class="spinner"></div></div>
+        <div class="report-card-header" style="padding: 20px; margin: 0; border-radius: 16px 16px 0 0;">
+            <div class="report-card-title"><i class="ti ti-packages"></i> مبيعات جميع الأصناف</div>
+            <div class="action-btns">
+                <button type="button" class="btn btn-sm btn-success" onclick="exportProductsExcel()"><i class="ti ti-file-spreadsheet me-1"></i> تصدير</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printProductsReport()"><i class="ti ti-printer me-1"></i> طباعة</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table all-products-table mb-0">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>الصنف</th>
+                        <th class="sortable" onclick="sortProducts('orders_count')">عدد الفواتير <i class="ti ti-arrows-sort" style="font-size:12px;"></i></th>
+                        <th class="sortable" onclick="sortProducts('total_quantity')">الكمية <i class="ti ti-arrows-sort" style="font-size:12px;"></i></th>
+                        <th class="sortable" onclick="sortProducts('total_sales')">الإجمالي <i class="ti ti-arrows-sort" style="font-size:12px;"></i></th>
+                        <th>النسبة</th>
+                    </tr>
+                </thead>
+                <tbody id="allProductsBody"></tbody>
+            </table>
+        </div>
+        <div id="productsEmptyState" class="empty-state d-none">
+            <div class="empty-state-icon"><i class="ti ti-packages-off"></i></div>
+            <h5>لا توجد بيانات</h5>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 3: صنف محدد -->
+<div class="tab-content" id="tab-single-product">
+    <div class="single-product-card">
+        <div class="product-search-wrapper">
+            <i class="ti ti-search product-search-icon"></i>
+            <input type="text" class="product-search-input" id="singleProductSearch" placeholder="ابحث عن صنف بالاسم أو الباركود..." autocomplete="off">
+            <div class="product-search-results" id="singleProductResults"></div>
         </div>
 
-        <table class="table mb-0">
-            <thead>
-                <tr>
-                    <th>العميل</th>
-                    <th>المناسبة</th>
-                    <th>تاريخ التسليم</th>
-                    <th>الإجمالي</th>
-                    <th>المدفوع</th>
-                    <th>طرق الدفع</th>
-                </tr>
-            </thead>
-            <tbody id="specialOrdersTableBody">
-            </tbody>
-        </table>
+        <div id="singleProductContent" style="display:none;">
+            <div class="selected-product-header">
+                <div>
+                    <div class="selected-product-name" id="spName"></div>
+                    <div class="selected-product-meta" id="spMeta"></div>
+                </div>
+                <div class="action-btns">
+                    <button type="button" class="btn btn-sm btn-success" onclick="exportSingleProduct()"><i class="ti ti-file-spreadsheet me-1"></i> تصدير</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="printSingleProduct()"><i class="ti ti-printer me-1"></i> طباعة</button>
+                </div>
+            </div>
 
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="icon-box blue"><i class="ti ti-receipt"></i></div>
+                    <div class="content">
+                        <div class="value" id="spOrdersCount">0</div>
+                        <div class="label">عدد الفواتير</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon-box purple"><i class="ti ti-scale"></i></div>
+                    <div class="content">
+                        <div class="value" id="spTotalQty">0</div>
+                        <div class="label">الكمية المباعة</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon-box green"><i class="ti ti-currency-dollar"></i></div>
+                    <div class="content">
+                        <div class="value" id="spTotalSales">0.000 د.ل</div>
+                        <div class="label">إجمالي المبيعات</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="icon-box orange"><i class="ti ti-chart-arrows"></i></div>
+                    <div class="content">
+                        <div class="value" id="spAvgPrice">0.000 د.ل</div>
+                        <div class="label">متوسط السعر</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="report-card">
+                    <div class="report-card-header">
+                        <div class="report-card-title"><i class="ti ti-chart-line"></i> المبيعات اليومية</div>
+                    </div>
+                    <div id="spDailyChart" style="height: 280px;"></div>
+                </div>
+                <div class="report-card">
+                    <div class="report-card-header">
+                        <div class="report-card-title"><i class="ti ti-chart-bar"></i> الكميات اليومية</div>
+                    </div>
+                    <div id="spQtyChart" style="height: 280px;"></div>
+                </div>
+            </div>
+
+            <div class="data-table">
+                <div class="report-card-header" style="padding: 20px; margin: 0; border-radius: 16px 16px 0 0;">
+                    <div class="report-card-title"><i class="ti ti-list-details"></i> آخر الفواتير</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>التاريخ</th>
+                                <th>الكمية</th>
+                                <th>السعر</th>
+                                <th>الإجمالي</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spTransactions"></tbody>
+                    </table>
+                </div>
+                <div id="spTransactionsEmpty" class="empty-state d-none">
+                    <div class="empty-state-icon"><i class="ti ti-receipt-off"></i></div>
+                    <h5>لا توجد فواتير</h5>
+                </div>
+            </div>
+        </div>
+
+        <div id="singleProductEmpty" class="empty-state">
+            <div class="empty-state-icon"><i class="ti ti-search"></i></div>
+            <h5>ابحث عن صنف</h5>
+            <p class="text-muted">اكتب اسم الصنف أو الباركود لعرض تقرير مبيعاته</p>
+        </div>
+    </div>
+</div>
+
+<!-- TAB 4: طلبيات خاصة -->
+<div class="tab-content" id="tab-special">
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="icon-box green"><i class="ti ti-currency-dollar"></i></div>
+            <div class="content">
+                <div class="value" id="specialTotalSales">0.000 د.ل</div>
+                <div class="label">إجمالي المبيعات</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="icon-box blue"><i class="ti ti-receipt"></i></div>
+            <div class="content">
+                <div class="value" id="specialOrdersCount">0</div>
+                <div class="label">عدد الطلبات</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="icon-box purple"><i class="ti ti-chart-bar"></i></div>
+            <div class="content">
+                <div class="value" id="specialAverageOrder">0.000 د.ل</div>
+                <div class="label">متوسط الطلب</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="icon-box orange"><i class="ti ti-cash"></i></div>
+            <div class="content">
+                <div class="value" id="specialTotalPaid">0.000 د.ل</div>
+                <div class="label">إجمالي المدفوع</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="data-table position-relative">
+        <div id="specialTableLoading" class="loading-overlay d-none"><div class="spinner"></div></div>
+        <div class="report-card-header" style="padding: 20px; margin: 0; border-radius: 16px 16px 0 0;">
+            <div class="report-card-title"><i class="ti ti-cake"></i> الطلبيات الخاصة المسلمة</div>
+            <div class="action-btns">
+                <button type="button" class="btn btn-sm btn-success" onclick="exportSpecialOrdersExcel()"><i class="ti ti-file-spreadsheet me-1"></i> تصدير</button>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        <th>العميل</th>
+                        <th>المناسبة</th>
+                        <th>تاريخ التسليم</th>
+                        <th>الإجمالي</th>
+                        <th>المدفوع</th>
+                        <th>طرق الدفع</th>
+                    </tr>
+                </thead>
+                <tbody id="specialOrdersTableBody"></tbody>
+            </table>
+        </div>
         <div id="specialEmptyState" class="empty-state d-none">
-            <div class="empty-state-icon">
-                <i class="ti ti-cake-off"></i>
-            </div>
+            <div class="empty-state-icon"><i class="ti ti-cake-off"></i></div>
             <h5>لا توجد طلبيات خاصة</h5>
             <p class="text-muted">لم يتم العثور على طلبيات خاصة مسلمة في الفترة المحددة</p>
         </div>
-
         <div id="specialPaginationWrapper" class="pagination-wrapper d-none">
-            <div class="pagination-info">
-                عرض <span id="specialPaginationFrom">0</span> - <span id="specialPaginationTo">0</span>
-                من <span id="specialPaginationTotal">0</span> طلب
-            </div>
-            <nav>
-                <ul class="pagination" id="specialPaginationNav">
-                </ul>
-            </nav>
+            <div class="pagination-info">عرض <span id="specialPaginationFrom">0</span> - <span id="specialPaginationTo">0</span> من <span id="specialPaginationTotal">0</span> طلب</div>
+            <nav><ul class="pagination" id="specialPaginationNav"></ul></nav>
         </div>
     </div>
 </div>
@@ -837,14 +1126,19 @@ let currentPage = 1;
 let specialCurrentPage = 1;
 let salesChart = null;
 let paymentChart = null;
+let activeTab = 'invoices';
+let productsSortField = 'total_sales';
+let productsSortDir = 'desc';
+let selectedProductId = null;
+let spDailyChart = null;
+let spQtyChart = null;
+let searchTimer = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     setPreset('today');
 
     document.querySelectorAll('.preset-btns .btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            setPreset(this.dataset.preset);
-        });
+        btn.addEventListener('click', function() { setPreset(this.dataset.preset); });
     });
 
     ['dateFrom', 'dateTo', 'posPointFilter', 'paymentMethodFilter'].forEach(id => {
@@ -855,26 +1149,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    document.addEventListener('keydown', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-            return;
-        }
-
-        if (e.ctrlKey && e.key === 'p') {
-            e.preventDefault();
-            printReport();
-        }
-
-        if (e.ctrlKey && e.key === 'e') {
-            e.preventDefault();
-            exportExcel();
-        }
-
-        if (e.key === 'Enter') {
-            loadData();
+    const searchInput = document.getElementById('singleProductSearch');
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => searchProductsForReport(this.value), 300);
+    });
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') document.getElementById('singleProductResults').classList.remove('show');
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.product-search-wrapper')) {
+            document.getElementById('singleProductResults').classList.remove('show');
         }
     });
 });
+
+function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.report-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    loadTabData(tab);
+}
+
+function loadTabData(tab) {
+    if (tab === 'invoices') { loadSummary(); loadCharts(); loadOrders(); }
+    if (tab === 'products') { loadAllProducts(); }
+    if (tab === 'single-product' && selectedProductId) { loadSingleProduct(selectedProductId); }
+    if (tab === 'special') { loadSpecialOrdersSummary(); loadSpecialOrders(); }
+}
 
 function setPreset(preset) {
     const today = new Date();
@@ -885,29 +1189,17 @@ function setPreset(preset) {
     document.querySelector(`[data-preset="${preset}"]`)?.classList.add('active');
 
     switch(preset) {
-        case 'today':
-            dateFrom = dateTo = formatDate(today);
-            break;
+        case 'today': dateFrom = dateTo = formatDate(today); break;
         case 'yesterday':
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            dateFrom = dateTo = formatDate(yesterday);
-            break;
+            const y = new Date(today); y.setDate(y.getDate() - 1);
+            dateFrom = dateTo = formatDate(y); break;
         case 'week':
-            const weekStart = new Date(today);
-            weekStart.setDate(today.getDate() - today.getDay());
-            dateFrom = formatDate(weekStart);
-            dateTo = formatDate(today);
-            break;
+            const w = new Date(today); w.setDate(today.getDate() - today.getDay());
+            dateFrom = formatDate(w); dateTo = formatDate(today); break;
         case 'month':
-            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            dateFrom = formatDate(monthStart);
-            dateTo = formatDate(today);
-            break;
-        case 'all':
-            dateFrom = '';
-            dateTo = '';
-            break;
+            dateFrom = formatDate(new Date(today.getFullYear(), today.getMonth(), 1));
+            dateTo = formatDate(today); break;
+        case 'all': dateFrom = ''; dateTo = ''; break;
     }
 
     document.getElementById('dateFrom').value = dateFrom;
@@ -916,9 +1208,7 @@ function setPreset(preset) {
     loadData();
 }
 
-function formatDate(date) {
-    return date.toISOString().split('T')[0];
-}
+function formatDate(date) { return date.toISOString().split('T')[0]; }
 
 function getFilters() {
     return {
@@ -930,433 +1220,295 @@ function getFilters() {
 }
 
 async function loadData() {
-    loadSummary();
-    loadCharts();
-    loadOrders();
-    loadTopProducts();
-    loadSpecialOrdersSummary();
-    loadSpecialOrders();
+    loadTabData(activeTab);
 }
 
 async function loadSummary() {
     const params = new URLSearchParams(getFilters());
-
     try {
-        const response = await fetch(`{{ route('reports.sales.summary') }}?${params}`);
-        const result = await response.json();
-
-        if (result.success) {
-            document.getElementById('totalSales').textContent = result.data.total_sales + ' د.ل';
-            document.getElementById('ordersCount').textContent = result.data.orders_count;
-            document.getElementById('averageOrder').textContent = result.data.average_order + ' د.ل';
-            document.getElementById('totalDiscount').textContent = result.data.total_discount + ' د.ل';
+        const res = await fetch(`{{ route('reports.sales.summary') }}?${params}`);
+        const r = await res.json();
+        if (r.success) {
+            document.getElementById('totalSales').textContent = r.data.total_sales + ' د.ل';
+            document.getElementById('ordersCount').textContent = r.data.orders_count;
+            document.getElementById('averageOrder').textContent = r.data.average_order + ' د.ل';
+            document.getElementById('totalDiscount').textContent = r.data.total_discount + ' د.ل';
         }
-    } catch (error) {
-        console.error('Error loading summary:', error);
-    }
+    } catch (e) { console.error(e); }
 }
 
 async function loadCharts() {
     const params = new URLSearchParams(getFilters());
-
     try {
-        const response = await fetch(`{{ route('reports.sales.chart') }}?${params}`);
-        const result = await response.json();
-
-        if (result.success) {
-            renderSalesChart(result.data.daily_sales);
-            renderPaymentChart(result.data.payment_distribution);
+        const res = await fetch(`{{ route('reports.sales.chart') }}?${params}`);
+        const r = await res.json();
+        if (r.success) {
+            renderSalesChart(r.data.daily_sales);
+            renderPaymentChart(r.data.payment_distribution);
         }
-    } catch (error) {
-        console.error('Error loading charts:', error);
-    }
+    } catch (e) { console.error(e); }
 }
 
 function renderSalesChart(data) {
     const options = {
-        series: [{
-            name: 'المبيعات',
-            data: data.map(d => d.total)
-        }],
-        chart: {
-            type: 'area',
-            height: 300,
-            fontFamily: 'inherit',
-            toolbar: { show: false },
-            zoom: { enabled: false }
-        },
+        series: [{ name: 'المبيعات', data: data.map(d => d.total) }],
+        chart: { type: 'area', height: 300, fontFamily: 'inherit', toolbar: { show: false }, zoom: { enabled: false } },
         dataLabels: { enabled: false },
-        stroke: {
-            curve: 'smooth',
-            width: 3
-        },
-        fill: {
-            type: 'gradient',
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.4,
-                opacityTo: 0.05,
-            }
-        },
-        xaxis: {
-            categories: data.map(d => d.date),
-            labels: {
-                style: { fontFamily: 'inherit' }
-            }
-        },
-        yaxis: {
-            labels: {
-                formatter: val => val.toFixed(0) + ' د.ل',
-                style: { fontFamily: 'inherit' }
-            }
-        },
-        tooltip: {
-            y: {
-                formatter: val => val.toFixed(3) + ' د.ل'
-            }
-        },
+        stroke: { curve: 'smooth', width: 3 },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
+        xaxis: { categories: data.map(d => d.date), labels: { style: { fontFamily: 'inherit' } } },
+        yaxis: { labels: { formatter: val => val.toFixed(0) + ' د.ل', style: { fontFamily: 'inherit' } } },
+        tooltip: { y: { formatter: val => val.toFixed(3) + ' د.ل' } },
         colors: ['#10b981'],
-        grid: {
-            borderColor: '#f1f5f9',
-            strokeDashArray: 4
-        }
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
     };
-
-    if (salesChart) {
-        salesChart.updateOptions(options);
-    } else {
-        salesChart = new ApexCharts(document.getElementById('salesChart'), options);
-        salesChart.render();
-    }
+    if (salesChart) { salesChart.updateOptions(options); }
+    else { salesChart = new ApexCharts(document.getElementById('salesChart'), options); salesChart.render(); }
 }
 
 function renderPaymentChart(data) {
     if (data.length === 0) {
         document.getElementById('paymentChart').innerHTML = '<div class="text-center text-muted py-5">لا توجد بيانات</div>';
+        if (paymentChart) { paymentChart.destroy(); paymentChart = null; }
         return;
     }
-
     const options = {
         series: data.map(d => d.total),
-        chart: {
-            type: 'donut',
-            height: 300,
-            fontFamily: 'inherit'
-        },
+        chart: { type: 'donut', height: 300, fontFamily: 'inherit' },
         labels: data.map(d => d.name),
-        legend: {
-            position: 'bottom',
-            fontFamily: 'inherit'
-        },
-        dataLabels: {
-            enabled: true,
-            formatter: function(val) {
-                return val.toFixed(1) + '%';
-            }
-        },
-        tooltip: {
-            y: {
-                formatter: val => val.toFixed(3) + ' د.ل'
-            }
-        },
+        legend: { position: 'bottom', fontFamily: 'inherit' },
+        dataLabels: { enabled: true, formatter: val => val.toFixed(1) + '%' },
+        tooltip: { y: { formatter: val => val.toFixed(3) + ' د.ل' } },
         colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
-        plotOptions: {
-            pie: {
-                donut: {
-                    size: '65%',
-                    labels: {
-                        show: true,
-                        total: {
-                            show: true,
-                            label: 'الإجمالي',
-                            formatter: function(w) {
-                                return w.globals.seriesTotals.reduce((a, b) => a + b, 0).toFixed(3) + ' د.ل';
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        plotOptions: { pie: { donut: { size: '65%', labels: { show: true, total: { show: true, label: 'الإجمالي', formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0).toFixed(3) + ' د.ل' } } } } }
     };
-
-    if (paymentChart) {
-        paymentChart.updateOptions(options);
-    } else {
-        paymentChart = new ApexCharts(document.getElementById('paymentChart'), options);
-        paymentChart.render();
-    }
+    if (paymentChart) { paymentChart.updateOptions(options); }
+    else { paymentChart = new ApexCharts(document.getElementById('paymentChart'), options); paymentChart.render(); }
 }
 
 async function loadOrders() {
-    const tableLoading = document.getElementById('tableLoading');
-    tableLoading.classList.remove('d-none');
-
-    const params = new URLSearchParams({
-        ...getFilters(),
-        page: currentPage
-    });
-
+    document.getElementById('tableLoading').classList.remove('d-none');
+    const params = new URLSearchParams({ ...getFilters(), page: currentPage });
     try {
-        const response = await fetch(`{{ route('reports.sales.data') }}?${params}`);
-        const result = await response.json();
-
-        if (result.success) {
-            renderOrders(result.data);
-            renderPagination(result.pagination);
-        }
-    } catch (error) {
-        console.error('Error loading orders:', error);
-    } finally {
-        tableLoading.classList.add('d-none');
-    }
+        const res = await fetch(`{{ route('reports.sales.data') }}?${params}`);
+        const r = await res.json();
+        if (r.success) { renderOrders(r.data); renderPagination(r.pagination); }
+    } catch (e) { console.error(e); }
+    finally { document.getElementById('tableLoading').classList.add('d-none'); }
 }
 
 function renderOrders(orders) {
     const tbody = document.getElementById('ordersTableBody');
-    const emptyState = document.getElementById('emptyState');
-    const paginationWrapper = document.getElementById('paginationWrapper');
-
-    if (orders.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.classList.remove('d-none');
-        paginationWrapper.classList.add('d-none');
-        return;
-    }
-
-    emptyState.classList.add('d-none');
-    paginationWrapper.classList.remove('d-none');
-
-    tbody.innerHTML = orders.map(order => `
-        <tr>
-            <td><strong>${order.order_number}</strong></td>
-            <td>${order.created_at}</td>
-            <td>${order.pos_point}</td>
-            <td>${order.total}</td>
-            <td>${order.discount}</td>
-            <td class="text-success fw-bold">${order.net_total}</td>
-            <td><small class="text-muted">${order.payment_methods}</small></td>
-        </tr>
-    `).join('');
+    const empty = document.getElementById('emptyState');
+    const pag = document.getElementById('paginationWrapper');
+    if (orders.length === 0) { tbody.innerHTML = ''; empty.classList.remove('d-none'); pag.classList.add('d-none'); return; }
+    empty.classList.add('d-none'); pag.classList.remove('d-none');
+    tbody.innerHTML = orders.map(o => `<tr><td><strong>${o.order_number}</strong></td><td>${o.created_at}</td><td>${o.pos_point}</td><td>${o.total}</td><td>${o.discount}</td><td class="text-success fw-bold">${o.net_total}</td><td><small class="text-muted">${o.payment_methods}</small></td></tr>`).join('');
 }
 
-function renderPagination(pagination) {
-    document.getElementById('paginationFrom').textContent = pagination.from || 0;
-    document.getElementById('paginationTo').textContent = pagination.to || 0;
-    document.getElementById('paginationTotal').textContent = pagination.total;
-
+function renderPagination(p) {
+    document.getElementById('paginationFrom').textContent = p.from || 0;
+    document.getElementById('paginationTo').textContent = p.to || 0;
+    document.getElementById('paginationTotal').textContent = p.total;
     const nav = document.getElementById('paginationNav');
-    let html = '';
-
-    html += `
-        <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="goToPage(${pagination.current_page - 1}); return false;">
-                <i class="ti ti-chevron-right"></i>
-            </a>
-        </li>
-    `;
-
-    for (let i = 1; i <= pagination.last_page; i++) {
-        if (i === 1 || i === pagination.last_page ||
-            (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
-            html += `
-                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="goToPage(${i}); return false;">${i}</a>
-                </li>
-            `;
-        } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
-            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-        }
+    let h = `<li class="page-item ${p.current_page===1?'disabled':''}"><a class="page-link" href="#" onclick="goToPage(${p.current_page-1});return false;"><i class="ti ti-chevron-right"></i></a></li>`;
+    for (let i = 1; i <= p.last_page; i++) {
+        if (i===1||i===p.last_page||(i>=p.current_page-2&&i<=p.current_page+2)) h += `<li class="page-item ${i===p.current_page?'active':''}"><a class="page-link" href="#" onclick="goToPage(${i});return false;">${i}</a></li>`;
+        else if (i===p.current_page-3||i===p.current_page+3) h += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
     }
-
-    html += `
-        <li class="page-item ${pagination.current_page === pagination.last_page ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="goToPage(${pagination.current_page + 1}); return false;">
-                <i class="ti ti-chevron-left"></i>
-            </a>
-        </li>
-    `;
-
-    nav.innerHTML = html;
+    h += `<li class="page-item ${p.current_page===p.last_page?'disabled':''}"><a class="page-link" href="#" onclick="goToPage(${p.current_page+1});return false;"><i class="ti ti-chevron-left"></i></a></li>`;
+    nav.innerHTML = h;
 }
 
-function goToPage(page) {
-    currentPage = page;
-    loadOrders();
+function goToPage(page) { currentPage = page; loadOrders(); }
+
+async function loadAllProducts() {
+    document.getElementById('productsTableLoading').classList.remove('d-none');
+    const params = new URLSearchParams({ ...getFilters(), sort: productsSortField, direction: productsSortDir });
+    try {
+        const res = await fetch(`{{ route('reports.sales.products.all') }}?${params}`);
+        const r = await res.json();
+        if (r.success) {
+            document.getElementById('productsGrandTotal').textContent = r.grand_total + ' د.ل';
+            document.getElementById('productsCount').textContent = r.products_count;
+            renderAllProducts(r.data);
+        }
+    } catch (e) { console.error(e); }
+    finally { document.getElementById('productsTableLoading').classList.add('d-none'); }
 }
 
-async function loadTopProducts() {
-    const params = new URLSearchParams(getFilters());
+function renderAllProducts(products) {
+    const tbody = document.getElementById('allProductsBody');
+    const empty = document.getElementById('productsEmptyState');
+    if (products.length === 0) { tbody.innerHTML = ''; empty.classList.remove('d-none'); return; }
+    empty.classList.add('d-none');
+    tbody.innerHTML = products.map((p, i) => `<tr>
+        <td>${i+1}</td>
+        <td><strong>${p.name}</strong></td>
+        <td class="text-center">${p.orders_count}</td>
+        <td class="text-center">${p.quantity}</td>
+        <td class="text-success fw-bold">${p.total} د.ل</td>
+        <td style="min-width:120px;">${p.percentage}%<div class="percentage-bar"><div class="percentage-bar-fill" style="width:${p.percentage}%"></div></div></td>
+    </tr>`).join('');
+}
+
+function sortProducts(field) {
+    if (productsSortField === field) { productsSortDir = productsSortDir === 'desc' ? 'asc' : 'desc'; }
+    else { productsSortField = field; productsSortDir = 'desc'; }
+    loadAllProducts();
+}
+
+async function searchProductsForReport(q) {
+    const results = document.getElementById('singleProductResults');
+    if (q.length < 1) { results.classList.remove('show'); return; }
+    try {
+        const res = await fetch(`{{ route('reports.sales.products.search') }}?q=${encodeURIComponent(q)}`);
+        const products = await res.json();
+        if (products.length === 0) {
+            results.innerHTML = '<div style="padding:12px;color:#94a3b8;text-align:center;font-size:13px;">لا توجد نتائج</div>';
+        } else {
+            results.innerHTML = products.map(p => `<div class="product-search-item" onclick="selectProductForReport(${p.id},'${p.name.replace(/'/g,"\\'")}')"><span>${p.name}</span><span class="barcode">${p.barcode||''}</span></div>`).join('');
+        }
+        results.classList.add('show');
+    } catch (e) { console.error(e); }
+}
+
+function selectProductForReport(id, name) {
+    selectedProductId = id;
+    document.getElementById('singleProductSearch').value = name;
+    document.getElementById('singleProductResults').classList.remove('show');
+    loadSingleProduct(id);
+}
+
+async function loadSingleProduct(productId) {
+    const params = new URLSearchParams({ ...getFilters(), product_id: productId });
+    document.getElementById('singleProductEmpty').style.display = 'none';
+    document.getElementById('singleProductContent').style.display = '';
 
     try {
-        const response = await fetch(`{{ route('reports.sales.products') }}?${params}`);
-        const result = await response.json();
+        const res = await fetch(`{{ route('reports.sales.products.single') }}?${params}`);
+        const r = await res.json();
+        if (r.success) {
+            const d = r.data;
+            document.getElementById('spName').textContent = d.product.name;
+            document.getElementById('spMeta').textContent = (d.product.barcode ? 'باركود: ' + d.product.barcode + ' | ' : '') + 'السعر: ' + d.product.price + ' د.ل | ' + (d.product.type === 'weight' ? 'وزن' : 'قطعة');
+            document.getElementById('spOrdersCount').textContent = d.stats.orders_count;
+            document.getElementById('spTotalQty').textContent = d.stats.total_quantity;
+            document.getElementById('spTotalSales').textContent = d.stats.total_sales + ' د.ل';
+            document.getElementById('spAvgPrice').textContent = d.stats.avg_price + ' د.ل';
 
-        if (result.success) {
-            renderTopProducts(result.data);
+            renderSpDailyChart(d.daily_sales);
+            renderSpQtyChart(d.daily_sales);
+
+            const tbody = document.getElementById('spTransactions');
+            const empty = document.getElementById('spTransactionsEmpty');
+            if (d.transactions.length === 0) { tbody.innerHTML = ''; empty.classList.remove('d-none'); }
+            else {
+                empty.classList.add('d-none');
+                tbody.innerHTML = d.transactions.map(t => `<tr><td><strong>${t.order_number}</strong></td><td>${t.date}</td><td>${t.quantity}</td><td>${t.price} د.ل</td><td class="text-success fw-bold">${t.total} د.ل</td></tr>`).join('');
+            }
         }
-    } catch (error) {
-        console.error('Error loading products:', error);
-    }
+    } catch (e) { console.error(e); }
 }
 
-function renderTopProducts(products) {
-    const list = document.getElementById('topProductsList');
-    const emptyEl = document.getElementById('productsEmpty');
-
-    if (products.length === 0) {
-        list.innerHTML = '';
-        emptyEl.classList.remove('d-none');
-        return;
-    }
-
-    emptyEl.classList.add('d-none');
-
-    list.innerHTML = products.map((product, index) => `
-        <li>
-            <div class="product-name">
-                <span class="product-rank">${index + 1}</span>
-                ${product.name}
-            </div>
-            <div class="product-info">
-                <div class="product-qty">${product.quantity}</div>
-                <div class="product-total">${product.total} د.ل</div>
-            </div>
-        </li>
-    `).join('');
+function renderSpDailyChart(data) {
+    const opts = {
+        series: [{ name: 'المبيعات', data: data.map(d => d.total) }],
+        chart: { type: 'area', height: 280, fontFamily: 'inherit', toolbar: { show: false }, zoom: { enabled: false } },
+        dataLabels: { enabled: false },
+        stroke: { curve: 'smooth', width: 3 },
+        fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.05 } },
+        xaxis: { categories: data.map(d => d.date) },
+        yaxis: { labels: { formatter: v => v.toFixed(0) + ' د.ل' } },
+        tooltip: { y: { formatter: v => v.toFixed(3) + ' د.ل' } },
+        colors: ['#10b981'],
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+    };
+    if (spDailyChart) { spDailyChart.updateOptions(opts); }
+    else { spDailyChart = new ApexCharts(document.getElementById('spDailyChart'), opts); spDailyChart.render(); }
 }
 
-function exportExcel() {
-    const params = new URLSearchParams(getFilters());
-    window.location.href = `{{ route('reports.sales.export.excel') }}?${params}`;
+function renderSpQtyChart(data) {
+    const opts = {
+        series: [{ name: 'الكمية', data: data.map(d => d.qty) }],
+        chart: { type: 'bar', height: 280, fontFamily: 'inherit', toolbar: { show: false } },
+        dataLabels: { enabled: false },
+        xaxis: { categories: data.map(d => d.date) },
+        yaxis: { labels: { formatter: v => v.toFixed(0) } },
+        colors: ['#3b82f6'],
+        plotOptions: { bar: { borderRadius: 4, columnWidth: '60%' } },
+        grid: { borderColor: '#f1f5f9', strokeDashArray: 4 }
+    };
+    if (spQtyChart) { spQtyChart.updateOptions(opts); }
+    else { spQtyChart = new ApexCharts(document.getElementById('spQtyChart'), opts); spQtyChart.render(); }
 }
 
-function exportProductsExcel() {
-    const params = new URLSearchParams(getFilters());
-    window.location.href = `{{ route('reports.sales.export.products') }}?${params}`;
+function exportExcel() { window.location.href = `{{ route('reports.sales.export.excel') }}?${new URLSearchParams(getFilters())}`; }
+function exportProductsExcel() { window.location.href = `{{ route('reports.sales.export.products') }}?${new URLSearchParams(getFilters())}`; }
+function printReport() { window.open(`{{ route('reports.sales.print') }}?${new URLSearchParams(getFilters())}`, '_blank'); }
+function printProductsReport() { window.open(`{{ route('reports.sales.print.products') }}?${new URLSearchParams(getFilters())}`, '_blank'); }
+
+function exportSingleProduct() {
+    if (!selectedProductId) return;
+    const params = new URLSearchParams({ ...getFilters(), product_id: selectedProductId });
+    window.location.href = `{{ route('reports.sales.export.single-product') }}?${params}`;
 }
 
-function printReport() {
-    const params = new URLSearchParams(getFilters());
-    window.open(`{{ route('reports.sales.print') }}?${params}`, '_blank');
+function printSingleProduct() {
+    if (!selectedProductId) return;
+    const params = new URLSearchParams({ ...getFilters(), product_id: selectedProductId });
+    window.open(`{{ route('reports.sales.print.single-product') }}?${params}`, '_blank');
 }
 
 async function loadSpecialOrdersSummary() {
     const params = new URLSearchParams(getFilters());
-
     try {
-        const response = await fetch(`{{ route('reports.sales.special-orders.summary') }}?${params}`);
-        const result = await response.json();
-
-        if (result.success) {
-            document.getElementById('specialTotalSales').textContent = result.data.total_sales + ' د.ل';
-            document.getElementById('specialOrdersCount').textContent = result.data.orders_count;
-            document.getElementById('specialAverageOrder').textContent = result.data.average_order + ' د.ل';
-            document.getElementById('specialTotalPaid').textContent = result.data.total_paid + ' د.ل';
+        const res = await fetch(`{{ route('reports.sales.special-orders.summary') }}?${params}`);
+        const r = await res.json();
+        if (r.success) {
+            document.getElementById('specialTotalSales').textContent = r.data.total_sales + ' د.ل';
+            document.getElementById('specialOrdersCount').textContent = r.data.orders_count;
+            document.getElementById('specialAverageOrder').textContent = r.data.average_order + ' د.ل';
+            document.getElementById('specialTotalPaid').textContent = r.data.total_paid + ' د.ل';
         }
-    } catch (error) {
-        console.error('Error loading special orders summary:', error);
-    }
+    } catch (e) { console.error(e); }
 }
 
 async function loadSpecialOrders() {
-    const tableLoading = document.getElementById('specialTableLoading');
-    tableLoading.classList.remove('d-none');
-
-    const params = new URLSearchParams({
-        ...getFilters(),
-        page: specialCurrentPage
-    });
-
+    document.getElementById('specialTableLoading').classList.remove('d-none');
+    const params = new URLSearchParams({ ...getFilters(), page: specialCurrentPage });
     try {
-        const response = await fetch(`{{ route('reports.sales.special-orders.data') }}?${params}`);
-        const result = await response.json();
-
-        if (result.success) {
-            renderSpecialOrders(result.data);
-            renderSpecialPagination(result.pagination);
-        }
-    } catch (error) {
-        console.error('Error loading special orders:', error);
-    } finally {
-        tableLoading.classList.add('d-none');
-    }
+        const res = await fetch(`{{ route('reports.sales.special-orders.data') }}?${params}`);
+        const r = await res.json();
+        if (r.success) { renderSpecialOrders(r.data); renderSpecialPagination(r.pagination); }
+    } catch (e) { console.error(e); }
+    finally { document.getElementById('specialTableLoading').classList.add('d-none'); }
 }
 
 function renderSpecialOrders(orders) {
     const tbody = document.getElementById('specialOrdersTableBody');
-    const emptyState = document.getElementById('specialEmptyState');
-    const paginationWrapper = document.getElementById('specialPaginationWrapper');
-
-    if (orders.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.classList.remove('d-none');
-        paginationWrapper.classList.add('d-none');
-        return;
-    }
-
-    emptyState.classList.add('d-none');
-    paginationWrapper.classList.remove('d-none');
-
-    tbody.innerHTML = orders.map(order => `
-        <tr>
-            <td><strong>${order.customer}</strong></td>
-            <td>${order.event_type}</td>
-            <td>${order.delivery_date}</td>
-            <td>${order.total}</td>
-            <td class="text-success fw-bold">${order.paid}</td>
-            <td><small class="text-muted">${order.payment_methods}</small></td>
-        </tr>
-    `).join('');
+    const empty = document.getElementById('specialEmptyState');
+    const pag = document.getElementById('specialPaginationWrapper');
+    if (orders.length === 0) { tbody.innerHTML = ''; empty.classList.remove('d-none'); pag.classList.add('d-none'); return; }
+    empty.classList.add('d-none'); pag.classList.remove('d-none');
+    tbody.innerHTML = orders.map(o => `<tr><td><strong>${o.customer}</strong></td><td>${o.event_type}</td><td>${o.delivery_date}</td><td>${o.total}</td><td class="text-success fw-bold">${o.paid}</td><td><small class="text-muted">${o.payment_methods}</small></td></tr>`).join('');
 }
 
-function renderSpecialPagination(pagination) {
-    document.getElementById('specialPaginationFrom').textContent = pagination.from || 0;
-    document.getElementById('specialPaginationTo').textContent = pagination.to || 0;
-    document.getElementById('specialPaginationTotal').textContent = pagination.total;
-
+function renderSpecialPagination(p) {
+    document.getElementById('specialPaginationFrom').textContent = p.from || 0;
+    document.getElementById('specialPaginationTo').textContent = p.to || 0;
+    document.getElementById('specialPaginationTotal').textContent = p.total;
     const nav = document.getElementById('specialPaginationNav');
-    let html = '';
-
-    html += `
-        <li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="goToSpecialPage(${pagination.current_page - 1}); return false;">
-                <i class="ti ti-chevron-right"></i>
-            </a>
-        </li>
-    `;
-
-    for (let i = 1; i <= pagination.last_page; i++) {
-        if (i === 1 || i === pagination.last_page ||
-            (i >= pagination.current_page - 2 && i <= pagination.current_page + 2)) {
-            html += `
-                <li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                    <a class="page-link" href="#" onclick="goToSpecialPage(${i}); return false;">${i}</a>
-                </li>
-            `;
-        } else if (i === pagination.current_page - 3 || i === pagination.current_page + 3) {
-            html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
-        }
+    let h = `<li class="page-item ${p.current_page===1?'disabled':''}"><a class="page-link" href="#" onclick="goToSpecialPage(${p.current_page-1});return false;"><i class="ti ti-chevron-right"></i></a></li>`;
+    for (let i = 1; i <= p.last_page; i++) {
+        if (i===1||i===p.last_page||(i>=p.current_page-2&&i<=p.current_page+2)) h += `<li class="page-item ${i===p.current_page?'active':''}"><a class="page-link" href="#" onclick="goToSpecialPage(${i});return false;">${i}</a></li>`;
+        else if (i===p.current_page-3||i===p.current_page+3) h += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
     }
-
-    html += `
-        <li class="page-item ${pagination.current_page === pagination.last_page ? 'disabled' : ''}">
-            <a class="page-link" href="#" onclick="goToSpecialPage(${pagination.current_page + 1}); return false;">
-                <i class="ti ti-chevron-left"></i>
-            </a>
-        </li>
-    `;
-
-    nav.innerHTML = html;
+    h += `<li class="page-item ${p.current_page===p.last_page?'disabled':''}"><a class="page-link" href="#" onclick="goToSpecialPage(${p.current_page+1});return false;"><i class="ti ti-chevron-left"></i></a></li>`;
+    nav.innerHTML = h;
 }
 
-function goToSpecialPage(page) {
-    specialCurrentPage = page;
-    loadSpecialOrders();
-}
-
-function exportSpecialOrdersExcel() {
-    const params = new URLSearchParams(getFilters());
-    window.location.href = `{{ route('reports.sales.special-orders.export') }}?${params}`;
-}
+function goToSpecialPage(page) { specialCurrentPage = page; loadSpecialOrders(); }
+function exportSpecialOrdersExcel() { window.location.href = `{{ route('reports.sales.special-orders.export') }}?${new URLSearchParams(getFilters())}`; }
 </script>
 @endpush
