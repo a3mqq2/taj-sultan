@@ -806,6 +806,8 @@ class CashierController extends Controller
                     'paid_amount' => $specialOrder->paid_amount,
                     'remaining_amount' => $specialOrder->remaining_amount,
                     'status' => $specialOrder->status_name,
+                    'notes' => $specialOrder->notes,
+                    'description' => $specialOrder->description,
                     'cashier_name' => auth()->user()->name,
                     'created_at' => $specialOrder->created_at->format('Y-m-d H:i'),
                     'items' => $specialOrder->items->map(function ($item) {

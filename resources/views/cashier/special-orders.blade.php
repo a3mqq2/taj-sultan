@@ -202,7 +202,7 @@
         let currentOrder = null;
 
         let wStep = 0;
-        let wData = { customerName: '', customerPhone: '', customerId: null, eventType: '', deliveryDate: '', items: [] };
+        let wData = { customerName: '', customerPhone: '', customerId: null, eventType: '', deliveryDate: '', notes: '', items: [] };
         let wProductResults = [];
         let wProductIndex = -1;
         let wPmIndex = 0;
@@ -252,7 +252,7 @@
         }
 
         function startNewOrder() {
-            wData = { customerName: '', customerPhone: '', customerId: null, eventType: '', deliveryDate: '', items: [] };
+            wData = { customerName: '', customerPhone: '', customerId: null, eventType: '', deliveryDate: '', notes: '', items: [] };
             wPmIndex = 0;
             wStep = 1;
             renderWizard();
@@ -309,6 +309,8 @@
 
             let paymentsHtml = currentOrder.payments.map(p => `<div class="payment-item"><span>${p.method} ${p.notes ? '(' + p.notes + ')' : ''}</span><span class="amount">${parseFloat(p.amount).toFixed(3)} د.ل</span></div>`).join('') || '<div style="color:#94a3b8;text-align:center;padding:8px;">لا توجد مدفوعات</div>';
 
+            let notesHtml = currentOrder.notes ? `<div style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:12px;margin-bottom:16px;font-size:14px;"><strong style="color:#d97706;"><i class="ti ti-note"></i> ملاحظات:</strong> ${currentOrder.notes}</div>` : '';
+
             document.getElementById('viewBody').innerHTML = `
                 <div class="detail-grid">
                     <div class="detail-item"><div class="detail-label">الزبون</div><div class="detail-value">${currentOrder.customer_name}</div></div>
@@ -316,6 +318,7 @@
                     <div class="detail-item"><div class="detail-label">المناسبة</div><div class="detail-value">${currentOrder.event_type}</div></div>
                     <div class="detail-item"><div class="detail-label">تاريخ التسليم</div><div class="detail-value">${currentOrder.delivery_date}</div></div>
                 </div>
+                ${notesHtml}
                 <table class="items-table"><thead><tr><th>الصنف</th><th style="text-align:center">الكمية</th><th style="text-align:center">السعر</th><th style="text-align:left">الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table>
                 <div style="margin-top:16px;font-weight:700;font-size:14px;color:#64748b;margin-bottom:8px;"><i class="ti ti-cash"></i> المدفوعات</div>
                 ${paymentsHtml}
@@ -395,6 +398,7 @@
                     <div class="wizard-heading"><i class="ti ti-calendar-event"></i> تفاصيل المناسبة</div>
                     <select class="wizard-select" id="wEventType">${optionsHtml}</select>
                     <input type="date" class="wizard-input" id="wDeliveryDate" value="${wData.deliveryDate}" style="font-size:16px;">
+                    <textarea class="wizard-input right" id="wNotes" placeholder="ملاحظات (اختياري)" rows="2" style="font-size:14px;resize:none;height:auto;text-align:right;">${wData.notes}</textarea>
                     <div class="wizard-hint"><kbd>Enter</kbd> التالي &nbsp; <kbd>Esc</kbd> السابق</div>
                 `;
                 setTimeout(() => document.getElementById('wEventType').focus(), 50);
@@ -498,6 +502,8 @@
                     const focused = document.activeElement;
                     if (focused === document.getElementById('wEventType')) {
                         document.getElementById('wDeliveryDate').focus();
+                    } else if (focused === document.getElementById('wDeliveryDate')) {
+                        document.getElementById('wNotes').focus();
                     } else {
                         saveWizardStep2();
                         if (!wData.eventType) { toast('اختر المناسبة', 'error'); document.getElementById('wEventType').focus(); return; }
@@ -597,8 +603,10 @@
         function saveWizardStep2() {
             const et = document.getElementById('wEventType');
             const dd = document.getElementById('wDeliveryDate');
+            const nt = document.getElementById('wNotes');
             if (et) wData.eventType = et.value;
             if (dd) wData.deliveryDate = dd.value;
+            if (nt) wData.notes = nt.value.trim();
         }
 
         function closeWizard() {
@@ -698,7 +706,7 @@
                 event_type: wData.eventType,
                 delivery_date: wData.deliveryDate,
                 description: null,
-                notes: null,
+                notes: wData.notes || null,
                 items: wData.items.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price, total: i.total })),
                 total_amount: total,
                 initial_payment: payment > 0 ? payment : null,
@@ -772,9 +780,10 @@
             }
 
             const barcodeValue = String(data.id).padStart(8, '0');
-            const receiptContent = `<div class="receipt"><div class="header"><div class="title">تاج السلطان - طلبية خاصة</div></div><div class="barcode-section"><svg class="barcode-svg"></svg><div class="order-id">#${data.id}</div></div><div class="section"><div class="info"><span class="label">التاريخ:</span><span>${data.created_at}</span></div><div class="info"><span class="label">الكاشير:</span><span>${data.cashier_name}</span></div><div class="info"><span class="label">الزبون:</span><span><strong>${data.customer_name}</strong></span></div><div class="info"><span class="label">الهاتف:</span><span>${data.phone || '-'}</span></div><div class="info"><span class="label">المناسبة:</span><span>${data.event_type}</span></div><div class="info"><span class="label">التسليم:</span><span>${data.delivery_date}</span></div></div><div class="status-box">${data.status_name || 'قيد الانتظار'}</div><table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="total-box"><span>الإجمالي</span><span>${parseFloat(data.total_amount).toFixed(3)} د.ل</span></div><div class="paid-box"><span>المدفوع</span><span>${parseFloat(data.paid_amount).toFixed(3)} د.ل</span></div><div class="remaining-box"><span>المتبقي</span><span>${parseFloat(data.remaining_amount).toFixed(3)} د.ل</span></div>${paymentsHtml}<div class="thanks">شكراً لتعاملكم معنا</div><div class="footer"><img src="${BASE_URL}/hulul.jpg"><span>حلول لتقنية المعلومات</span></div></div>`;
+            const notesReceiptHtml = data.notes ? `<div class="notes-box">${data.notes}</div>` : '';
+            const receiptContent = `<div class="receipt"><div class="header"><div class="title">تاج السلطان - طلبية خاصة</div></div><div class="barcode-section"><svg class="barcode-svg"></svg><div class="order-id">#${data.id}</div></div><div class="section"><div class="info"><span class="label">التاريخ:</span><span>${data.created_at}</span></div><div class="info"><span class="label">الكاشير:</span><span>${data.cashier_name}</span></div><div class="info"><span class="label">الزبون:</span><span><strong>${data.customer_name}</strong></span></div><div class="info"><span class="label">الهاتف:</span><span>${data.phone || '-'}</span></div><div class="info"><span class="label">المناسبة:</span><span>${data.event_type}</span></div><div class="info"><span class="label">التسليم:</span><span>${data.delivery_date}</span></div></div><div class="status-box">${data.status_name || 'قيد الانتظار'}</div>${notesReceiptHtml}<table><thead><tr><th>الصنف</th><th>الكمية</th><th>السعر</th><th>الإجمالي</th></tr></thead><tbody>${itemsHtml}</tbody></table><div class="total-box"><span>الإجمالي</span><span>${parseFloat(data.total_amount).toFixed(3)} د.ل</span></div><div class="paid-box"><span>المدفوع</span><span>${parseFloat(data.paid_amount).toFixed(3)} د.ل</span></div><div class="remaining-box"><span>المتبقي</span><span>${parseFloat(data.remaining_amount).toFixed(3)} د.ل</span></div>${paymentsHtml}<div class="thanks">شكراً لتعاملكم معنا</div><div class="footer"><img src="${BASE_URL}/hulul.jpg"><span>حلول لتقنية المعلومات</span></div></div>`;
 
-            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="${BASE_URL}/assets/fonts/cairo/cairo.css" rel="stylesheet"><script src="${BASE_URL}/js/barcode/jsbarcode.min.js"><\/script><style>@page{margin:0;size:72mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:11px;line-height:1.3;padding:3mm;width:72mm;color:#000}.receipt{page-break-after:always}.receipt:last-child{page-break-after:auto}.header{text-align:center;border-bottom:1px dashed #000;padding-bottom:6px;margin-bottom:6px}.header .title{font-size:13px;font-weight:700}.barcode-section{text-align:center;border-bottom:1px dashed #000;padding:5px 0}.barcode-svg{display:block;margin:0 auto}.order-id{font-size:12px;font-weight:700;margin-top:3px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.info .label{font-weight:700}.section{border-bottom:1px dashed #000;padding-bottom:6px;margin-bottom:6px}.status-box{text-align:center;padding:5px;border:1px solid #000;font-weight:700;font-size:12px;margin:6px 0}table{width:100%;border-collapse:collapse;margin:6px 0}th{background:#000;color:#fff;padding:4px;font-size:10px}td{padding:4px;font-size:10px;border-bottom:1px dotted #ccc}.total-box{border:1px solid #000;padding:6px;margin:6px 0;display:flex;justify-content:space-between;font-size:14px;font-weight:800}.paid-box{display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:3px 0}.remaining-box{border:1px dashed #000;padding:5px;margin-top:4px;display:flex;justify-content:space-between;font-size:12px;font-weight:700}.payments-section{border-top:1px dashed #000;padding-top:6px;margin-top:6px}.section-title{background:#000;color:#fff;text-align:center;font-weight:700;font-size:10px;padding:3px}.payment-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0}.thanks{text-align:center;font-size:11px;font-weight:700;border-top:1px dashed #000;padding:6px 0}.footer{text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;font-size:9px;color:#333;padding-top:4px}.footer img{height:22px;width:auto;filter:grayscale(100%)}</style></head><body>${receiptContent}${receiptContent}<script>JsBarcode(".barcode-svg","${barcodeValue}",{format:"CODE128",width:1.8,height:40,displayValue:false,margin:5,background:"#ffffff",lineColor:"#000000"});<\/script></body></html>`;
+            const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><link href="${BASE_URL}/assets/fonts/cairo/cairo.css" rel="stylesheet"><script src="${BASE_URL}/js/barcode/jsbarcode.min.js"><\/script><style>@page{margin:0;size:72mm auto}*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Cairo',sans-serif;font-size:11px;line-height:1.3;padding:3mm;width:72mm;color:#000}.receipt{page-break-after:always}.receipt:last-child{page-break-after:auto}.header{text-align:center;border-bottom:1px dashed #000;padding-bottom:6px;margin-bottom:6px}.header .title{font-size:13px;font-weight:700}.barcode-section{text-align:center;border-bottom:1px dashed #000;padding:5px 0}.barcode-svg{display:block;margin:0 auto}.order-id{font-size:12px;font-weight:700;margin-top:3px}.info{font-size:11px;display:flex;justify-content:space-between;padding:2px 0}.info .label{font-weight:700}.section{border-bottom:1px dashed #000;padding-bottom:6px;margin-bottom:6px}.status-box{text-align:center;padding:5px;border:1px solid #000;font-weight:700;font-size:12px;margin:6px 0}table{width:100%;border-collapse:collapse;margin:6px 0}th{background:#000;color:#fff;padding:4px;font-size:10px}td{padding:4px;font-size:10px;border-bottom:1px dotted #ccc}.total-box{border:1px solid #000;padding:6px;margin:6px 0;display:flex;justify-content:space-between;font-size:14px;font-weight:800}.paid-box{display:flex;justify-content:space-between;font-size:11px;font-weight:700;padding:3px 0}.remaining-box{border:1px dashed #000;padding:5px;margin-top:4px;display:flex;justify-content:space-between;font-size:12px;font-weight:700}.payments-section{border-top:1px dashed #000;padding-top:6px;margin-top:6px}.section-title{background:#000;color:#fff;text-align:center;font-weight:700;font-size:10px;padding:3px}.payment-row{display:flex;justify-content:space-between;font-size:10px;padding:2px 0}.thanks{text-align:center;font-size:11px;font-weight:700;border-top:1px dashed #000;padding:6px 0}.footer{text-align:center;display:flex;align-items:center;justify-content:center;gap:5px;font-size:9px;color:#333;padding-top:4px}.notes-box{padding:5px;border:1px dashed #000;font-size:10px;margin:4px 0;font-weight:600}.footer img{height:22px;width:auto;filter:grayscale(100%)}</style></head><body>${receiptContent}${receiptContent}<script>JsBarcode(".barcode-svg","${barcodeValue}",{format:"CODE128",width:1.8,height:40,displayValue:false,margin:5,background:"#ffffff",lineColor:"#000000"});<\/script></body></html>`;
 
             const win = window.open('', '_blank', 'width=400,height=600');
             if (win) {
