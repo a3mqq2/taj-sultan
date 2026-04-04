@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\PosPoint;
 use App\Models\PaymentMethod;
 use App\Models\SpecialOrder;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -18,8 +19,9 @@ class SalesReportController extends Controller
     {
         $posPoints = PosPoint::where('active', true)->get();
         $paymentMethods = PaymentMethod::where('is_active', true)->orderBy('sort_order')->get();
+        $users = User::where('is_active', true)->orderBy('name')->get();
 
-        return view('reports.sales.index', compact('posPoints', 'paymentMethods'));
+        return view('reports.sales.index', compact('posPoints', 'paymentMethods', 'users'));
     }
 
     public function data(Request $request)
@@ -710,6 +712,10 @@ class SalesReportController extends Controller
             $query->where('pos_point_id', $request->pos_point_id);
         }
 
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
         if ($request->filled('payment_method_id')) {
             $query->whereHas('payments', function ($q) use ($request) {
                 $q->where('payment_method_id', $request->payment_method_id);
@@ -727,6 +733,10 @@ class SalesReportController extends Controller
 
         if ($request->filled('date_to')) {
             $query->whereDate('delivery_date', '<=', $request->date_to);
+        }
+
+        if ($request->filled('user_id')) {
+            $query->where('user_id', $request->user_id);
         }
 
         if ($request->filled('payment_method_id')) {

@@ -781,6 +781,17 @@
                 </select>
             </div>
         </div>
+        <div class="col-lg-2 col-md-4 col-6">
+            <div class="filter-group">
+                <label class="filter-label">المستخدم</label>
+                <select class="form-select filter-input" id="userFilter">
+                    <option value="">الكل</option>
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
         <div class="col-lg-4 col-md-8">
             <div class="filter-group">
                 <label class="filter-label">فترة سريعة</label>
@@ -1141,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.addEventListener('click', function() { setPreset(this.dataset.preset); });
     });
 
-    ['dateFrom', 'dateTo', 'posPointFilter', 'paymentMethodFilter'].forEach(id => {
+    ['dateFrom', 'dateTo', 'posPointFilter', 'paymentMethodFilter', 'userFilter'].forEach(id => {
         document.getElementById(id).addEventListener('change', function() {
             document.querySelectorAll('.preset-btns .btn').forEach(b => b.classList.remove('active'));
             currentPage = 1;
@@ -1216,6 +1227,7 @@ function getFilters() {
         date_to: document.getElementById('dateTo').value,
         pos_point_id: document.getElementById('posPointFilter').value,
         payment_method_id: document.getElementById('paymentMethodFilter').value,
+        user_id: document.getElementById('userFilter').value,
     };
 }
 
