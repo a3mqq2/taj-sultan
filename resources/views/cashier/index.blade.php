@@ -1145,6 +1145,11 @@
                     <i class="ti ti-reload"></i>
                     تحديث
                 </button>
+                <button type="button" class="header-btn" style="background:linear-gradient(135deg,#06b6d4,#0891b2);" onclick="openTodayOrdersModal()">
+                    <span class="shortcut-badge">F2</span>
+                    <i class="ti ti-receipt-2"></i>
+                    فواتير اليوم
+                </button>
                 <button type="button" class="header-btn" style="background:linear-gradient(135deg,#ef4444,#dc2626);" onclick="showCancelInvoiceModal()">
                     <span class="shortcut-badge">F3</span>
                     <i class="ti ti-file-x"></i>
@@ -1165,6 +1170,12 @@
                     <i class="ti ti-cake"></i>
                     طلبيات خاصة
                 </a>
+                <button type="button" class="header-btn" style="background:linear-gradient(135deg,#64748b,#475569);position:relative;" onclick="openPendingModal()" id="btnPending">
+                    <span class="shortcut-badge">F8</span>
+                    <i class="ti ti-clock-pause"></i>
+                    غير مسددة
+                    <span id="pendingCount" style="display:none;position:absolute;top:-8px;right:-8px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;">0</span>
+                </button>
                 <button type="button" class="header-btn" style="background:linear-gradient(135deg,#0ea5e9,#0284c7);" onclick="openShortcutsModal()">
                     <span class="shortcut-badge">F9</span>
                     <i class="ti ti-keyboard"></i>
@@ -1225,8 +1236,9 @@
 
                 <div class="footer-section">
                     <div class="footer-hints">
-                        <div class="hint"><kbd>F2</kbd> الباركود</div>
+                        <div class="hint"><kbd>F2</kbd> فواتير اليوم</div>
                         <div class="hint"><kbd>F4</kbd> خصم</div>
+                        <div class="hint"><kbd>F8</kbd> غير مسددة</div>
                         <div class="hint"><kbd>F9</kbd> اختصارات</div>
                         <div class="hint"><kbd>F10</kbd> تعليق</div>
                         <div class="hint"><kbd>Enter</kbd> دفع</div>
@@ -1350,6 +1362,38 @@
         </div>
     </div>
 
+    <div class="shortcuts-modal" id="todayOrdersModal">
+        <div class="shortcuts-modal-content" style="max-width:560px;">
+            <div class="shortcuts-modal-header">
+                <div class="shortcuts-modal-title">
+                    <i class="ti ti-receipt-2" style="color:#06b6d4;"></i>
+                    فواتير اليوم
+                </div>
+                <button class="modal-close" onclick="closeTodayOrdersModal()"><i class="ti ti-x"></i></button>
+            </div>
+            <div id="todayOrdersList" style="max-height:450px;overflow-y:auto;"></div>
+            <div class="shortcuts-hint" style="margin-top:12px;">
+                انقر على فاتورة لإعادة طباعتها &bull; <kbd>Esc</kbd> إغلاق
+            </div>
+        </div>
+    </div>
+
+    <div class="shortcuts-modal" id="pendingModal">
+        <div class="shortcuts-modal-content" style="max-width:520px;">
+            <div class="shortcuts-modal-header">
+                <div class="shortcuts-modal-title">
+                    <i class="ti ti-clock-pause" style="color:#64748b;"></i>
+                    فواتير غير مسددة
+                </div>
+                <button class="modal-close" onclick="closePendingModal()"><i class="ti ti-x"></i></button>
+            </div>
+            <div id="pendingList" style="max-height:400px;overflow-y:auto;"></div>
+            <div class="shortcuts-hint" style="margin-top:12px;">
+                انقر على فاتورة لفتحها &bull; <kbd>Esc</kbd> إغلاق
+            </div>
+        </div>
+    </div>
+
     <script>
         const BASE_URL = "{{ url('/') }}";
         const WEIGHT_PREFIX = '99';
@@ -1389,6 +1433,11 @@
         let creditShowNewForm = false;
         let creditPaidAmount = 0;
         let creditSearchQuery = '';
+        let processingPayment = false;
+        let todayOrdersData = [];
+        let todayOrderIndex = -1;
+        let pendingOrdersData = [];
+        let pendingOrderIndex = -1;
 
         document.addEventListener('DOMContentLoaded', init);
 
@@ -1404,6 +1453,7 @@
             document.addEventListener('keydown', handleGlobalKeys);
             renderShortcutsGrid();
             updateHeldCount();
+            loadPendingCount();
         }
 
         function debounce(func, wait) {
@@ -1425,14 +1475,69 @@
                 return;
             }
 
+            if (document.getElementById('todayOrdersModal').classList.contains('active')) {
+                if (e.key === 'Escape') { e.preventDefault(); closeTodayOrdersModal(); return; }
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (todayOrdersData.length > 0) {
+                        todayOrderIndex = Math.min(todayOrderIndex + 1, todayOrdersData.length - 1);
+                        highlightTodayOrder();
+                    }
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (todayOrdersData.length > 0) {
+                        todayOrderIndex = Math.max(todayOrderIndex - 1, 0);
+                        highlightTodayOrder();
+                    }
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (todayOrderIndex >= 0 && todayOrderIndex < todayOrdersData.length) {
+                        reprintOrder(todayOrdersData[todayOrderIndex].order_number);
+                    }
+                    return;
+                }
+                return;
+            }
+
+            if (document.getElementById('pendingModal').classList.contains('active')) {
+                if (e.key === 'Escape') { e.preventDefault(); closePendingModal(); return; }
+                if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (pendingOrdersData.length > 0) {
+                        pendingOrderIndex = Math.min(pendingOrderIndex + 1, pendingOrdersData.length - 1);
+                        renderPendingList();
+                    }
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (pendingOrdersData.length > 0) {
+                        pendingOrderIndex = Math.max(pendingOrderIndex - 1, 0);
+                        renderPendingList();
+                    }
+                    return;
+                }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (pendingOrderIndex >= 0 && pendingOrderIndex < pendingOrdersData.length) {
+                        loadPendingOrder(pendingOrdersData[pendingOrderIndex].order_number);
+                    }
+                    return;
+                }
+                return;
+            }
+
             if (e.key === 'F1') {
                 e.preventDefault();
                 location.reload();
             }
             if (e.key === 'F2') {
                 e.preventDefault();
-                document.getElementById('invoiceInput').focus();
-                document.getElementById('invoiceInput').select();
+                openTodayOrdersModal();
             }
             if (e.key === 'F3') {
                 e.preventDefault();
@@ -1456,7 +1561,7 @@
             }
             if (e.key === 'F8') {
                 e.preventDefault();
-                if (hasItems()) openWizard();
+                openPendingModal();
             }
             if (e.key === 'F9') {
                 e.preventDefault();
@@ -1471,7 +1576,11 @@
                 }
             }
             if (e.key === 'Escape') {
-                if (document.getElementById('heldModal').classList.contains('active')) {
+                if (document.getElementById('todayOrdersModal').classList.contains('active')) {
+                    closeTodayOrdersModal(); return;
+                } else if (document.getElementById('pendingModal').classList.contains('active')) {
+                    closePendingModal();
+                } else if (document.getElementById('heldModal').classList.contains('active')) {
                     closeHeldModal();
                 } else if (document.getElementById('discountModal').classList.contains('active')) {
                     closeDiscountModal();
@@ -2443,8 +2552,11 @@
         }
 
         async function processWizardPayment(deliveryType, deliveryPhone) {
+            if (processingPayment) return;
+            processingPayment = true;
+
             const total = getTotal();
-            if (total <= 0) return toast('لا يوجد مبلغ', 'error');
+            if (total <= 0) { processingPayment = false; return toast('لا يوجد مبلغ', 'error'); }
 
             const grossTotal = getGrossTotal();
 
@@ -2467,7 +2579,7 @@
                         })
                     });
                     const createData = await createRes.json();
-                    if (!createData.success) return toast(createData.message, 'error');
+                    if (!createData.success) { processingPayment = false; return toast(createData.message, 'error'); }
                     orderId = createData.data.id;
                 } else {
                     orderId = currentOrder.id;
@@ -2503,6 +2615,7 @@
                         toast('تم حفظ البيع بالآجل', 'success');
                         resetAll();
                     } else {
+                        processingPayment = false;
                         toast(payData.message, 'error');
                     }
                 } else {
@@ -2531,10 +2644,12 @@
                         toast('تم الدفع بنجاح', 'success');
                         resetAll();
                     } else {
+                        processingPayment = false;
                         toast(payData.message, 'error');
                     }
                 }
             } catch (err) {
+                processingPayment = false;
                 toast('خطأ في الاتصال: ' + err.message, 'error');
             }
         }
@@ -3067,6 +3182,153 @@ ${creditHtml}
             toast('تم حذف الفاتورة المعلقة', 'success');
         }
 
+        async function openTodayOrdersModal() {
+            todayOrdersData = [];
+            todayOrderIndex = -1;
+            document.getElementById('todayOrdersModal').classList.add('active');
+            document.getElementById('todayOrdersList').innerHTML = '<div style="text-align:center;padding:24px;"><div style="width:24px;height:24px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></div></div>';
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/today-orders');
+                const data = await res.json();
+                const container = document.getElementById('todayOrdersList');
+
+                if (data.success && data.data.length > 0) {
+                    todayOrdersData = data.data;
+                    todayOrderIndex = 0;
+                    renderTodayOrdersList();
+                } else {
+                    container.innerHTML = '<div class="held-empty"><i class="ti ti-receipt-off" style="font-size:32px;display:block;margin-bottom:8px;"></i>لا توجد فواتير اليوم</div>';
+                }
+            } catch (err) {
+                document.getElementById('todayOrdersList').innerHTML = '<div class="held-empty">خطأ في الاتصال</div>';
+            }
+        }
+
+        function renderTodayOrdersList() {
+            const container = document.getElementById('todayOrdersList');
+            container.innerHTML = todayOrdersData.map(function(o, idx) {
+                const isSelected = idx === todayOrderIndex;
+                const deliveryIcon = o.delivery_type === 'delivery' ? '<span style="color:#10b981;font-size:11px;"><i class="ti ti-truck-delivery"></i></span>' : '';
+                const discountInfo = parseFloat(o.discount) > 0 ? '<span style="color:#f59e0b;font-size:11px;">خصم ' + o.discount + '</span>' : '';
+                return '<div class="held-item" id="todayOrder' + idx + '" onclick="reprintOrder(\'' + o.order_number + '\')" style="cursor:pointer;border-color:' + (isSelected ? '#06b6d4' : '#e2e8f0') + ';background:' + (isSelected ? '#ecfeff' : '#f8fafc') + ';">' +
+                    '<div class="held-item-info" style="flex:1;">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                            '<div class="held-item-total">#' + o.order_number + ' ' + deliveryIcon + '</div>' +
+                            '<div class="held-item-meta">' + o.paid_at + '</div>' +
+                        '</div>' +
+                        '<div style="display:flex;gap:12px;font-size:12px;color:#64748b;">' +
+                            '<span><i class="ti ti-device-desktop"></i> ' + o.pos_point + '</span>' +
+                            '<span><i class="ti ti-user"></i> ' + o.cashier + '</span>' +
+                            '<span><i class="ti ti-box"></i> ' + o.items_count + '</span>' +
+                            (discountInfo ? discountInfo : '') +
+                            '<span style="font-weight:700;color:#059669;">' + o.total + ' د.ل</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div style="display:flex;align-items:center;color:' + (isSelected ? '#06b6d4' : '#cbd5e1') + ';font-size:20px;padding-right:8px;"><i class="ti ti-printer"></i></div>' +
+                '</div>';
+            }).join('');
+
+            if (todayOrderIndex >= 0) {
+                const el = document.getElementById('todayOrder' + todayOrderIndex);
+                if (el) el.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function highlightTodayOrder() {
+            renderTodayOrdersList();
+        }
+
+        function closeTodayOrdersModal() {
+            todayOrdersData = [];
+            todayOrderIndex = -1;
+            document.getElementById('todayOrdersModal').classList.remove('active');
+            document.getElementById('invoiceInput').focus();
+        }
+
+        function reprintOrder(orderNumber) {
+            closeTodayOrdersModal();
+            window.open(BASE_URL + '/cashier/reprint/' + orderNumber, '_blank');
+        }
+
+        async function openPendingModal() {
+            pendingOrdersData = [];
+            pendingOrderIndex = -1;
+            document.getElementById('pendingModal').classList.add('active');
+            document.getElementById('pendingList').innerHTML = '<div style="text-align:center;padding:24px;"><div style="width:24px;height:24px;border:3px solid #e2e8f0;border-top-color:#3b82f6;border-radius:50%;animation:spin 0.8s linear infinite;display:inline-block;"></div></div>';
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/pending-orders');
+                const data = await res.json();
+
+                if (data.success && data.data.length > 0) {
+                    const badge = document.getElementById('pendingCount');
+                    badge.textContent = data.data.length;
+                    badge.style.display = 'flex';
+                    pendingOrdersData = data.data;
+                    pendingOrderIndex = 0;
+                    renderPendingList();
+                } else {
+                    document.getElementById('pendingCount').style.display = 'none';
+                    document.getElementById('pendingList').innerHTML = '<div class="held-empty"><i class="ti ti-checks" style="font-size:32px;display:block;margin-bottom:8px;color:#10b981;"></i>لا توجد فواتير غير مسددة</div>';
+                }
+            } catch (err) {
+                document.getElementById('pendingList').innerHTML = '<div class="held-empty">خطأ في الاتصال</div>';
+            }
+        }
+
+        function renderPendingList() {
+            const container = document.getElementById('pendingList');
+            container.innerHTML = pendingOrdersData.map(function(o, idx) {
+                const isSelected = idx === pendingOrderIndex;
+                return '<div class="held-item" id="pendingOrder' + idx + '" onclick="loadPendingOrder(\'' + o.order_number + '\')" style="border-color:' + (isSelected ? '#64748b' : '#e2e8f0') + ';background:' + (isSelected ? '#f1f5f9' : '#f8fafc') + ';">' +
+                    '<div class="held-item-info" style="flex:1;">' +
+                        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+                            '<div class="held-item-total">#' + o.order_number + '</div>' +
+                            '<div class="held-item-meta">' + o.date + ' ' + o.created_at + '</div>' +
+                        '</div>' +
+                        '<div style="display:flex;gap:12px;font-size:12px;color:#64748b;">' +
+                            '<span><i class="ti ti-device-desktop"></i> ' + o.pos_point + '</span>' +
+                            '<span><i class="ti ti-user"></i> ' + o.user + '</span>' +
+                            '<span><i class="ti ti-box"></i> ' + o.items_count + ' أصناف</span>' +
+                            '<span style="font-weight:700;color:#1e293b;">' + o.total + ' د.ل</span>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+
+            if (pendingOrderIndex >= 0) {
+                const el = document.getElementById('pendingOrder' + pendingOrderIndex);
+                if (el) el.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        function closePendingModal() {
+            pendingOrdersData = [];
+            pendingOrderIndex = -1;
+            document.getElementById('pendingModal').classList.remove('active');
+            document.getElementById('invoiceInput').focus();
+        }
+
+        async function loadPendingOrder(orderNumber) {
+            closePendingModal();
+            await fetchOrder(orderNumber);
+        }
+
+        async function loadPendingCount() {
+            try {
+                const res = await fetch(BASE_URL + '/cashier/pending-orders');
+                const data = await res.json();
+                const badge = document.getElementById('pendingCount');
+                if (data.success && data.data.length > 0) {
+                    badge.textContent = data.data.length;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            } catch (err) {}
+        }
+
         function resetAll() {
             currentOrder = null;
             directItems = [];
@@ -3074,6 +3336,7 @@ ${creditHtml}
             discount = 0;
             mergedOrderIds = [];
             selectedCustomer = null;
+            processingPayment = false;
 
             document.getElementById('invoiceInput').value = '';
             document.getElementById('invoiceInput').disabled = false;

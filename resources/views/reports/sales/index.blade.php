@@ -820,6 +820,10 @@
         <i class="ti ti-search"></i>
         صنف محدد
     </button>
+    <button type="button" class="report-tab" onclick="switchTab('breakdown')">
+        <i class="ti ti-chart-pie"></i>
+        حسب الدفع والنقاط
+    </button>
     <button type="button" class="report-tab" onclick="switchTab('special')">
         <i class="ti ti-cake"></i>
         طلبيات خاصة
@@ -1061,6 +1065,70 @@
     </div>
 </div>
 
+<!-- TAB 5: حسب الدفع والنقاط -->
+<div class="tab-content" id="tab-breakdown">
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="data-table position-relative">
+                <div id="breakdownPmLoading" class="loading-overlay d-none"><div class="spinner"></div></div>
+                <div class="report-card-header" style="padding: 20px; margin: 0; border-radius: 16px 16px 0 0;">
+                    <div class="report-card-title"><i class="ti ti-credit-card"></i> المبيعات حسب طريقة الدفع</div>
+                    <div class="action-btns">
+                        <span class="fw-bold text-success" id="pmGrandTotal">0.000 د.ل</span>
+                    </div>
+                </div>
+                <div id="pmChartContainer" style="padding:16px;"><div id="pmBreakdownChart" style="height:280px;"></div></div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>طريقة الدفع</th>
+                                <th class="text-center">عدد الفواتير</th>
+                                <th class="text-center">الإجمالي</th>
+                                <th>النسبة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pmBreakdownBody"></tbody>
+                    </table>
+                </div>
+                <div id="pmBreakdownEmpty" class="empty-state d-none">
+                    <div class="empty-state-icon"><i class="ti ti-credit-card-off"></i></div>
+                    <h5>لا توجد بيانات</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="data-table position-relative">
+                <div id="breakdownPosLoading" class="loading-overlay d-none"><div class="spinner"></div></div>
+                <div class="report-card-header" style="padding: 20px; margin: 0; border-radius: 16px 16px 0 0;">
+                    <div class="report-card-title"><i class="ti ti-device-desktop"></i> المبيعات حسب نقطة البيع</div>
+                    <div class="action-btns">
+                        <span class="fw-bold text-success" id="posGrandTotal">0.000 د.ل</span>
+                    </div>
+                </div>
+                <div id="posChartContainer" style="padding:16px;"><div id="posBreakdownChart" style="height:280px;"></div></div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>نقطة البيع</th>
+                                <th class="text-center">عدد الفواتير</th>
+                                <th class="text-center">الإجمالي</th>
+                                <th>النسبة</th>
+                            </tr>
+                        </thead>
+                        <tbody id="posBreakdownBody"></tbody>
+                    </table>
+                </div>
+                <div id="posBreakdownEmpty" class="empty-state d-none">
+                    <div class="empty-state-icon"><i class="ti ti-device-desktop-off"></i></div>
+                    <h5>لا توجد بيانات</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- TAB 4: طلبيات خاصة -->
 <div class="tab-content" id="tab-special">
     <div class="summary-grid">
@@ -1144,6 +1212,8 @@ let selectedProductId = null;
 let spDailyChart = null;
 let spQtyChart = null;
 let searchTimer = null;
+let pmBreakdownChart = null;
+let posBreakdownChart = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     setPreset('today');
@@ -1188,6 +1258,7 @@ function loadTabData(tab) {
     if (tab === 'invoices') { loadSummary(); loadCharts(); loadOrders(); }
     if (tab === 'products') { loadAllProducts(); }
     if (tab === 'single-product' && selectedProductId) { loadSingleProduct(selectedProductId); }
+    if (tab === 'breakdown') { loadBreakdown(); }
     if (tab === 'special') { loadSpecialOrdersSummary(); loadSpecialOrders(); }
 }
 
@@ -1453,6 +1524,83 @@ function renderSpQtyChart(data) {
     };
     if (spQtyChart) { spQtyChart.updateOptions(opts); }
     else { spQtyChart = new ApexCharts(document.getElementById('spQtyChart'), opts); spQtyChart.render(); }
+}
+
+async function loadBreakdown() {
+    document.getElementById('breakdownPmLoading').classList.remove('d-none');
+    document.getElementById('breakdownPosLoading').classList.remove('d-none');
+    const params = new URLSearchParams(getFilters());
+    try {
+        const res = await fetch(`{{ route('reports.sales.breakdown') }}?${params}`);
+        const r = await res.json();
+        if (r.success) {
+            const d = r.data;
+            document.getElementById('pmGrandTotal').textContent = d.pm_grand_total + ' د.ل';
+            document.getElementById('posGrandTotal').textContent = d.pos_grand_total + ' د.ل';
+
+            const pmBody = document.getElementById('pmBreakdownBody');
+            const pmEmpty = document.getElementById('pmBreakdownEmpty');
+            if (d.by_payment_method.length > 0) {
+                pmEmpty.classList.add('d-none');
+                pmBody.innerHTML = d.by_payment_method.map(p => `<tr><td><strong>${p.name}</strong></td><td class="text-center">${p.orders_count}</td><td class="text-center text-success fw-bold">${p.total_formatted} د.ل</td><td style="min-width:100px;">${p.percentage}%<div class="percentage-bar"><div class="percentage-bar-fill" style="width:${p.percentage}%"></div></div></td></tr>`).join('');
+                renderBreakdownChart('pmBreakdownChart', d.by_payment_method, 'pm');
+            } else {
+                pmBody.innerHTML = '';
+                pmEmpty.classList.remove('d-none');
+                document.getElementById('pmChartContainer').innerHTML = '';
+            }
+
+            const posBody = document.getElementById('posBreakdownBody');
+            const posEmpty = document.getElementById('posBreakdownEmpty');
+            if (d.by_pos_point.length > 0) {
+                posEmpty.classList.add('d-none');
+                posBody.innerHTML = d.by_pos_point.map(p => `<tr><td><strong>${p.name}</strong></td><td class="text-center">${p.orders_count}</td><td class="text-center text-success fw-bold">${p.total_formatted} د.ل</td><td style="min-width:100px;">${p.percentage}%<div class="percentage-bar"><div class="percentage-bar-fill" style="width:${p.percentage}%"></div></div></td></tr>`).join('');
+                renderBreakdownChart('posBreakdownChart', d.by_pos_point, 'pos');
+            } else {
+                posBody.innerHTML = '';
+                posEmpty.classList.remove('d-none');
+                document.getElementById('posChartContainer').innerHTML = '';
+            }
+        }
+    } catch (e) { console.error(e); }
+    finally {
+        document.getElementById('breakdownPmLoading').classList.add('d-none');
+        document.getElementById('breakdownPosLoading').classList.add('d-none');
+    }
+}
+
+function renderBreakdownChart(elId, data, type) {
+    const container = document.getElementById(elId);
+    if (!container) return;
+    container.innerHTML = '';
+    const el = document.createElement('div');
+    el.style.height = '280px';
+    container.parentElement.querySelector('div').replaceWith(container);
+
+    const colors = type === 'pm'
+        ? ['#3b82f6','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#84cc16','#f97316','#6366f1']
+        : ['#10b981','#3b82f6','#f59e0b','#8b5cf6','#ef4444','#06b6d4'];
+
+    const opts = {
+        series: data.map(d => d.total),
+        chart: { type: 'donut', height: 280, fontFamily: 'inherit' },
+        labels: data.map(d => d.name),
+        legend: { position: 'bottom', fontFamily: 'inherit' },
+        dataLabels: { enabled: true, formatter: val => val.toFixed(1) + '%' },
+        tooltip: { y: { formatter: val => val.toFixed(3) + ' د.ل' } },
+        colors: colors.slice(0, data.length),
+        plotOptions: { pie: { donut: { size: '60%', labels: { show: true, total: { show: true, label: 'الإجمالي', formatter: w => w.globals.seriesTotals.reduce((a,b) => a+b, 0).toFixed(3) + ' د.ل' } } } } }
+    };
+
+    if (type === 'pm') {
+        if (pmBreakdownChart) { pmBreakdownChart.destroy(); }
+        pmBreakdownChart = new ApexCharts(document.getElementById(elId), opts);
+        pmBreakdownChart.render();
+    } else {
+        if (posBreakdownChart) { posBreakdownChart.destroy(); }
+        posBreakdownChart = new ApexCharts(document.getElementById(elId), opts);
+        posBreakdownChart.render();
+    }
 }
 
 function exportExcel() { window.location.href = `{{ route('reports.sales.export.excel') }}?${new URLSearchParams(getFilters())}`; }

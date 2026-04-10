@@ -207,6 +207,7 @@
         let wProductIndex = -1;
         let wPmIndex = 0;
         let wViewPmIndex = 0;
+        let wPayments = [];
 
         document.addEventListener('DOMContentLoaded', async function() {
             document.getElementById('btnNewOrder').addEventListener('click', startNewOrder);
@@ -254,6 +255,7 @@
         function startNewOrder() {
             wData = { customerName: '', customerPhone: '', customerId: null, eventType: '', deliveryDate: '', notes: '', items: [] };
             wPmIndex = 0;
+            wPayments = [];
             wStep = 1;
             renderWizard();
         }
@@ -333,6 +335,9 @@
             footerHtml += '<button class="view-btn primary" onclick="printOrder()"><i class="ti ti-printer"></i> طباعة</button>';
             if (currentOrder.status !== 'delivered' && currentOrder.status !== 'cancelled' && currentOrder.remaining_amount > 0) {
                 footerHtml += '<button class="view-btn success" onclick="openAddPayment()"><i class="ti ti-cash"></i> إضافة دفعة</button>';
+            }
+            if (currentOrder.status !== 'delivered' && currentOrder.status !== 'cancelled') {
+                footerHtml += '<button class="view-btn" style="background:#059669;color:#fff;" onclick="changeOrderStatus(\'delivered\')"><i class="ti ti-truck-delivery"></i> تم التسليم</button>';
             }
             document.getElementById('viewFooter').innerHTML = footerHtml;
             wViewPmIndex = 0;
@@ -428,17 +433,38 @@
                 }, 50);
             } else if (wStep === 4) {
                 let total = wData.items.reduce((s, i) => s + i.total, 0);
-                let pmHtml = PAYMENT_METHODS.map((m, i) => `<div class="pm-option ${i === wPmIndex ? 'selected' : ''}" data-idx="${i}">${m.name}</div>`).join('');
+                let paidSoFar = wPayments.reduce((s, p) => s + p.amount, 0);
+                let remaining = total - paidSoFar;
+                let pmHtml = PAYMENT_METHODS.map((m, i) => `<div class="pm-option ${i === wPmIndex ? 'selected' : ''}" data-idx="${i}" onclick="wPmIndex=${i};updatePmHighlight();">${m.name}</div>`).join('');
+
+                let paymentsListHtml = '';
+                if (wPayments.length > 0) {
+                    paymentsListHtml = '<div class="wizard-items">' + wPayments.map((p, i) => `<div class="wizard-item"><div><div class="name">${p.method_name}</div><div class="info">${parseFloat(p.amount).toFixed(3)} د.ل</div></div><div><button onclick="removeWPayment(${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;font-size:18px;padding:4px;"><i class="ti ti-x"></i></button></div></div>`).join('') + '</div>';
+                }
 
                 content.innerHTML = `
                     <div class="wizard-title">الخطوة 4 من 5</div>
                     <div class="wizard-heading"><i class="ti ti-cash"></i> الدفع</div>
                     <div class="wizard-total-bar"><span>الإجمالي</span><span>${total.toFixed(3)} د.ل</span></div>
+                    ${paymentsListHtml}
+                    ${remaining > 0.001 ? `
+                    <div style="text-align:center;font-size:13px;color:#64748b;margin:8px 0;">المتبقي: <strong style="color:#ef4444;">${remaining.toFixed(3)} د.ل</strong></div>
                     <div class="pm-grid" id="wPmGrid">${pmHtml}</div>
-                    <input type="number" class="wizard-input" id="wPayAmount" step="0.001" placeholder="المبلغ المدفوع (اختياري)" value="${total > 0 ? total.toFixed(3) : ''}">
-                    <div class="wizard-hint"><kbd>←→</kbd> طريقة الدفع &nbsp; <kbd>Enter</kbd> حفظ &nbsp; <kbd>Esc</kbd> السابق</div>
+                    <input type="number" class="wizard-input" id="wPayAmount" step="0.001" placeholder="المبلغ" value="${remaining.toFixed(3)}">
+                    <div style="display:flex;gap:8px;margin-top:8px;">
+                        <button type="button" onclick="addWPayment()" style="flex:1;padding:12px;background:#3b82f6;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;"><i class="ti ti-plus"></i> إضافة دفعة</button>
+                        <button type="button" onclick="saveNewOrder()" style="flex:1;padding:12px;background:#10b981;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;"><i class="ti ti-check"></i> حفظ الطلبية</button>
+                    </div>
+                    <div class="wizard-hint"><kbd>←→</kbd> طريقة الدفع &nbsp; <kbd>Enter</kbd> إضافة دفعة &nbsp; <kbd>Ctrl+Enter</kbd> حفظ &nbsp; <kbd>Esc</kbd> السابق</div>
+                    ` : `
+                    <div style="text-align:center;padding:16px;color:#10b981;font-weight:700;font-size:16px;"><i class="ti ti-check"></i> تم تغطية المبلغ بالكامل</div>
+                    <button type="button" onclick="saveNewOrder()" style="width:100%;padding:14px;background:#10b981;color:#fff;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;"><i class="ti ti-check"></i> حفظ الطلبية</button>
+                    <div class="wizard-hint"><kbd>Enter</kbd> حفظ &nbsp; <kbd>Esc</kbd> السابق</div>
+                    `}
                 `;
-                setTimeout(() => document.getElementById('wPayAmount').focus(), 50);
+                if (remaining > 0.001) {
+                    setTimeout(() => document.getElementById('wPayAmount').focus(), 50);
+                }
             } else if (wStep === 5) {
                 content.innerHTML = `
                     <div class="wizard-title">الخطوة 3 من 5 - إضافة صنف</div>
@@ -451,7 +477,7 @@
                 setTimeout(() => document.getElementById('wQtyInput').focus(), 50);
             } else if (wStep === 10) {
                 let remaining = parseFloat(currentOrder.remaining_amount);
-                let pmHtml = PAYMENT_METHODS.map((m, i) => `<div class="pm-option ${i === wViewPmIndex ? 'selected' : ''}" data-idx="${i}">${m.name}</div>`).join('');
+                let pmHtml = PAYMENT_METHODS.map((m, i) => `<div class="pm-option ${i === wViewPmIndex ? 'selected' : ''}" data-idx="${i}" onclick="wViewPmIndex=${i};updatePmHighlight();">${m.name}</div>`).join('');
 
                 content.innerHTML = `
                     <div class="wizard-heading"><i class="ti ti-cash"></i> إضافة دفعة</div>
@@ -551,24 +577,37 @@
                         renderWizard();
                     }
                 }
-            } else if (wStep === 4 || wStep === 10) {
-                const pmIdx = wStep === 10 ? 'wViewPmIndex' : 'wPmIndex';
-                const currentIdx = wStep === 10 ? wViewPmIndex : wPmIndex;
-
+            } else if (wStep === 10) {
                 if (e.key === 'ArrowLeft') {
                     e.preventDefault();
-                    if (wStep === 10) wViewPmIndex = (wViewPmIndex + 1) % PAYMENT_METHODS.length;
-                    else wPmIndex = (wPmIndex + 1) % PAYMENT_METHODS.length;
+                    wViewPmIndex = (wViewPmIndex + 1) % PAYMENT_METHODS.length;
                     updatePmHighlight();
                 } else if (e.key === 'ArrowRight') {
                     e.preventDefault();
-                    if (wStep === 10) wViewPmIndex = (wViewPmIndex - 1 + PAYMENT_METHODS.length) % PAYMENT_METHODS.length;
-                    else wPmIndex = (wPmIndex - 1 + PAYMENT_METHODS.length) % PAYMENT_METHODS.length;
+                    wViewPmIndex = (wViewPmIndex - 1 + PAYMENT_METHODS.length) % PAYMENT_METHODS.length;
                     updatePmHighlight();
                 } else if (e.key === 'Enter') {
                     e.preventDefault();
-                    if (wStep === 10) processViewPayment();
-                    else saveNewOrder();
+                    processViewPayment();
+                }
+            } else if (wStep === 4) {
+                if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    wPmIndex = (wPmIndex + 1) % PAYMENT_METHODS.length;
+                    updatePmHighlight();
+                } else if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    wPmIndex = (wPmIndex - 1 + PAYMENT_METHODS.length) % PAYMENT_METHODS.length;
+                    updatePmHighlight();
+                } else if (e.key === 'Enter' && e.ctrlKey) {
+                    e.preventDefault();
+                    saveNewOrder();
+                } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    let total = wData.items.reduce((s, i) => s + i.total, 0);
+                    let paidSoFar = wPayments.reduce((s, p) => s + p.amount, 0);
+                    if (total - paidSoFar <= 0.001) { saveNewOrder(); return; }
+                    addWPayment();
                 }
             } else if (wStep === 5) {
                 if (e.key === 'Enter') {
@@ -689,15 +728,40 @@
             document.getElementById('wCustomerPhone').focus();
         }
 
+        function addWPayment() {
+            const amountEl = document.getElementById('wPayAmount');
+            if (!amountEl) return;
+            const amount = parseFloat(amountEl.value);
+            if (!amount || amount <= 0) { toast('أدخل المبلغ', 'error'); amountEl.focus(); return; }
+
+            const total = wData.items.reduce((s, i) => s + i.total, 0);
+            const paidSoFar = wPayments.reduce((s, p) => s + p.amount, 0);
+            const remaining = total - paidSoFar;
+
+            if (amount > remaining + 0.001) { toast('المبلغ أكبر من المتبقي', 'error'); amountEl.focus(); return; }
+
+            const pm = PAYMENT_METHODS[wPmIndex];
+            wPayments.push({ payment_method_id: pm.id, method_name: pm.name, amount: amount });
+            toast('تم إضافة الدفعة', 'success');
+            renderWizard();
+        }
+
+        function removeWPayment(index) {
+            wPayments.splice(index, 1);
+            renderWizard();
+        }
+
         async function saveNewOrder() {
-            const payment = parseFloat(document.getElementById('wPayAmount').value) || 0;
             const total = wData.items.reduce((s, i) => s + i.total, 0);
 
             if (wData.items.length === 0) { toast('أضف صنف على الأقل', 'error'); return; }
-            if (payment > total) { toast('الدفعة أكبر من الإجمالي', 'error'); return; }
 
-            const pmIdx = wPmIndex;
-            const pm = PAYMENT_METHODS[pmIdx];
+            const amountEl = document.getElementById('wPayAmount');
+            const pendingAmount = amountEl ? parseFloat(amountEl.value) || 0 : 0;
+            if (pendingAmount > 0 && wPayments.length === 0) {
+                const pm = PAYMENT_METHODS[wPmIndex];
+                wPayments.push({ payment_method_id: pm.id, method_name: pm.name, amount: pendingAmount });
+            }
 
             const payload = {
                 customer_id: wData.customerId || null,
@@ -709,8 +773,7 @@
                 notes: wData.notes || null,
                 items: wData.items.map(i => ({ product_id: i.product_id, quantity: i.quantity, price: i.price, total: i.total })),
                 total_amount: total,
-                initial_payment: payment > 0 ? payment : null,
-                payment_method_id: payment > 0 ? pm.id : null
+                payments: wPayments.length > 0 ? wPayments.map(p => ({ payment_method_id: p.payment_method_id, amount: p.amount })) : null
             };
 
             try {
@@ -752,6 +815,41 @@
                     showOrderView();
                     toast('تم إضافة الدفعة', 'success');
                     if (currentOrder.remaining_amount <= 0) toast('تم سداد الطلبية بالكامل!', 'success');
+                } else {
+                    toast(data.message, 'error');
+                }
+            } catch (err) {
+                toast('خطأ في الاتصال', 'error');
+            }
+        }
+
+        async function changeOrderStatus(newStatus) {
+            if (!currentOrder) return;
+            const labels = { ready: 'جاهز', delivered: 'تم التسليم' };
+            const result = await Swal.fire({
+                title: `تغيير الحالة إلى "${labels[newStatus]}"؟`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'نعم',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#8b5cf6',
+                cancelButtonColor: '#64748b',
+                customClass: { popup: 'swal-rtl', title: 'swal-title-rtl' }
+            });
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/special-orders/' + currentOrder.id + '/status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    currentOrder.status = data.status;
+                    currentOrder.status_name = data.status_name;
+                    showOrderView();
+                    toast(data.message, 'success');
                 } else {
                     toast(data.message, 'error');
                 }

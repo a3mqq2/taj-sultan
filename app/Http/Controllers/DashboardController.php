@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Customer;
 use App\Models\SpecialOrder;
+use App\Models\SpecialOrderPayment;
 use App\Models\PosPoint;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,11 +21,18 @@ class DashboardController extends Controller
         $startOfWeek = Carbon::now()->startOfWeek();
         $startOfMonth = Carbon::now()->startOfMonth();
 
-        $todaySales = Order::paidOrDelivering()->whereDate('paid_at', $today)->sum('total');
+        $todayOrdersSales = Order::paidOrDelivering()->whereDate('paid_at', $today)->sum('total');
+        $todaySpecialPayments = SpecialOrderPayment::whereDate('created_at', $today)->sum('amount');
+        $todaySales = $todayOrdersSales + $todaySpecialPayments;
         $todayOrders = Order::paidOrDelivering()->whereDate('paid_at', $today)->count();
 
-        $weekSales = Order::paidOrDelivering()->where('paid_at', '>=', $startOfWeek)->sum('total');
-        $monthSales = Order::paidOrDelivering()->where('paid_at', '>=', $startOfMonth)->sum('total');
+        $weekOrdersSales = Order::paidOrDelivering()->where('paid_at', '>=', $startOfWeek)->sum('total');
+        $weekSpecialPayments = SpecialOrderPayment::where('created_at', '>=', $startOfWeek)->sum('amount');
+        $weekSales = $weekOrdersSales + $weekSpecialPayments;
+
+        $monthOrdersSales = Order::paidOrDelivering()->where('paid_at', '>=', $startOfMonth)->sum('total');
+        $monthSpecialPayments = SpecialOrderPayment::where('created_at', '>=', $startOfMonth)->sum('amount');
+        $monthSales = $monthOrdersSales + $monthSpecialPayments;
 
         $productsCount = Product::count();
         $activeProducts = Product::active()->count();
@@ -71,16 +79,21 @@ class DashboardController extends Controller
             ]);
         }
 
-        $salesData = Order::paidOrDelivering()
+        $ordersSales = Order::paidOrDelivering()
             ->where('paid_at', '>=', Carbon::now()->subDays(6)->startOfDay())
             ->select(DB::raw('DATE(paid_at) as date'), DB::raw('SUM(total) as total'))
             ->groupBy('date')
             ->pluck('total', 'date');
 
-        $chartData = $days->map(function ($day) use ($salesData) {
+        $specialPayments = SpecialOrderPayment::where('created_at', '>=', Carbon::now()->subDays(6)->startOfDay())
+            ->select(DB::raw('DATE(created_at) as date'), DB::raw('SUM(amount) as total'))
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $chartData = $days->map(function ($day) use ($ordersSales, $specialPayments) {
             return [
                 'date' => $day['arabic_label'],
-                'sales' => (float) ($salesData[$day['date']] ?? 0),
+                'sales' => (float) (($ordersSales[$day['date']] ?? 0) + ($specialPayments[$day['date']] ?? 0)),
             ];
         });
 

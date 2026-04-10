@@ -19,7 +19,7 @@ class SalesReportController extends Controller
     {
         $posPoints = PosPoint::where('active', true)->get();
         $paymentMethods = PaymentMethod::where('is_active', true)->orderBy('sort_order')->get();
-        $users = User::where('is_active', true)->orderBy('name')->get();
+        $users = User::where('is_active', true)->whereIn('role', ['cashier', 'sales'])->orderBy('name')->get();
 
         return view('reports.sales.index', compact('posPoints', 'paymentMethods', 'users'));
     }
@@ -133,6 +133,64 @@ class SalesReportController extends Controller
             'data' => [
                 'daily_sales' => $dailySales,
                 'payment_distribution' => $paymentDistribution,
+            ]
+        ]);
+    }
+
+    public function breakdownData(Request $request)
+    {
+        $byPaymentMethod = OrderPayment::query()
+            ->whereHas('order', function ($q) use ($request) {
+                $q->whereIn('status', ['paid', 'delivering']);
+                $this->applyFilters($q, $request);
+            })
+            ->join('payment_methods', 'order_payments.payment_method_id', '=', 'payment_methods.id')
+            ->selectRaw('payment_methods.id, payment_methods.name, COUNT(DISTINCT order_payments.order_id) as orders_count, SUM(order_payments.amount) as total')
+            ->groupBy('payment_methods.id', 'payment_methods.name')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->name,
+                'orders_count' => $item->orders_count,
+                'total' => round($item->total, 3),
+            ]);
+
+        $pmGrandTotal = $byPaymentMethod->sum('total');
+        $byPaymentMethod = $byPaymentMethod->map(function ($item) use ($pmGrandTotal) {
+            $item['percentage'] = $pmGrandTotal > 0 ? round(($item['total'] / $pmGrandTotal) * 100, 1) : 0;
+            $item['total_formatted'] = number_format($item['total'], 3);
+            return $item;
+        });
+
+        $byPosPoint = Order::query()
+            ->whereIn('status', ['paid', 'delivering']);
+        $this->applyFilters($byPosPoint, $request);
+        $byPosPoint = $byPosPoint
+            ->join('pos_points', 'orders.pos_point_id', '=', 'pos_points.id')
+            ->selectRaw('pos_points.id, pos_points.name, COUNT(orders.id) as orders_count, SUM(orders.total - COALESCE(orders.discount, 0)) as total')
+            ->groupBy('pos_points.id', 'pos_points.name')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn($item) => [
+                'name' => $item->name,
+                'orders_count' => $item->orders_count,
+                'total' => round($item->total, 3),
+            ]);
+
+        $posGrandTotal = $byPosPoint->sum('total');
+        $byPosPoint = $byPosPoint->map(function ($item) use ($posGrandTotal) {
+            $item['percentage'] = $posGrandTotal > 0 ? round(($item['total'] / $posGrandTotal) * 100, 1) : 0;
+            $item['total_formatted'] = number_format($item['total'], 3);
+            return $item;
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'by_payment_method' => $byPaymentMethod->values(),
+                'by_pos_point' => $byPosPoint->values(),
+                'pm_grand_total' => number_format($pmGrandTotal, 3),
+                'pos_grand_total' => number_format($posGrandTotal, 3),
             ]
         ]);
     }

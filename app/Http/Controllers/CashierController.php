@@ -16,6 +16,7 @@ use App\Models\SpecialOrderPayment;
 use App\Models\EventType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class CashierController extends Controller
 {
@@ -39,6 +40,65 @@ class CashierController extends Controller
         }
 
         return view('cashier.index', compact('paymentMethods', 'shortcuts'));
+    }
+
+    public function pendingOrders()
+    {
+        $orders = Order::with(['posPoint', 'items', 'user'])
+            ->pending()
+            ->whereNull('merged_into')
+            ->orderBy('created_at', 'desc')
+            ->limit(50)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'pos_point' => $order->posPoint->name ?? '-',
+                    'user' => $order->user->name ?? '-',
+                    'total' => number_format($order->total, 3),
+                    'items_count' => $order->items->count(),
+                    'created_at' => $order->created_at->format('H:i'),
+                    'date' => $order->created_at->format('Y-m-d'),
+                ];
+            });
+
+        return response()->json(['success' => true, 'data' => $orders]);
+    }
+
+    public function todayOrders()
+    {
+        $orders = Order::with(['posPoint', 'paidByUser', 'items'])
+            ->whereIn('status', ['paid', 'delivering'])
+            ->whereDate('paid_at', Carbon::today())
+            ->orderBy('paid_at', 'desc')
+            ->limit(100)
+            ->get()
+            ->map(function ($order) {
+                return [
+                    'id' => $order->id,
+                    'order_number' => $order->order_number,
+                    'pos_point' => $order->posPoint->name ?? '-',
+                    'cashier' => $order->paidByUser->name ?? '-',
+                    'total' => number_format($order->total, 3),
+                    'discount' => number_format($order->discount ?? 0, 3),
+                    'items_count' => $order->items->count(),
+                    'paid_at' => $order->paid_at->format('H:i'),
+                    'delivery_type' => $order->delivery_type,
+                ];
+            });
+
+        return response()->json(['success' => true, 'data' => $orders]);
+    }
+
+    public function reprintOrder($orderNumber)
+    {
+        $order = Order::with(['items', 'payments.paymentMethod', 'paidByUser', 'posPoint'])
+            ->where('order_number', $orderNumber)
+            ->whereIn('status', ['paid', 'delivering'])
+            ->firstOrFail();
+
+        return view('cashier.reprint', compact('order'));
     }
 
     public function fetchOrder(Request $request)
@@ -747,6 +807,9 @@ class CashierController extends Controller
             'total_amount' => 'required|numeric|min:0',
             'initial_payment' => 'nullable|numeric|min:0',
             'payment_method_id' => 'required_with:initial_payment|nullable|exists:payment_methods,id',
+            'payments' => 'nullable|array',
+            'payments.*.payment_method_id' => 'required|exists:payment_methods,id',
+            'payments.*.amount' => 'required|numeric|min:0.001',
         ]);
 
         try {
@@ -760,8 +823,8 @@ class CashierController extends Controller
                     'description' => $validated['description'] ?? null,
                     'notes' => $validated['notes'] ?? null,
                     'total_amount' => $validated['total_amount'],
-                    'paid_amount' => $validated['initial_payment'] ?? 0,
-                    'remaining_amount' => $validated['total_amount'] - ($validated['initial_payment'] ?? 0),
+                    'paid_amount' => 0,
+                    'remaining_amount' => $validated['total_amount'],
                     'status' => SpecialOrder::STATUS_IN_PROGRESS,
                     'user_id' => auth()->id(),
                 ]);
@@ -779,13 +842,33 @@ class CashierController extends Controller
                     ]);
                 }
 
-                if (!empty($validated['initial_payment']) && $validated['initial_payment'] > 0) {
+                $totalPaid = 0;
+                if (!empty($validated['payments'])) {
+                    foreach ($validated['payments'] as $payment) {
+                        SpecialOrderPayment::create([
+                            'special_order_id' => $order->id,
+                            'payment_method_id' => $payment['payment_method_id'],
+                            'amount' => $payment['amount'],
+                            'user_id' => auth()->id(),
+                            'notes' => 'عربون',
+                        ]);
+                        $totalPaid += $payment['amount'];
+                    }
+                } elseif (!empty($validated['initial_payment']) && $validated['initial_payment'] > 0) {
                     SpecialOrderPayment::create([
                         'special_order_id' => $order->id,
                         'payment_method_id' => $validated['payment_method_id'],
                         'amount' => $validated['initial_payment'],
                         'user_id' => auth()->id(),
                         'notes' => 'عربون',
+                    ]);
+                    $totalPaid = $validated['initial_payment'];
+                }
+
+                if ($totalPaid > 0) {
+                    $order->update([
+                        'paid_amount' => $totalPaid,
+                        'remaining_amount' => $validated['total_amount'] - $totalPaid,
                     ]);
                 }
 
@@ -1006,6 +1089,28 @@ class CashierController extends Controller
             ->findOrFail($id);
 
         return view('cashier.special-order-print', compact('order'));
+    }
+
+    public function updateSpecialOrderStatus(Request $request, $id)
+    {
+        $order = SpecialOrder::findOrFail($id);
+        $validated = $request->validate(['status' => 'required|in:delivered']);
+
+        if ($order->status === 'delivered' || $order->status === 'cancelled') {
+            return response()->json(['success' => false, 'message' => 'لا يمكن تغيير الحالة']);
+        }
+
+        $order->status = $validated['status'];
+        $order->save();
+
+        $statusNames = SpecialOrder::getStatuses();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم تغيير الحالة',
+            'status' => $order->status,
+            'status_name' => $statusNames[$order->status] ?? $order->status,
+        ]);
     }
 
     public function cancelSpecialOrder($id)

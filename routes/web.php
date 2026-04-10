@@ -125,6 +125,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/sales/print', [SalesReportController::class, 'print'])->name('sales.print');
         Route::get('/sales/print/products', [SalesReportController::class, 'printProducts'])->name('sales.print.products');
         Route::get('/sales/print/single-product', [SalesReportController::class, 'printSingleProduct'])->name('sales.print.single-product');
+        Route::get('/sales/breakdown', [SalesReportController::class, 'breakdownData'])->name('sales.breakdown');
         Route::get('/sales/special-orders/data', [SalesReportController::class, 'specialOrdersData'])->name('sales.special-orders.data');
         Route::get('/sales/special-orders/summary', [SalesReportController::class, 'specialOrdersSummary'])->name('sales.special-orders.summary');
         Route::get('/sales/special-orders/export', [SalesReportController::class, 'exportSpecialOrdersExcel'])->name('sales.special-orders.export');
@@ -142,6 +143,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->group(function () {
     Route::get('/', [CashierController::class, 'index'])->name('index');
     Route::post('/fetch-order', [CashierController::class, 'fetchOrder'])->name('fetch-order');
+    Route::get('/pending-orders', [CashierController::class, 'pendingOrders'])->name('pending-orders');
+    Route::get('/today-orders', [CashierController::class, 'todayOrders'])->name('today-orders');
+    Route::get('/reprint/{orderNumber}', [CashierController::class, 'reprintOrder'])->name('reprint');
     Route::post('/new-invoice', [CashierController::class, 'newInvoice'])->name('new-invoice');
     Route::post('/find-by-barcode', [CashierController::class, 'findByBarcode'])->name('find-by-barcode');
     Route::post('/add-item-to-order', [CashierController::class, 'addItemToOrder'])->name('add-item-to-order');
@@ -168,6 +172,7 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::post('/special-orders/payment', [CashierController::class, 'addSpecialOrderPayment'])->name('special-orders.payment');
     Route::get('/special-orders/{id}/print', [CashierController::class, 'printSpecialOrder'])->name('special-orders.print');
     Route::post('/special-orders/{id}/cancel', [CashierController::class, 'cancelSpecialOrder'])->name('special-orders.cancel');
+    Route::post('/special-orders/{id}/status', [CashierController::class, 'updateSpecialOrderStatus'])->name('special-orders.status');
 
     Route::post('/fetch-order-for-merge', [CashierController::class, 'fetchOrderForMerge'])->name('fetch-order-for-merge');
     Route::post('/merge-orders', [CashierController::class, 'mergeOrders'])->name('merge-orders');
