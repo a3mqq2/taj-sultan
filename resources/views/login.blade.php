@@ -12,9 +12,6 @@
         <!-- IBM Plex Sans Arabic Font (Local) -->
         <link href="{{ asset('assets/fonts/ibm-plex-arabic/ibm-plex-arabic.css') }}" rel="stylesheet">
 
-        <!-- Theme Config Js -->
-        <script src="{{ asset('assets/js/config.js') }}"></script>
-
         <!-- Vendor css -->
         <link href="{{ asset('assets/css/vendors.min.css') }}" rel="stylesheet" type="text/css" />
 
@@ -163,7 +160,10 @@
                                             </div>
 
                                             <div class="d-grid gap-2">
-                                                <button type="submit" class="btn btn-primary fw-semibold py-2">دخول</button>
+                                                <button type="submit" class="btn btn-primary fw-semibold py-2" id="loginBtn">
+                                                    <span id="loginText">دخول</span>
+                                                    <span id="loginSpinner" style="display:none;"><span class="spinner-border spinner-border-sm me-1"></span>جاري الدخول...</span>
+                                                </button>
                                                 <button type="button" class="btn btn-outline-danger fw-semibold py-2" onclick="closeWindow()">
                                                     <i class="ti ti-x me-1"></i> إغلاق
                                                 </button>
@@ -184,12 +184,29 @@
             </div>
         </div>
 
-        <!-- Vendor js -->
-        <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
-
-        <!-- App js -->
-        <script src="{{ asset('assets/js/app.js') }}"></script>
         <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var loginInput = document.getElementById('userLogin');
+            var passInput = document.getElementById('userPassword');
+            var form = document.querySelector('form');
+
+            loginInput.focus();
+
+            loginInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    passInput.focus();
+                }
+            });
+
+            form.addEventListener('submit', function() {
+                var btn = document.getElementById('loginBtn');
+                btn.disabled = true;
+                document.getElementById('loginText').style.display = 'none';
+                document.getElementById('loginSpinner').style.display = '';
+            });
+        });
+
         function closeWindow() {
             if (window.electronAPI && window.electronAPI.closeWindow) {
                 window.electronAPI.closeWindow();
