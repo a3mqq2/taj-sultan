@@ -175,11 +175,11 @@
                                     <i class="ti ti-chevron-down align-middle d-none d-lg-inline"></i>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end">
-                                    <form method="POST" action="{{ route('logout') }}">
+                                    <form method="POST" action="{{ route('logout') }}" onsubmit="this.querySelector('button').disabled=true;this.querySelector('.logout-text').style.display='none';this.querySelector('.logout-spin').style.display='';">
                                         @csrf
                                         <button type="submit" class="dropdown-item fw-semibold">
-                                            <i class="ti ti-logout me-1 fs-lg align-middle"></i>
-                                            <span class="align-middle">تسجيل الخروج</span>
+                                            <span class="logout-text"><i class="ti ti-logout me-1 fs-lg align-middle"></i><span class="align-middle">تسجيل الخروج</span></span>
+                                            <span class="logout-spin" style="display:none;"><span class="spinner-border spinner-border-sm me-1"></span><span class="align-middle">جاري الخروج...</span></span>
                                         </button>
                                     </form>
                                 </div>
