@@ -1388,8 +1388,9 @@
                 <button class="modal-close" onclick="closePendingModal()"><i class="ti ti-x"></i></button>
             </div>
             <div id="pendingList" style="max-height:400px;overflow-y:auto;"></div>
-            <div class="shortcuts-hint" style="margin-top:12px;">
-                انقر على فاتورة لفتحها &bull; <kbd>Esc</kbd> إغلاق
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;">
+                <div class="shortcuts-hint">انقر على فاتورة لفتحها &bull; <kbd>Esc</kbd> إغلاق</div>
+                <button id="deleteAllPendingBtn" onclick="deleteAllPendingOrders()" style="display:none;background:#fee2e2;border:none;border-radius:8px;padding:6px 14px;color:#dc2626;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;"><i class="ti ti-trash"></i> حذف الكل</button>
             </div>
         </div>
     </div>
@@ -3267,9 +3268,11 @@ ${creditHtml}
                     badge.style.display = 'flex';
                     pendingOrdersData = data.data;
                     pendingOrderIndex = 0;
+                    document.getElementById('deleteAllPendingBtn').style.display = 'flex';
                     renderPendingList();
                 } else {
                     document.getElementById('pendingCount').style.display = 'none';
+                    document.getElementById('deleteAllPendingBtn').style.display = 'none';
                     document.getElementById('pendingList').innerHTML = '<div class="held-empty"><i class="ti ti-checks" style="font-size:32px;display:block;margin-bottom:8px;color:#10b981;"></i>لا توجد فواتير غير مسددة</div>';
                 }
             } catch (err) {
@@ -3281,8 +3284,8 @@ ${creditHtml}
             const container = document.getElementById('pendingList');
             container.innerHTML = pendingOrdersData.map(function(o, idx) {
                 const isSelected = idx === pendingOrderIndex;
-                return '<div class="held-item" id="pendingOrder' + idx + '" onclick="loadPendingOrder(\'' + o.order_number + '\')" style="border-color:' + (isSelected ? '#64748b' : '#e2e8f0') + ';background:' + (isSelected ? '#f1f5f9' : '#f8fafc') + ';">' +
-                    '<div class="held-item-info" style="flex:1;">' +
+                return '<div class="held-item" id="pendingOrder' + idx + '" style="border-color:' + (isSelected ? '#64748b' : '#e2e8f0') + ';background:' + (isSelected ? '#f1f5f9' : '#f8fafc') + ';display:flex;align-items:center;gap:8px;">' +
+                    '<div class="held-item-info" style="flex:1;cursor:pointer;" onclick="loadPendingOrder(\'' + o.order_number + '\')">' +
                         '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
                             '<div class="held-item-total">#' + o.order_number + '</div>' +
                             '<div class="held-item-meta">' + o.date + ' ' + o.created_at + '</div>' +
@@ -3294,12 +3297,99 @@ ${creditHtml}
                             '<span style="font-weight:700;color:#1e293b;">' + o.total + ' د.ل</span>' +
                         '</div>' +
                     '</div>' +
+                    '<button onclick="deletePendingOrder(' + o.id + ', \'' + o.order_number + '\')" style="flex-shrink:0;background:#fee2e2;border:none;border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#dc2626;" title="حذف الفاتورة"><i class="ti ti-trash" style="font-size:18px;"></i></button>' +
                 '</div>';
             }).join('');
 
             if (pendingOrderIndex >= 0) {
                 const el = document.getElementById('pendingOrder' + pendingOrderIndex);
                 if (el) el.scrollIntoView({ block: 'nearest' });
+            }
+        }
+
+        async function deletePendingOrder(id, orderNumber) {
+            const result = await Swal.fire({
+                title: 'حذف الفاتورة',
+                text: 'هل تريد حذف الفاتورة #' + orderNumber + '؟ لا يمكن التراجع.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'حذف',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                reverseButtons: true,
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/delete-invoice/' + id, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'تم الحذف', text: data.message, timer: 1500, showConfirmButton: false });
+                    pendingOrdersData = pendingOrdersData.filter(function(o) { return o.id !== id; });
+                    pendingOrderIndex = Math.min(pendingOrderIndex, pendingOrdersData.length - 1);
+                    if (pendingOrdersData.length === 0) {
+                        document.getElementById('pendingList').innerHTML = '<div class="held-empty"><i class="ti ti-checks" style="font-size:32px;display:block;margin-bottom:8px;color:#10b981;"></i>لا توجد فواتير غير مسددة</div>';
+                        const badge = document.getElementById('pendingCount');
+                        badge.style.display = 'none';
+                    } else {
+                        renderPendingList();
+                        const badge = document.getElementById('pendingCount');
+                        badge.textContent = pendingOrdersData.length;
+                    }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: data.message });
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'خطأ', text: 'تعذر الاتصال بالخادم' });
+            }
+        }
+
+        async function deleteAllPendingOrders() {
+            const result = await Swal.fire({
+                title: 'حذف جميع الفواتير',
+                text: 'هل تريد حذف جميع الفواتير غير المسددة (' + pendingOrdersData.length + ')؟ لا يمكن التراجع.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'حذف الكل',
+                cancelButtonText: 'إلغاء',
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                reverseButtons: true,
+            });
+
+            if (!result.isConfirmed) return;
+
+            try {
+                const res = await fetch(BASE_URL + '/cashier/delete-all-pending', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    Swal.fire({ icon: 'success', title: 'تم الحذف', text: data.message, timer: 1500, showConfirmButton: false });
+                    pendingOrdersData = [];
+                    pendingOrderIndex = -1;
+                    document.getElementById('pendingList').innerHTML = '<div class="held-empty"><i class="ti ti-checks" style="font-size:32px;display:block;margin-bottom:8px;color:#10b981;"></i>لا توجد فواتير غير مسددة</div>';
+                    document.getElementById('pendingCount').style.display = 'none';
+                    document.getElementById('deleteAllPendingBtn').style.display = 'none';
+                } else {
+                    Swal.fire({ icon: 'error', title: 'خطأ', text: data.message });
+                }
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'خطأ', text: 'تعذر الاتصال بالخادم' });
             }
         }
 

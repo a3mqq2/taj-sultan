@@ -1180,6 +1180,18 @@ class CashierController extends Controller
         ]);
     }
 
+    public function deleteAllPending()
+    {
+        $count = Order::pending()->whereNull('merged_into')->count();
+
+        Order::pending()->whereNull('merged_into')->update(['status' => 'cancelled']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'تم إلغاء ' . $count . ' فاتورة',
+        ]);
+    }
+
     public function deleteInvoice($id)
     {
         $order = Order::with(['items', 'payments'])->find($id);

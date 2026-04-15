@@ -178,6 +178,7 @@ Route::prefix('cashier')->name('cashier.')->middleware(['auth', 'cashier'])->gro
     Route::post('/merge-orders', [CashierController::class, 'mergeOrders'])->name('merge-orders');
     Route::post('/find-invoice', [CashierController::class, 'findInvoice'])->name('find-invoice');
     Route::post('/delete-invoice/{id}', [CashierController::class, 'deleteInvoice'])->name('delete-invoice');
+    Route::post('/delete-all-pending', [CashierController::class, 'deleteAllPending'])->name('delete-all-pending');
     Route::post('/verify-cancel-code', [SettingController::class, 'verifyCancelCode'])->name('verify-cancel-code');
 
     Route::get('/deliveries', [CashierController::class, 'deliveries'])->name('deliveries');
