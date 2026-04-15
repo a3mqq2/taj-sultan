@@ -57,6 +57,15 @@ line-height:1;
 text-align:center;
 }
 
+.barcode-price{
+font-family:Arial,sans-serif;
+font-size:10px;
+font-weight:bold;
+margin-top:1mm !important;
+line-height:1;
+text-align:center;
+}
+
 .no-print{
 text-align:center;
 padding:20px !important;
@@ -115,6 +124,10 @@ background:white;
 </div>
 
 <div class="barcode-text">{{ $barcode }}</div>
+
+@if($price !== null)
+<div class="barcode-price">{{ number_format($price, 3) }} د.ل</div>
+@endif
 
 </div>
 

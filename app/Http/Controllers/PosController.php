@@ -167,6 +167,8 @@ class PosController extends Controller
 
     public function sticker(string $slug, string $barcode)
     {
-        return view('pos.sticker', compact('barcode'));
+        $order = Order::where('order_number', $barcode)->first();
+        $price = $order ? $order->total : null;
+        return view('pos.sticker', compact('barcode', 'price'));
     }
 }
