@@ -21,9 +21,6 @@ height:30mm;
 
 body{
 font-family:Arial,sans-serif;
-display:flex;
-align-items:center;
-justify-content:center;
 }
 
 .barcode-item{
@@ -32,15 +29,9 @@ height:30mm;
 display:flex;
 flex-direction:column;
 align-items:center;
-justify-content:center;
-padding:2mm;
+justify-content:flex-start;
+padding-top:4mm;
 overflow:hidden;
-}
-
-.barcode{
-display:flex;
-align-items:center;
-justify-content:center;
 }
 
 .barcode svg{
@@ -52,8 +43,7 @@ height:16mm;
 font-family:monospace;
 font-size:9px;
 font-weight:bold;
-margin-top:-2mm !important;
-line-height:1;
+margin-top:1mm !important;
 text-align:center;
 }
 
@@ -62,7 +52,6 @@ font-family:Arial,sans-serif;
 font-size:10px;
 font-weight:bold;
 margin-top:1mm !important;
-line-height:1;
 text-align:center;
 }
 
@@ -81,15 +70,12 @@ width:35mm !important;
 height:30mm !important;
 margin:0 !important;
 padding:0 !important;
-display:flex;
-align-items:center;
-justify-content:center;
 }
 
 .barcode-item{
 width:35mm !important;
 height:30mm !important;
-padding:2mm !important;
+padding-top:4mm !important;
 }
 
 @page{
@@ -135,18 +121,18 @@ background:white;
 JsBarcode("#barcode","{{ $barcode }}",{
 format:"CODE128",
 width:0.7,
-height:18,
+height:16,
 displayValue:false,
 margin:0
 });
 
-window.onload = function(){
+window.onload=function(){
 setTimeout(function(){
 window.print();
 },300);
 };
 
-window.onafterprint = function(){
+window.onafterprint=function(){
 window.close();
 };
 </script>
