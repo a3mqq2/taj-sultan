@@ -48,17 +48,19 @@ height:16mm;
 font-family:monospace;
 font-size:8px;
 font-weight:bold;
-margin-top:1mm !important;
+margin-top:0 !important;
 text-align:center;
 letter-spacing:0.5px;
+line-height:1;
 }
 
 .barcode-price{
 font-family:Arial,sans-serif;
 font-size:10px;
 font-weight:bold;
-margin-top:1mm !important;
+margin-top:0.3mm !important;
 text-align:center;
+line-height:1;
 }
 
 .no-print{
