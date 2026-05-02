@@ -15,8 +15,8 @@ box-sizing:border-box;
 html,body{
 margin:0 !important;
 padding:0 !important;
-width:35mm;
-height:30mm;
+width:30mm;
+height:35mm;
 }
 
 body{
@@ -24,41 +24,40 @@ font-family:Arial,sans-serif;
 }
 
 .barcode-item{
-width:35mm;
-height:30mm;
+width:30mm;
+height:35mm;
 display:flex;
 flex-direction:column;
 align-items:center;
-justify-content:flex-start;
-padding-top:3.5mm;
+justify-content:center;
 overflow:hidden;
 }
 
 .barcode{
-margin-left:1.5mm;
 display:flex;
 align-items:center;
 justify-content:center;
 }
 
 .barcode svg{
-width:30mm;
-height:15mm;
+width:28mm;
+height:16mm;
 }
 
 .barcode-text{
 font-family:monospace;
-font-size:9px;
+font-size:8px;
 font-weight:bold;
-margin-top:0.5mm !important;
+margin-top:1mm !important;
 text-align:center;
+letter-spacing:0.5px;
 }
 
 .barcode-price{
 font-family:Arial,sans-serif;
 font-size:10px;
 font-weight:bold;
-margin-top:0.5mm !important;
+margin-top:1mm !important;
 text-align:center;
 }
 
@@ -73,20 +72,19 @@ display:none !important;
 }
 
 html,body{
-width:35mm !important;
-height:30mm !important;
+width:30mm !important;
+height:35mm !important;
 margin:0 !important;
 padding:0 !important;
 }
 
 .barcode-item{
-width:35mm !important;
-height:30mm !important;
-padding-top:3.5mm !important;
+width:30mm !important;
+height:35mm !important;
 }
 
 @page{
-size:35mm 30mm;
+size:30mm 35mm;
 margin:0 !important;
 }
 }
@@ -107,7 +105,7 @@ background:white;
 <button onclick="window.print()" style="padding:10px 30px;font-size:16px;cursor:pointer;">
 طباعة
 </button>
-<p style="margin-top:10px;color:#666;">35mm x 30mm</p>
+<p style="margin-top:10px;color:#666;">30mm x 35mm</p>
 </div>
 
 <div class="barcode-item">
@@ -127,8 +125,8 @@ background:white;
 <script>
 JsBarcode("#barcode","{{ $barcode }}",{
 format:"CODE128",
-width:0.6,
-height:15,
+width:0.7,
+height:16,
 displayValue:false,
 margin:0
 });
