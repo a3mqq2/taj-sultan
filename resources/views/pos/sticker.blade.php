@@ -34,14 +34,15 @@ overflow:hidden;
 }
 
 .barcode{
-display:flex;
-align-items:center;
-justify-content:center;
+display:block;
+line-height:0;
+font-size:0;
 }
 
 .barcode svg{
-width:28mm;
-height:16mm;
+width:29mm;
+height:18mm;
+display:block;
 }
 
 .barcode-text{
@@ -127,8 +128,8 @@ background:white;
 <script>
 JsBarcode("#barcode","{{ $barcode }}",{
 format:"CODE128",
-width:0.7,
-height:16,
+width:2,
+height:60,
 displayValue:false,
 margin:0
 });
